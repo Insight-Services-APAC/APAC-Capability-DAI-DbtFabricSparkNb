@@ -70,6 +70,7 @@ def GenerateMasterNotebook(project_root):
         # Write the notebook to a file
         with open(notebook_dir + f'master_notebook_{sort_order}.ipynb', 'w') as f:
             nbf.write(nb, f)
+            print (f"master_notebook_{sort_order}.ipynb created")
 
 
     #Create the master notebook
@@ -88,6 +89,7 @@ def GenerateMasterNotebook(project_root):
     # Write the notebook to a file
     with open(notebook_dir + f'master_notebook.ipynb', 'w') as f:
         nbf.write(nb, f)
+        print (f"master_notebook.ipynb created")
 
 @staticmethod
 def GetManifest():
