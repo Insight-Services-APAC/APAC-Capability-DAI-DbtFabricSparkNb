@@ -450,7 +450,8 @@ class SparkAdapter(SQLAdapter):
 
         # Inject the JSON into the SQL as a comment
         sql = '/*{"project_root": "'+ project_root + '"}*/' + f'\n{sql}'
-            
+        
+        print("sql is ", sql)
 
         return self.connections.execute(sql=sql, auto_begin=auto_begin, fetch=fetch, limit=limit)
     

@@ -29,8 +29,8 @@ os.environ['DBT_PROJECT_DIR'] = "./testproj"
 
 #v = dbt.tests.util.get_project_config()
 
-dbt.tests.util.run_dbt(['run'])
+dbt.tests.util.run_dbt(['seed'])
 
-utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
+#utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
 
 
