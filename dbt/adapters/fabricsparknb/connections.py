@@ -219,6 +219,9 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
     abridge_sql_log: bool = False,
 ) -> Tuple[Connection, Any]:
         
+        if(sql.__contains__('/*FABRICSPARKNB_ALERT:')):
+            raise dbt.exceptions.DbtRuntimeError(sql)            
+
         connection = self.get_thread_connection()
         if(dbt.adapters.fabricsparknb.utils.CheckSqlForModelCommentBlock(sql) == False):
             sql = self._add_query_comment(sql)
