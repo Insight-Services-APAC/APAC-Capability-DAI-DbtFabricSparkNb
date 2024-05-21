@@ -415,7 +415,7 @@ class LivyCursor:
         #print(sql)
 
         
-       
+        sql = sql % parameters
 
         # Extract the comments from the SQL
         comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
@@ -430,11 +430,16 @@ class LivyCursor:
                 pass
 
         # Print the JSON objects        
-        print(merged_json)    
+        #print(merged_json)    
 
         # Extract the node_id
-        node_id = merged_json['node_id']
+        if 'node_id' in merged_json.keys():
+            node_id = merged_json['node_id']
+        else:
+            print("Node ID not found in the SQL")
+            print(sql)
         
+       
         project_root = merged_json['project_root']
         notebook_dir = f'{project_root}/target/notebooks/'
         # Use the node_id as the filename
@@ -464,8 +469,22 @@ class LivyCursor:
         with open(filename, 'w') as f:
             nbf.write(nb, f)
 
-        self._rows = []
-        self._schema = []
+         # If node_id begins with 'test.' then it is a test node and we should return failures, should_warn, should_error
+        if node_id.startswith('test.'):
+            self._rows = [[0,0,0]]
+            self._schema = []
+
+            for c in ['failures', 'should_warn', 'should_error']:
+                col = {}
+                col["name"] = c
+                col["type"] = 'int'
+                col["nullable"] = True
+                self._schema.append(col)
+
+        else:        
+            self._rows = []
+            self._schema = []
+        
         self.executed.append(node_id)
         
         return

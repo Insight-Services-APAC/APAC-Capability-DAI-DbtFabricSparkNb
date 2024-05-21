@@ -1,4 +1,7 @@
 from colorama import init
+import dbt.adapters.fabricspark
+import dbt.utils
+import dbt.adapters
 import dbt.adapters.fabricsparknb.mock as mock
 import dbt.adapters.fabricspark.connections as fs_connections
 from contextlib import contextmanager
@@ -207,6 +210,7 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
         logger.debug(f"SPARK VERSION {os.getenv('DBT_SPARK_VERSION')}")
 
 
+
     def add_query(
     self,
     sql: str,
@@ -216,6 +220,10 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
 ) -> Tuple[Connection, Any]:
         
         connection = self.get_thread_connection()
+        if(dbt.adapters.fabricsparknb.utils.CheckSqlForModelCommentBlock(sql) == False):
+            sql = self._add_query_comment(sql)
+            sql = '/*{"project_root": "'+ self.profile.project_root + '"}*/' + f'\n{sql}'
+
         if auto_begin and connection.transaction_open is False:
             self.begin()
         fire_event(ConnectionUsed(conn_type=self.TYPE, conn_name=connection.name))
