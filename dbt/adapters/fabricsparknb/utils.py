@@ -84,7 +84,7 @@ def GenerateMasterNotebook(project_root):
         template = env.get_template('master_notebook.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
