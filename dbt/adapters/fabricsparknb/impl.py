@@ -1,3 +1,58 @@
+# Document this file including a listing of methods and classes, and a description of the file's purpose.
+
+# This file contains the implementation of the SparkAdapter class, which is a subclass of the SQLAdapter class. 
+# The SparkAdapter class is used to interact with Spark databases. 
+# The SparkAdapter class provides methods for executing SQL queries, listing schemas, listing relations, getting columns in a relation, and getting a relation. The SparkAdapter class also provides methods for converting agate table types to Spark types, and for converting agate table columns to Spark columns. The SparkAdapter class also provides methods for parsing relation information, and for building Spark relations. The SparkAdapter class also provides methods for getting the catalog, and for checking if a schema exists. The SparkAdapter class also provides methods for getting rows different SQL, and for standardizing grants dictionaries. The SparkAdapter class also provides a method for debugging queries.
+
+# Create a mermaid class diagram:
+# classDiagram
+#     class FabricSparkAdapter {
+#         -COLUMN_NAMES
+#         -INFORMATION_COLUMNS_REGEX
+#         -INFORMATION_OWNER_REGEX
+#         -INFORMATION_STATISTICS_REGEX
+#         -HUDI_METADATA_COLUMNS
+#         -CONSTRAINT_SUPPORT
+#         -Relation
+#         -RelationInfo
+#         -Column
+#         -ConnectionManager
+#         -AdapterSpecificConfigs
+#         +date_function()
+#         +convert_text_type()
+
+#         +convert_number_type()
+#         +convert_integer_type()
+#         +convert_date_type()
+#         +convert_time_type()
+#         +convert_datetime_type()
+#         +quote()
+#         +_get_relation_information()
+#         +_get_relation_information_using_describe()
+#         +_build_spark_relation_list()
+#         +get_relation()
+#         +parse_describe_extended()
+#         +find_table_information_separator()
+#         +get_columns_in_relation()
+#         +parse_columns_from_information()
+#         +_get_columns_for_catalog()
+#         +get_catalog()
+#         +execute()
+#         +list_schemas()
+#         +check_schema_exists()
+#         +get_rows_different_sql()
+#         +standardize_grants_dict()
+#         +debug_query()
+#     }
+
+
+
+
+
+
+
+
+
 from gettext import Catalog
 import dbt.adapters.fabricspark.connections as fs_connections
 import dbt.adapters.fabricsparknb.catalog as catalog
@@ -450,7 +505,8 @@ class SparkAdapter(SQLAdapter):
 
         # Inject the JSON into the SQL as a comment
         sql = '/*{"project_root": "'+ project_root + '"}*/' + f'\n{sql}'
-            
+        
+        #print("sql is ", sql)
 
         return self.connections.execute(sql=sql, auto_begin=auto_begin, fetch=fetch, limit=limit)
     

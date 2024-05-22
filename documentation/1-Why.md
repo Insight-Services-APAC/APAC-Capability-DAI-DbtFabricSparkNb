@@ -1,0 +1,134 @@
+
+# Objective of this project
+
+This project is the result of a search to find a tool that would accelerate the development and ongoing maintenance processes relating to data transformation activities within a software-as-a-service (SAAS) aligend lakehouse architecture and technology stack.
+
+When designing this project the core, **"must have"** requirements were to:
+
+1) Minimise the effort required to **`track lineage and dependencies`** between data transformation activities
+
+2) Minimise the effort required to create, maintain and update **`data transformation activities`**
+
+3) Minimise the effort required to **`document data transformation activities`**
+
+4) Minimise the effort required to **`create and maintain a data catalog`** of the entities created by data transformation activities
+
+5) Be compatable with a **`Software-As-A-Service (SAAS) technology stack`** and avoid the neeed for platform as a Service (PaaS) components
+
+6) **`Avoid locking-in transformation logic`** into specific vendor proprietry language or technology stack.
+
+7) Minimise the effort required to **`test data transformation activities`**
+
+Secondary **"nice to have"** requirements were:
+
+1) Minimise the effort required to create, maintain, update and execute **`data quality checks`**
+
+2) **`Automate the generation of data transformation activities`** from a data lineage and dependencies
+
+# Discovering our approach
+
+After reviewing the available tools and technologies and considering the requirements it soon became clear to us that [Dbt-Core ](https://github.com/dbt-labs/dbt-core) appeared to be good fit for our needs. However, there were some limitations that we needed to address:
+
+1) Dbt-Core is a command line tool and all of its adapters appeared to require some **`Platform as a Service (PaaS) comoponents`** to be introduced into the technology stack in order to host a secure "python" runtime environement. This was not compatable with our requirement for a Software-As-A-Service (SAAS) technology stack.
+
+2) Dbt-Core **`combined code build, test and deployment with re-occuring data pipeline execution`**. This requires Dbt-core to be run everytime a data pipeline needs to be refreshed regardless of whether underlying changes to business logic have been made.
+
+3) Dbt-Core rose to popularity as a tool for data transformation at a time when data warehouses and relational dataabses were the predominant transformation engines. There seemed to be some uncertainty as to how it would  perform in the context of a SAAS, lakehouse architecture. Dbt-Core can be quite "chatty" and create multiple connections to the transformation engine. This could be a problem in a SAAS environment where the number of connections may be limited. In addition, code execution against a lakehouse architecture tend to incur higher latency than traditional data warehouses. It is plausible to expect that Dbt-Core's deafult behaviour of creating multiple connections and executing a large number of separate and distinct code blocks would result in relatively long project run times and a degraded developer experience.
+
+4) Dbt-core might be considered to be a "heavy" tool for some use cases. It is a large codebase with a lot of functionality. It is possible that some users may find it difficult to understand and use.
+
+# Dbt Child Adapter
+
+
+```mermaid
+classDiagram
+    BaseAdapter <|-- SparkAdapter : Inheritance
+    SparkAdapter <|-- FabricSparkAdapter : Inheritance
+    namespace Adapter {
+    class BaseAdapter{
+        +get_columns_in_relation(relation)
+        +get_missing_columns(from_relation, to_relation)
+        +expand_target_column_types(temp_table, to_relation)
+        +list_relations_without_caching(schema)
+        +drop_relation(relation)
+        +truncate_relation(relation)
+        +rename_relation(from_relation, to_relation)
+        +get_relation(database, schema, identifier)
+        +create_schema(schema)
+        +drop_schema(schema)
+        +quote(identifier)
+        +convert_text_type()
+        +convert_number_type()
+        +convert_boolean_type()
+        +convert_datetime_type()
+        +convert_date_type()
+        +convert_time_type()
+        +get_rows_different_sql()
+        +get_merge_sql()
+        +get_distinct_sql()
+        +date_function()
+    }
+    
+    class SparkAdapter{
+        +get_columns_in_relation(relation)
+        +get_missing_columns(from_relation, to_relation)
+        +expand_target_column_types(temp_table, to_relation)
+        +list_relations_without_caching(schema)
+        +drop_relation(relation)
+        +truncate_relation(relation)
+        +rename_relation(from_relation, to_relation)
+        +get_relation(database, schema, identifier)
+        +create_schema(schema)
+        +drop_schema(schema)
+        +quote(identifier)
+        +convert_text_type()
+        +convert_number_type()
+        +convert_boolean_type()
+        +convert_datetime_type()
+        +convert_date_type()
+        +convert_time_type()
+        +get_rows_different_sql()
+        +get_merge_sql()
+        +get_distinct_sql()
+        +date_function()
+    }
+    class FabricSparkAdapter {
+         -COLUMN_NAMES
+         -INFORMATION_COLUMNS_REGEX
+         -INFORMATION_OWNER_REGEX
+         -INFORMATION_STATISTICS_REGEX
+         -HUDI_METADATA_COLUMNS
+         -CONSTRAINT_SUPPORT
+         -Relation
+         -RelationInfo
+         -Column
+         -ConnectionManager
+         -AdapterSpecificConfigs
+         
+         +_get_relation_information()
+         +_get_relation_information_using_describe()
+         +_build_spark_relation_list()
+         +get_relation()
+         +parse_describe_extended()
+         +find_table_information_separator()
+         +get_columns_in_relation()
+         +parse_columns_from_information()
+         +_get_columns_for_catalog()
+         +get_catalog()
+         +execute()
+         +list_schemas()
+         +check_schema_exists()
+         +get_rows_different_sql()
+         +standardize_grants_dict()
+         +debug_query()
+
+         +date_function()
+         +convert_text_type()
+         +convert_number_type()
+         +convert_integer_type()
+         +convert_date_type()
+         +convert_time_type()
+         +convert_datetime_type()
+         +quote()
+     }
+    }

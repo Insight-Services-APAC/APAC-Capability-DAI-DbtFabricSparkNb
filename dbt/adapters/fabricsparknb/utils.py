@@ -1,4 +1,6 @@
 
+import re
+import dbt.logger
 from jinja2 import Environment, FileSystemLoader
 import nbformat as nbf
 import os
@@ -11,6 +13,7 @@ import dbt
 import copy
 import dbt.adapters.fabricspark
 import dbt.adapters.fabricsparknb 
+import dbt.logger as logger
 from dbt.adapters.fabricsparknb import utils as utils 
 import dbt.tests
 import os
@@ -19,6 +22,25 @@ from dbt.contracts.graph.manifest import Manifest
 from dbt.clients.system import load_file_contents
 
 
+@staticmethod 
+def CheckSqlForModelCommentBlock(sql) -> bool:
+    # Extract the comments from the SQL
+    comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
+
+    # Convert each comment to a JSON object
+    merged_json = {}
+    for comment in comments:
+        try:
+            json_object = json.loads(comment)
+            merged_json.update(json_object)
+        except json.JSONDecodeError:
+            logger.logger.error('Could not parse comment as JSON')
+            pass
+    
+    if 'node_id' in merged_json.keys():
+        return True
+    else:
+        return False
 
 
 @staticmethod
@@ -112,7 +134,41 @@ def SortManifest(nodes_orig):
     sort_order = 0
     while nodes:
         # Find nodes that have no dependencies within the remaining nodes
-        nodes_without_deps = [node_id for node_id, node in nodes.items() if not any(dep in nodes for dep in node.depends_on.nodes)]
+        #nodes_without_deps = [node_id for node_id, node in nodes.items() if not any(dep in nodes for dep in node.depends_on.nodes)]
+        
+        # Initialize an empty list to store the node_ids
+        nodes_without_deps = []
+
+        # Iterate over the items in the nodes dictionary
+        for node_id, node in nodes.items():
+            # Initialize a flag to indicate whether a dependency is found
+            has_dependency = False
+
+            # Check if the node has a depends_on attribute
+            if hasattr(node, 'depends_on'):
+                # Check if depends_on has a nodes attribute
+                if hasattr(node.depends_on, 'nodes'):
+                    # Iterate over the nodes in depends_on
+                    for dep in node.depends_on.nodes:
+                        # Check if the dependency is in nodes
+                        if dep in nodes:
+                            has_dependency = True
+                            break
+                else :
+                    # If the node has no depends_on attribute, it has no dependencies
+                    has_dependency = False
+                    print(f"Node {node_id} has no nodes attribute")
+            else :
+                # If the node has no depends_on attribute, it has no dependencies
+                has_dependency = False
+                print(f"Node {node_id} has no depends_on attribute")
+
+            # If no dependency was found, add the node_id to the list
+            if not has_dependency:
+                nodes_without_deps.append(node_id)
+        
+        
+        
         if not nodes_without_deps:
             raise Exception('Circular dependency detected')
         # Assign the current sort order to the nodes without dependencies
