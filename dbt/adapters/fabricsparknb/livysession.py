@@ -17,6 +17,10 @@ from azure.identity import AzureCliCredential, ClientSecretCredential
 from dbt.adapters.fabricspark.fabric_spark_credentials import SparkCredentials
 import nbformat as nbf
 
+import dbt.adapters
+import dbt.adapters.fabricsparknb
+import dbt.adapters.fabricsparknb.utils
+
 
 
 
@@ -454,20 +458,31 @@ class LivyCursor:
                 with open(filename, 'r') as f:
                     nb = nbf.read(f, as_version=4)
             else: 
-                nb = nbf.v4.new_notebook()
+                nb = None
         else:
-            nb = nbf.v4.new_notebook()
+            nb = None
+
+         
+        if node_id.startswith('test.'):
+            node_type = 'test'
+        else:
+            node_type = 'model'
+
+        mnb: dbt.adapters.fabricsparknb.utils.ModelNotebook = dbt.adapters.fabricsparknb.utils.ModelNotebook(nb=nb, node_type=node_type)
+        ssc = mnb.GetSparkSqlCells()
 
         # Create a new code cell with the SQL
         code = f"%%sql\n{sql}"
         cell = nbf.v4.new_code_cell(source=code)
 
         # Add the cell to the notebook
-        nb.cells.append(cell)
+        mnb.AddCell(cell)
+        mnb.GatherSql()
+        mnb.SetTheSqlVariable()
         
         # Write the notebook to a file
         with open(filename, 'w') as f:
-            nbf.write(nb, f)
+            nbf.write(mnb.nb, f)
 
          # If node_id begins with 'test.' then it is a test node and we should return failures, should_warn, should_error
         if node_id.startswith('test.'):
