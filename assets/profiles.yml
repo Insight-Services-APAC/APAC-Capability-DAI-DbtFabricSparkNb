@@ -1,0 +1,22 @@
+fabric-spark-testnb:
+  target: fabricspark-devnb
+  outputs:
+    fabricspark-devnb:
+      authentication: CLI
+      method: livy
+      connect_retries: 0
+      connect_timeout: 10
+      endpoint: https://api.fabric.microsoft.com/v1
+      workspaceid: bab084ca-748d-438e-94ad-405428bd5694
+      lakehouseid: ccb45a7d-60fc-447b-b1d3-713e05f55e9a
+      lakehouse: lakesales
+      lakehousedatapath: /Files/notebooks
+      schema: dbo
+      threads: 1
+      type: fabricsparknb
+      retry_all: true
+      fabricworkspacename: Fabric_AI_Test
+        
+        
+        
+       
