@@ -44,7 +44,6 @@ class Utils:
         Utils.export_resources(resource_type, azure_client_id, azure_tenant_id, azure_client_secret, synapse_workspace_name, output_folder)
 
     def import_notebooks(output_folder, workspace_id, prefix, notebook_names=None):
-        print("here33")
         date = datetime.now().strftime('%Y_%m_%dT%H_%M_%S')
         resource_type = "notebooks"
         res_imported = 0
@@ -59,9 +58,11 @@ class Utils:
         print(f"Importing individual resources of type '{resource_type}' into Fabric workspace '{workspace_id}'...")
         if notebook_names is None:
             notebook_names = [name.split('.')[0] for name in os.listdir(artifact_path) if name.endswith(".ipynb")]
-       
+        print("here1")
+        print(notebook_names)
+        print("here2")
         for notebook_name in notebook_names:
-            print("here33")
+            
             file_path = os.path.join(artifact_path, f"{notebook_name}.ipynb")
             if os.path.exists(file_path):
                 with open(file_path, "r", encoding='utf-8') as read_file:
