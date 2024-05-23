@@ -1,5 +1,6 @@
 
 import re
+from dataclasses import dataclass
 import dbt.logger
 from jinja2 import Environment, FileSystemLoader
 import nbformat as nbf
@@ -90,10 +91,10 @@ def GenerateMasterNotebook(project_root):
         env = Environment(loader=FileSystemLoader(template_dir))
 
         # Load the template
-        template = env.get_template('master_notebook.ipynb')
+        template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
@@ -103,14 +104,24 @@ def GenerateMasterNotebook(project_root):
             nbf.write(nb, f)
             print (f"master_notebook_{sort_order}.ipynb created")
 
+    # Define the directory containing the Jinja templates
+    template_dir = 'dbt/include/fabricsparknb/'
 
-    #Create the master notebook
-    nb = nbf.v4.new_notebook()
-    cell = nbf.v4.new_code_cell(source="import mssparkutils.notebook")
-    # Add the cell to the notebook
-    nb.cells.append(cell)
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('master_notebook.ipynb')
+
+    # Render the template with the notebook_file variable
+    rendered_template = template.render()
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
 
     for sort_order in range(min_sort_order, max_sort_order + 1):
+        cell = nbf.v4.new_markdown_cell(source=f"## Run Order {sort_order}")
+        nb.cells.append(cell)
         # Create a new code cell with the SQL
         code = 'mssparkutils.notebook.run("master_notebook_'+str(sort_order)+'")'
         cell = nbf.v4.new_code_cell(source=code)
@@ -121,6 +132,80 @@ def GenerateMasterNotebook(project_root):
     with open(notebook_dir + f'master_notebook.ipynb', 'w') as f:
         nbf.write(nb, f)
         print (f"master_notebook.ipynb created")
+
+
+class ModelNotebook:
+    def __init__(self, nb : nbf.NotebookNode = None, node_type = 'model'):        
+        if nb is None:
+            filename = f'dbt/include/fabricsparknb/{node_type}_notebook.ipynb'            
+            if os.path.exists(filename):
+                with open(filename, 'r') as f:
+                    nb = nbf.read(f, as_version=4)
+             
+        self.nb: nbf.NotebookNode = nb
+        self.sql: str = ""    
+
+    def AddSqlFromExistingNotebook(self, notebook):
+        for cell in notebook.cells:
+            if cell.cell_type == 'code' and "\\*FABRICSPARKNB: SQLSTART*\\" in cell.source and "\\*FABRICSPARKNB: SQLEND*\\" in cell.source:
+                # Define the pattern
+                pattern = r'/\*FABRICSPARKNB: SQLSTART\*/(.*?)/\*FABRICSPARKNB: SQLEND\*/'
+
+                # Search for the pattern in the SQL
+                match = re.search(pattern, cell.source, re.DOTALL)
+
+                # If a match was found, return the matched text; otherwise, return an empty string
+                old_sql = match.group(1) if match else ''
+                
+                self.sql = old_sql
+        
+
+    def AddSql(self, sql):
+        self.sql += '\n' + sql
+    
+    def AddCell(self, cell):        
+        # Add the cell to the notebook
+        self.nb.cells.append(cell)
+
+    def GatherSql(self):
+        #Concatenate all the SQL cells in the notebook
+        self.sql = ""
+        for cell in self.GetSparkSqlCells():
+            self.sql += '\n' + cell.source.replace("%%sql","")        
+    
+    def SetTheSqlVariable(self):
+        # Find the first code cell and set the sql variable
+        for i, cell in enumerate(self.nb.cells):
+            if cell.cell_type == 'markdown' and "# Declare the SQL" in cell.source:
+                target_cell = self.nb.cells[i+1]
+                target_cell.source = target_cell.source.replace("{{sql}}", self.sql)
+                break
+
+    def GetSparkSqlCells(self):
+        # Get the existing SQL Cell from the notebook. It will be the code cell following the markdown cell containing "# SPARK SQL Cell for Debugging"
+        spark_sql_cell = None
+        for i, cell in enumerate(self.nb.cells):
+            if cell.cell_type == 'markdown' and "# SPARK SQL Cells for Debugging" in cell.source:
+                spark_sql_cells = self.nb.cells[i+1:len(self.nb.cells)]
+        
+        return spark_sql_cells      
+
+    def Render(self):
+        # Define the directory containing the Jinja templates
+        template_dir = 'dbt/include/fabricsparknb/'
+
+        # Create a Jinja environment
+        env = Environment(loader=FileSystemLoader(template_dir))
+
+        # Load the template
+        template = env.get_template('model_notebook.ipynb')
+
+        # Render the template with the notebook_file variable
+        rendered_template = template.render(sql=self.sql.replace('\n',''))
+
+        # Parse the rendered template as a notebook
+        self.nb = nbf.reads(rendered_template, as_version=4)        
+
 
 @staticmethod
 def GetManifest():
