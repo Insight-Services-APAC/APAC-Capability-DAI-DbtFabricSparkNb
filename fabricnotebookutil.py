@@ -44,6 +44,7 @@ class Utils:
         Utils.export_resources(resource_type, azure_client_id, azure_tenant_id, azure_client_secret, synapse_workspace_name, output_folder)
 
     def import_notebooks(output_folder, workspace_id, prefix, notebook_names=None):
+        print("here33")
         date = datetime.now().strftime('%Y_%m_%dT%H_%M_%S')
         resource_type = "notebooks"
         res_imported = 0
