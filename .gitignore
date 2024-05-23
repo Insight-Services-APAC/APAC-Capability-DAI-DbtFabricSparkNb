@@ -30,6 +30,8 @@ test.env
 
 # Pyenv
 .python-version
+dbt-env/
+#test
 
 # pycharm
 .idea/
