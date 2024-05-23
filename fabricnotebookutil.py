@@ -68,7 +68,7 @@ class Utils:
                 with open(file_path, "r", encoding='utf-8') as read_file:
                     ntbk_json = json.load(read_file)
                 ntbk_name = f"{notebook_name}"
-                Utils.import_notebook(ntbk_name, ntbk_json, workspace_id, False)
+                Utils.import_notebook(ntbk_name, ntbk_json, workspace_id, True)
                 res_imported += 1
 
         resources_imported[resource_type] = res_imported
