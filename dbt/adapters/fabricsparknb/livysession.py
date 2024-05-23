@@ -246,7 +246,7 @@ class LivySession:
         nb.cells.append(cell)
 
         # Create the directory if it does not exist
-        os.makedirs('./target/notebooks/', exist_ok=True)
+        os.makedirs('/target/notebooks/', exist_ok=True)
 
         # Extract the JSON from the SQL comment
         if(re.search(r'/\* (.*) \*/', sql) is None):
@@ -262,7 +262,7 @@ class LivySession:
         node_id = data['node_id']
 
         # Use the node_id as the filename
-        filename = f'./target/notebooks/{node_id}.ipynb'
+        filename = f'/target/notebooks/{node_id}.ipynb'
 
 
         # Write the notebook to a file

@@ -56,7 +56,7 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
 @staticmethod
 def GenerateMasterNotebook(project_root):
     # Iterate through the notebooks directory and create a list of notebook files
-    notebook_dir = f'./{project_root}/target/notebooks/'
+    notebook_dir = f'/{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(notebook_dir) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
     manifest = GetManifest()

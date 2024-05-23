@@ -23,16 +23,17 @@ from collections import deque
 from dbt.config import RuntimeConfig
 from dbt.cli.flags import Flags, convert_config
 from dbt.cli.main import cli
+from pathlib import Path
 
 
 
 
-os.environ['DBT_PROJECT_DIR'] = "./testproj"
+os.environ['DBT_PROJECT_DIR'] = "testproj"
 
 dbt.tests.util.run_dbt(['build'])
 
 
-profile_path = Path(os.environ['USERPROFILE']) / '.dbt/'
+profile_path = Path(os.path.expanduser('~')) / '.dbt/'
 profile = dbt.config.profile.read_profile(profile_path)
 config = dbt.config.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
 profile_info = profile[config['profile']]
