@@ -58,10 +58,9 @@ class Utils:
         print(f"Importing individual resources of type '{resource_type}' into Fabric workspace '{workspace_id}'...")
         if notebook_names is None:
             notebook_names = [name.split('.')[0] for name in os.listdir(artifact_path) if name.endswith(".ipynb")]
-            print("here")
-            print(notebook_names)
-            print("here2")
+       
         for notebook_name in notebook_names:
+            print("here33")
             file_path = os.path.join(artifact_path, f"{notebook_name}.ipynb")
             if os.path.exists(file_path):
                 with open(file_path, "r", encoding='utf-8') as read_file:
