@@ -281,10 +281,11 @@ def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_pa
         file_client.upload_data(data, overwrite=True)
 
 @staticmethod
-def UploadAllNotebooks():
-    account_name = "onelake"
-    workspace_name = "Fabric_AI_Test"
-    data_path = "lakesales.Lakehouse/Files/notebooks"
+def UploadAllNotebooks(fabricworkspacename: str, datapath: str):
+    print("Started uploading to :"+fabricworkspacename+" file path "+datapath)
+    account_name = "onelake"  ##always this
+    workspace_name = fabricworkspacename       
+    data_path =  datapath           
     account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
     local_notebook_path = os.environ['DBT_PROJECT_DIR'] + '/target/notebooks'
     token_credential = DefaultAzureCredential()
@@ -295,6 +296,8 @@ def UploadAllNotebooks():
     for notebook in notebookarr:
         UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
         print("Uploaded:"+notebook)
+    print("Completed uploading to :"+fabricworkspacename+" file path "+datapath)
+    print("Be sure to run the notebook import from Fabric")
         
 
 

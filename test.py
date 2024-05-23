@@ -40,5 +40,7 @@ target_info = profile_info['outputs'][profile_info['target']]
 print(target_info['lakehouse'])
 
 utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
+#must have access to the following fabric workspace and datalake
+utils.UploadAllNotebooks("Fabric_AI_Test","lakesales.Lakehouse/Files/notebooks")  ##uploads notebooks to onelake
 
 
