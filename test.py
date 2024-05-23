@@ -38,13 +38,13 @@ config = dbt.config.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
 profile_info = profile[config['profile']]
 target_info = profile_info['outputs'][profile_info['target']]
 lakehouse = target_info['lakehouse']
-fabricworkspacename = target_info['fabricworkspacename']
+workspacename = target_info['workspacename']
 lakehousedatapath = target_info['lakehousedatapath'] 
 lakehousedatapathfull = lakehouse+".Lakehouse"+lakehousedatapath
 utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
 # Note: for following to run you must have access to the following fabric workspace and datalake
 # add profile.yml must be same structure as assets\profiles.yml in this repo note new attributes have been added 
-utils.UploadAllNotebooks(fabricworkspacename,lakehousedatapathfull)  ##uploads notebooks to onelake
+utils.UploadAllNotebooks(workspacename,lakehousedatapathfull)  ##uploads notebooks to onelake
 # spark notebook to conevrt uploaded files into notebooks is assets\PySparkIngestNotebooks.ipynb
 # the above notebook needs assets\assets\fabricnotebookutil.py
 

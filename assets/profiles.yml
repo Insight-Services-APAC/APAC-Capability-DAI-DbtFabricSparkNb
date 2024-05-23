@@ -15,7 +15,7 @@ fabric-spark-testnb:
       threads: 1
       type: fabricsparknb
       retry_all: true
-      fabricworkspacename: Fabric_AI_Test
+      workspacename: Fabric_AI_Test
         
         
         
