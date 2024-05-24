@@ -19,8 +19,20 @@ The `dbt-fabricspark` package contains all of the code enabling dbt to work with
 - Read the [introduction](https://docs.getdbt.com/docs/introduction/) and [viewpoint](https://docs.getdbt.com/docs/about/viewpoint/)
 
 ## Running locally
-Use livy endpoint to connect to Synapse Spark in Microsoft Fabric. The binaries required to setup local environment is not possiblw with Synapse Spark in Microsoft Fabric. However, you can configure profile to connect via livy endpoints.
+### Installs 
+#### Windows 
+```bash
+winget install microsoft.azd
 
+```
+
+#### OSX
+```bash
+brew tap azure/azd && brew install azd
+
+```
+
+### Profile
 Create a profile like this one:
 
 ```yaml
@@ -33,6 +45,7 @@ fabric-spark-test:
         connect_timeout: 10
         endpoint: https://api.fabric.microsoft.com/v1
         workspaceid: bab084ca-748d-438e-94ad-405428bd5694
+        workspacename: myworkspace
         lakehouseid: ccb45a7d-60fc-447b-b1d3-713e05f55e9a
         lakehouse: test
         schema: test

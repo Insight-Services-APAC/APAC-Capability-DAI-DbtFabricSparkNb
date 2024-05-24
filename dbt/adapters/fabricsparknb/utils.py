@@ -21,7 +21,7 @@ import os
 import json
 from dbt.contracts.graph.manifest import Manifest
 from dbt.clients.system import load_file_contents
-
+from pathlib import Path
 from azure.storage.filedatalake import (
     DataLakeServiceClient,
     DataLakeDirectoryClient,
@@ -57,7 +57,7 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
 def GenerateMasterNotebook(project_root):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
-    notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(notebook_dir) if f.endswith('.ipynb') and 'master_notebook' not in f]
+    notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
     manifest = GetManifest()
     nodes_copy = SortManifest(manifest.nodes)
@@ -133,6 +133,34 @@ def GenerateMasterNotebook(project_root):
         nbf.write(nb, f)
         print (f"master_notebook.ipynb created")
 
+def GenerateMetadataExtract(project_root):
+    # Copy from 
+    src = f'dbt/include/fabricsparknb/metadata_extract.ipynb'
+    tgt = f'./{project_root}/target/notebooks/metadata_extract.ipynb'
+    import shutil
+    shutil.copyfile(src, tgt) 
+
+def GenerateNotebookUpload(project_root, workspaceid):
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    # Define the directory containing the Jinja templates
+    template_dir = 'dbt/include/fabricsparknb/'
+
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('import_notebook.ipynb')
+
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(workspace_id=workspaceid)
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
+
+    # Write the notebook to a file
+    with open(notebook_dir + f'import_notebook.ipynb', 'w') as f:
+        nbf.write(nb, f)
+        print (f"import_notebook.ipynb created")
 
 class ModelNotebook:
     def __init__(self, nb : nbf.NotebookNode = None, node_type = 'model'):        
@@ -289,10 +317,20 @@ def UploadAllNotebooks(workspacename: str, datapath: str):
     token_credential = DefaultAzureCredential()
     service_client = DataLakeServiceClient(account_url, credential=token_credential)
     file_system_client = service_client.get_file_system_client(workspacename)
-    directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
-    notebookarr = os.listdir(local_notebook_path)
+    print("File System Client Created")
+    print(datapath)
+    paths = file_system_client.get_paths(path=datapath)
+    print("\nCurrent paths in the workspace:")
+    
+    for path in paths:
+        print(path.name + '\n')
+
+
+    #directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
+    notebookarr = os.listdir(Path(local_notebook_path))
+    
     for notebook in notebookarr:
-        UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
+       #UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
         print("Uploaded:"+notebook)
     print("Completed uploading to :"+workspacename+" file path "+datapath)
     print("Be sure to run the notebook import from Fabric")

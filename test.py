@@ -23,16 +23,17 @@ from collections import deque
 from dbt.config import RuntimeConfig
 from dbt.cli.flags import Flags, convert_config
 from dbt.cli.main import cli
+from pathlib import Path
 
 
 
 
-os.environ['DBT_PROJECT_DIR'] = "./testproj"
+os.environ['DBT_PROJECT_DIR'] = "testproj"
 
 dbt.tests.util.run_dbt(['build'])
 
 
-profile_path = Path(os.environ['USERPROFILE']) / '.dbt/'
+profile_path = Path(os.path.expanduser('~')) / '.dbt/'
 profile = dbt.config.profile.read_profile(profile_path)
 config = dbt.config.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
 profile_info = profile[config['profile']]
@@ -42,9 +43,12 @@ workspacename = target_info['workspacename']
 lakehousedatapath = target_info['lakehousedatapath'] 
 lakehousedatapathfull = lakehouse+".Lakehouse"+lakehousedatapath
 utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
+utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'])
+utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'])
+
 # Note: for following to run you must have access to the following fabric workspace and datalake
 # add profile.yml must be same structure as assets\profiles.yml in this repo note new attributes have been added 
-utils.UploadAllNotebooks(workspacename,lakehousedatapathfull)  ##uploads notebooks to onelake
+#utils.UploadAllNotebooks(workspacename,lakehousedatapathfull)  ##uploads notebooks to onelake
 # spark notebook to conevrt uploaded files into notebooks is assets\PySparkIngestNotebooks.ipynb
 # the above notebook needs assets\assets\fabricnotebookutil.py
 
