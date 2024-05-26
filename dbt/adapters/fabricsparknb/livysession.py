@@ -19,6 +19,7 @@ import nbformat as nbf
 
 import dbt.adapters
 import dbt.adapters.fabricsparknb
+import dbt.adapters.fabricsparknb.notebook
 import dbt.adapters.fabricsparknb.utils
 
 logger = AdapterLogger("fabricsparknb")
@@ -229,7 +230,7 @@ class LivySession:
         https://github.com/mkleehammer/pyodbc/wiki/Cursor#executesql-parameters
         """
 
-        print(sql)
+        raise Exception("Execute method in Livy session hit. Not expected!!. Please check the code.")
 
         # Create a new notebook
         nb = nbf.v4.new_notebook()
@@ -412,6 +413,9 @@ class LivyCursor:
         # Extract the comments from the SQL
         comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
 
+        # Get the remainder of the string
+        remainder = re.sub(r'/\*(.*?)\*/', '', sql, flags=re.DOTALL)
+
         # Convert each comment to a JSON object
         merged_json = {}
         for comment in comments:
@@ -454,17 +458,23 @@ class LivyCursor:
         else:
             node_type = 'model'
 
-        mnb: dbt.adapters.fabricsparknb.utils.ModelNotebook = dbt.adapters.fabricsparknb.utils.ModelNotebook(nb=nb, node_type=node_type)
-        ssc = mnb.GetSparkSqlCells()
+        mnb: dbt.adapters.fabricsparknb.notebook.ModelNotebook = dbt.adapters.fabricsparknb.notebook.ModelNotebook(nb=nb, node_type=node_type)
+        # ssc = mnb.GetSparkSqlCells()
 
-        # Create a new code cell with the SQL
-        code = f"%%sql\n{sql}"
+        # Create a new code cell with the SQL remainder
+        # Split the remainder into lines
+        lines = remainder.split('\n')
+        # Filter out blank lines
+        non_blank_lines = [line for line in lines if line.strip() != '']
+        # Join the lines back together
+        remainder_without_blank_lines = '\n'.join(non_blank_lines)
+        code = f"%%sql\n{remainder_without_blank_lines}"
         cell = nbf.v4.new_code_cell(source=code)
 
         # Add the cell to the notebook
         mnb.AddCell(cell)
-        mnb.GatherSql()
-        mnb.SetTheSqlVariable()
+        # mnb.GatherSql()
+        # mnb.SetTheSqlVariable()
 
         # Write the notebook to a file
         with open(filename, 'w') as f:

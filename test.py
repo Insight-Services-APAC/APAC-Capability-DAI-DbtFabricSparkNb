@@ -13,6 +13,7 @@ from dbt.adapters.fabricsparknb import utils as utils
 import dbt.tests
 from pathlib import Path
 import os
+import shutil
 
 os.environ['DBT_PROJECT_DIR'] = "testproj"
 
@@ -26,13 +27,15 @@ workspacename = target_info['workspacename']
 lakehousedatapath = target_info['lakehousedatapath']
 lakehousedatapathfull = lakehouse + ".Lakehouse" + lakehousedatapath
 
+shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
 utils.GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
 
 dbt.tests.util.run_dbt(['build'])
 
-utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'])
-utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'])
-utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'])
+utils.SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
+utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
+utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
+utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
 
 # Note: for following to run you must have access to the following fabric workspace and datalake
 # add profile.yml must be same structure as assets\profiles.yml in this repo note new attributes have been added

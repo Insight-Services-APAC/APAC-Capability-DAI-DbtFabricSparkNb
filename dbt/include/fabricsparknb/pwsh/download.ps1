@@ -18,5 +18,5 @@ else
     Write-Host "Logging in"
     & azcopy login #--tenant-id 72f988bf-86f1-41af-91ab-2d7cd011db47
 }
-& azcopy copy "https://onelake.blob.fabric.microsoft.com/$workspacename/$itemPath/MetaExtracts/" "./testproj/target/metaextracts/" --overwrite=true --recursive --trusted-microsoft-suffixes=onelake.blob.fabric.microsoft.com --log-level=INFO;
+& azcopy copy "https://onelake.blob.fabric.microsoft.com/$workspacename/$itemPath/MetaExtracts/" "./{{project_root}}/" --overwrite=true --recursive --trusted-microsoft-suffixes=onelake.blob.fabric.microsoft.com --log-level=INFO;
 
