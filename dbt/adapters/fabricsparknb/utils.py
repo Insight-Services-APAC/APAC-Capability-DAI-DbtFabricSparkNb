@@ -217,8 +217,8 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
         # Gather the Spark SQL from the notebook and set the sql variable
         mnb.GatherSql()
         mnb.SetTheSqlVariable()
-        # always set the config in first cell
-        mnb.nb.cells[0].source = mnb.nb.cells[0].source.replace("{{lakehouse_name}}", lakehouse_name)
+        # always set the config in first code cell
+        mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
 
         # Write the notebook to a file
         with open(notebook_dir + notebook_file, 'w') as f:
