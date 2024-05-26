@@ -103,14 +103,23 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
+    # Find Markdown cell contaning # Executions for Each Run Order Below:
+    insertion_point = None
+    for i, cell in enumerate(nb.cells):
+        if cell.cell_type == 'markdown' and cell.source.startswith('# Executions for Each Run Order Below:'):
+            insertion_point = i + 1
+            break
+    
     for sort_order in range(min_sort_order, max_sort_order + 1):
         cell = nbf.v4.new_markdown_cell(source=f"## Run Order {sort_order}")
-        nb.cells.append(cell)
+        nb.cells.insert((insertion_point), cell)
+        insertion_point += 1
         # Create a new code cell with the SQL
         code = 'mssparkutils.notebook.run("master_notebook_' + str(sort_order) + '")'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
-        nb.cells.append(cell)
+        nb.cells.insert((insertion_point), cell)
+        insertion_point += 1
 
     # Write the notebook to a file
     with open(notebook_dir + 'master_notebook.ipynb', 'w') as f:
