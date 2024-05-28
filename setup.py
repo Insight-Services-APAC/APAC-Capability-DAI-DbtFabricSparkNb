@@ -30,7 +30,7 @@ with open(os.path.join(this_directory, "README.md"), "r", encoding="utf8") as f:
 # get this package's version from dbt/adapters/<name>/__version__.py
 def _get_plugin_version_dict():
     _version_path = os.path.join(
-        this_directory, "dbt", "adapters", "fabricspark", "__version__.py"
+        this_directory, "dbt", "adapters", "fabricsparknb", "__version__.py"
     )
     _semver = r"""(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"""
     _pre = r"""((?P<prekind>a|b|rc)(?P<pre>\d+))?"""
@@ -50,7 +50,7 @@ def _get_dbt_core_version():
     return f"{minor}{pre}"
 
 
-package_name = "dbt-fabricspark"
+package_name = "dbt-fabricsparknb"
 package_version = "1.7.0"
 dbt_core_version = _get_dbt_core_version()
 print(f"printing version --------- {dbt_core_version}")
@@ -62,9 +62,9 @@ setup(
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Pradeep Srikakolapu",
-    author_email="pvenkat@microsoft.com",
-    url="https://github.com/microsoft/dbt-fabricspark",
+    author="John Rampono",
+    author_email="john.rampono@insight.com",
+    url="https://github.com/microsoft/dbt-fabricsparknb",
     packages=find_namespace_packages(include=["dbt", "dbt.*"]),
     include_package_data=True,
     install_requires=[

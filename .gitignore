@@ -39,8 +39,8 @@ dbt-env/
 # MacOS
 .DS_Store
 
-# vscode
-.vscode
+
+
 
 # other
 .hive-metastore/

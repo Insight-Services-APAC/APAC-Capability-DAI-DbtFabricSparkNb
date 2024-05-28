@@ -1,38 +1,23 @@
 
 import re
-from dataclasses import dataclass
-import dbt.logger
 from jinja2 import Environment, FileSystemLoader
 import nbformat as nbf
 import os
-from dataclasses import dataclass
-import dbt.parser
-import dbt.parser.manifest
-import dbt.tests.util
-import dbt.utils
-import dbt
 import copy
-import dbt.adapters.fabricspark
-import dbt.adapters.fabricsparknb 
 import dbt.logger as logger
-from dbt.adapters.fabricsparknb import utils as utils 
-import dbt.tests
-import os
 import json
 from dbt.contracts.graph.manifest import Manifest
 from dbt.clients.system import load_file_contents
+from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from pathlib import Path
 from azure.storage.filedatalake import (
     DataLakeServiceClient,
     DataLakeDirectoryClient,
-    FileSystemClient
 )
 from azure.identity import DefaultAzureCredential
 
 
-
-
-@staticmethod 
+@staticmethod
 def CheckSqlForModelCommentBlock(sql) -> bool:
     # Extract the comments from the SQL
     comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
@@ -46,7 +31,7 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
         except json.JSONDecodeError:
             logger.logger.error('Could not parse comment as JSON')
             pass
-    
+
     if 'node_id' in merged_json.keys():
         return True
     else:
@@ -54,14 +39,14 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
     manifest = GetManifest()
     nodes_copy = SortManifest(manifest.nodes)
-    
+
     notebook_files = []
     # Add sort_order attribute to each file object
     for file in notebook_files_str:
@@ -71,12 +56,11 @@ def GenerateMasterNotebook(project_root):
             notebook_file['name'] = file
             notebook_file['sort_order'] = matching_node.sort_order
             notebook_files.append(notebook_file)
-    
+
     # Find the minimum and maximum sort_order
     min_sort_order = min(file['sort_order'] for file in notebook_files)
     max_sort_order = max(file['sort_order'] for file in notebook_files)
-    
-    
+
     # Loop from min_sort_order to max_sort_order
     for sort_order in range(min_sort_order, max_sort_order + 1):
         # Get the files with the current sort_order
@@ -85,7 +69,7 @@ def GenerateMasterNotebook(project_root):
         # Do something with the files...
 
         # Define the directory containing the Jinja templates
-        template_dir = 'dbt/include/fabricsparknb/'
+        template_dir = 'dbt/include/fabricsparknb/notebooks/'
 
         # Create a Jinja environment
         env = Environment(loader=FileSystemLoader(template_dir))
@@ -94,7 +78,7 @@ def GenerateMasterNotebook(project_root):
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
@@ -102,10 +86,10 @@ def GenerateMasterNotebook(project_root):
         # Write the notebook to a file
         with open(notebook_dir + f'master_notebook_{sort_order}.ipynb', 'w') as f:
             nbf.write(nb, f)
-            print (f"master_notebook_{sort_order}.ipynb created")
+            print(f"master_notebook_{sort_order}.ipynb created")
 
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/'
+    template_dir = 'dbt/include/fabricsparknb/notebooks/'
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -114,36 +98,62 @@ def GenerateMasterNotebook(project_root):
     template = env.get_template('master_notebook.ipynb')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render()
+    rendered_template = template.render(lakehouse_name=lakehouse_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
+    # Find Markdown cell contaning # Executions for Each Run Order Below:
+    insertion_point = None
+    for i, cell in enumerate(nb.cells):
+        if cell.cell_type == 'markdown' and cell.source.startswith('# Executions for Each Run Order Below:'):
+            insertion_point = i + 1
+            break
+    
     for sort_order in range(min_sort_order, max_sort_order + 1):
         cell = nbf.v4.new_markdown_cell(source=f"## Run Order {sort_order}")
-        nb.cells.append(cell)
+        nb.cells.insert((insertion_point), cell)
+        insertion_point += 1
         # Create a new code cell with the SQL
-        code = 'mssparkutils.notebook.run("master_notebook_'+str(sort_order)+'")'
+        code = 'mssparkutils.notebook.run("master_notebook_' + str(sort_order) + '")'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
-        nb.cells.append(cell)
-    
+        nb.cells.insert((insertion_point), cell)
+        insertion_point += 1
+
     # Write the notebook to a file
-    with open(notebook_dir + f'master_notebook.ipynb', 'w') as f:
+    with open(notebook_dir + 'master_notebook.ipynb', 'w') as f:
         nbf.write(nb, f)
-        print (f"master_notebook.ipynb created")
+        print("master_notebook.ipynb created")
 
-def GenerateMetadataExtract(project_root):
-    # Copy from 
-    src = f'dbt/include/fabricsparknb/metadata_extract.ipynb'
-    tgt = f'./{project_root}/target/notebooks/metadata_extract.ipynb'
-    import shutil
-    shutil.copyfile(src, tgt) 
 
-def GenerateNotebookUpload(project_root, workspaceid):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/'
+    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('metadata_extract.ipynb')
+
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name)
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
+
+    # Write the notebook to a file
+    with open(notebook_dir + 'metadata_extract.ipynb', 'w') as f:
+        nbf.write(nb, f)
+        print("metadata_extract.ipynb created")
+
+
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name):
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    # Define the directory containing the Jinja templates
+    template_dir = 'dbt/include/fabricsparknb/notebooks/'
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -152,87 +162,77 @@ def GenerateNotebookUpload(project_root, workspaceid):
     template = env.get_template('import_notebook.ipynb')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid)
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
     # Write the notebook to a file
-    with open(notebook_dir + f'import_notebook.ipynb', 'w') as f:
+    with open(notebook_dir + 'import_notebook.ipynb', 'w') as f:
         nbf.write(nb, f)
-        print (f"import_notebook.ipynb created")
+        print("import_notebook.ipynb created")
 
-class ModelNotebook:
-    def __init__(self, nb : nbf.NotebookNode = None, node_type = 'model'):        
-        if nb is None:
-            filename = f'dbt/include/fabricsparknb/{node_type}_notebook.ipynb'            
-            if os.path.exists(filename):
-                with open(filename, 'r') as f:
-                    nb = nbf.read(f, as_version=4)
-             
-        self.nb: nbf.NotebookNode = nb
-        self.sql: str = ""    
 
-    def AddSqlFromExistingNotebook(self, notebook):
-        for cell in notebook.cells:
-            if cell.cell_type == 'code' and "\\*FABRICSPARKNB: SQLSTART*\\" in cell.source and "\\*FABRICSPARKNB: SQLEND*\\" in cell.source:
-                # Define the pattern
-                pattern = r'/\*FABRICSPARKNB: SQLSTART\*/(.*?)/\*FABRICSPARKNB: SQLEND\*/'
+def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
+    notebook_dir = f'./{project_root}/target/pwsh/'
 
-                # Search for the pattern in the SQL
-                match = re.search(pattern, cell.source, re.DOTALL)
+    Path(notebook_dir).mkdir(parents=True, exist_ok=True)
+    # Define the directory containing the Jinja templates
+    template_dir = 'dbt/include/fabricsparknb/pwsh/'
 
-                # If a match was found, return the matched text; otherwise, return an empty string
-                old_sql = match.group(1) if match else ''
-                
-                self.sql = old_sql
-        
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
 
-    def AddSql(self, sql):
-        self.sql += '\n' + sql
-    
-    def AddCell(self, cell):        
-        # Add the cell to the notebook
-        self.nb.cells.append(cell)
+    # Load the template
+    template = env.get_template('upload.ps1')
 
-    def GatherSql(self):
-        #Concatenate all the SQL cells in the notebook
-        self.sql = ""
-        for cell in self.GetSparkSqlCells():
-            self.sql += '\n' + cell.source.replace("%%sql","")        
-    
-    def SetTheSqlVariable(self):
-        # Find the first code cell and set the sql variable
-        for i, cell in enumerate(self.nb.cells):
-            if cell.cell_type == 'markdown' and "# Declare the SQL" in cell.source:
-                target_cell = self.nb.cells[i+1]
-                target_cell.source = target_cell.source.replace("{{sql}}", self.sql)
-                break
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
-    def GetSparkSqlCells(self):
-        # Get the existing SQL Cell from the notebook. It will be the code cell following the markdown cell containing "# SPARK SQL Cell for Debugging"
-        spark_sql_cell = None
-        for i, cell in enumerate(self.nb.cells):
-            if cell.cell_type == 'markdown' and "# SPARK SQL Cells for Debugging" in cell.source:
-                spark_sql_cells = self.nb.cells[i+1:len(self.nb.cells)]
-        
-        return spark_sql_cells      
-
-    def Render(self):
-        # Define the directory containing the Jinja templates
-        template_dir = 'dbt/include/fabricsparknb/'
-
-        # Create a Jinja environment
-        env = Environment(loader=FileSystemLoader(template_dir))
+    # Write the notebook to a file
+    with open(notebook_dir + 'upload.ps1', 'w') as f:
+        f.write(rendered_template)
+        print("upload.ps1 created")
 
         # Load the template
-        template = env.get_template('model_notebook.ipynb')
+    template = env.get_template('download.ps1')
 
-        # Render the template with the notebook_file variable
-        rendered_template = template.render(sql=self.sql.replace('\n',''))
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
-        # Parse the rendered template as a notebook
-        self.nb = nbf.reads(rendered_template, as_version=4)        
+    # Write the notebook to a file
+    with open(notebook_dir + 'download.ps1', 'w') as f:
+        f.write(rendered_template)
+        print("download.ps1 created")
+
+
+@staticmethod
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
+    # Iterate through the notebooks directory and create a list of notebook files
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
+
+    for notebook_file in notebook_files:
+        # Load the notebook
+        with open(notebook_dir + notebook_file, 'r') as f:
+            nb = nbf.read(f, as_version=4)
+        
+        if notebook_file.startswith('test.'):
+            node_type = 'test'
+        else:
+            node_type = 'model'
+
+        mnb: ModelNotebook = ModelNotebook(nb=nb, node_type=node_type)        
+        # Gather the Spark SQL from the notebook and set the sql variable
+        mnb.GatherSql()
+        mnb.SetTheSqlVariable()
+        # always set the config in first code cell
+        mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
+
+        # Write the notebook to a file
+        with open(notebook_dir + notebook_file, 'w') as f:
+            nbf.write(nb, f)
+            print(f"{notebook_file} updated")
 
 
 @staticmethod
@@ -250,14 +250,15 @@ def GetManifest():
     manifest = Manifest.from_dict(data)
     return manifest
 
+
 @staticmethod
 def SortManifest(nodes_orig):
     nodes = copy.deepcopy(nodes_orig)
     sort_order = 0
     while nodes:
         # Find nodes that have no dependencies within the remaining nodes
-        #nodes_without_deps = [node_id for node_id, node in nodes.items() if not any(dep in nodes for dep in node.depends_on.nodes)]
-        
+        # nodes_without_deps = [node_id for node_id, node in nodes.items() if not any(dep in nodes for dep in node.depends_on.nodes)]
+
         # Initialize an empty list to store the node_ids
         nodes_without_deps = []
 
@@ -288,9 +289,7 @@ def SortManifest(nodes_orig):
             # If no dependency was found, add the node_id to the list
             if not has_dependency:
                 nodes_without_deps.append(node_id)
-        
-        
-        
+
         if not nodes_without_deps:
             raise Exception('Circular dependency detected')
         # Assign the current sort order to the nodes without dependencies
@@ -308,10 +307,11 @@ def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_pa
     with open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
         file_client.upload_data(data, overwrite=True)
 
+
 @staticmethod
 def UploadAllNotebooks(workspacename: str, datapath: str):
-    print("Started uploading to :"+workspacename+" file path "+datapath)
-    account_name = "onelake"  ##always this                 
+    print("Started uploading to :" + workspacename + " file path " + datapath)
+    account_name = "onelake"  # always this
     account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
     local_notebook_path = os.environ['DBT_PROJECT_DIR'] + '/target/notebooks'
     token_credential = DefaultAzureCredential()
@@ -321,21 +321,15 @@ def UploadAllNotebooks(workspacename: str, datapath: str):
     print(datapath)
     paths = file_system_client.get_paths(path=datapath)
     print("\nCurrent paths in the workspace:")
-    
+
     for path in paths:
         print(path.name + '\n')
 
-
-    #directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
+    # directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
     notebookarr = os.listdir(Path(local_notebook_path))
-    
+
     for notebook in notebookarr:
-       #UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
-        print("Uploaded:"+notebook)
-    print("Completed uploading to :"+workspacename+" file path "+datapath)
+        # UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
+        print("Uploaded:" + notebook)
+    print("Completed uploading to :" + workspacename + " file path " + datapath)
     print("Be sure to run the notebook import from Fabric")
-        
-
-
-
-

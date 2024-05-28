@@ -19,10 +19,8 @@ import nbformat as nbf
 
 import dbt.adapters
 import dbt.adapters.fabricsparknb
+import dbt.adapters.fabricsparknb.notebook
 import dbt.adapters.fabricsparknb.utils
-
-
-
 
 logger = AdapterLogger("fabricsparknb")
 NUMBERS = DECIMALS + (int, float)
@@ -136,7 +134,6 @@ class LivySession:
     def create_session(self, data) -> str:
         self.session_id = "0"
         return self.session_id
-        
         # Create sessions
         response = None
         try:
@@ -172,7 +169,7 @@ class LivySession:
                 self.connect_url + "/sessions/" + self.session_id,
                 headers=get_headers(self.credential, False),
             ).json()
-            if res["state"] == "starting" or res["state"] == "not_started":                
+            if res["state"] == "starting" or res["state"] == "not_started":
                 # logger.debug("Polling Session creation status - ", self.connect_url + '/sessions/' + self.session_id )
                 time.sleep(DEFAULT_POLL_WAIT)
             elif res["livyInfo"]["currentState"] == "idle":
@@ -212,7 +209,7 @@ class LivySession:
         return res["livyInfo"]["currentState"] == "idle"
 
     @staticmethod
-    def execute( sql: str, *parameters: Any) -> None:
+    def execute(sql: str, *parameters: Any) -> None:
         """
         Execute a sql statement.
 
@@ -232,8 +229,8 @@ class LivySession:
         ------
         https://github.com/mkleehammer/pyodbc/wiki/Cursor#executesql-parameters
         """
-        
-        print(sql)
+
+        raise Exception("Execute method in Livy session hit. Not expected!!. Please check the code.")
 
         # Create a new notebook
         nb = nbf.v4.new_notebook()
@@ -249,11 +246,10 @@ class LivySession:
         os.makedirs('/target/notebooks/', exist_ok=True)
 
         # Extract the JSON from the SQL comment
-        if(re.search(r'/\* (.*) \*/', sql) is None):
+        if (re.search(r'/\* (.*) \*/', sql) is None):
             raise Exception("JSON not found in the SQL comment")
-        else: 
+        else:
             json_string = re.search(r'/\* (.*) \*/', sql).group(1)
-
 
         # Parse the JSON
         data = json.loads(json_string)
@@ -264,16 +260,11 @@ class LivySession:
         # Use the node_id as the filename
         filename = f'/target/notebooks/{node_id}.ipynb'
 
-
         # Write the notebook to a file
         with open(filename, 'w') as f:
             nbf.write(nb, f)
 
-        self._rows = []
-        self._schema = []
 
-        return
-    
 # cursor object - wrapped for livy API
 class LivyCursor:
     """
@@ -395,7 +386,6 @@ class LivyCursor:
                 return res
             time.sleep(DEFAULT_POLL_STATEMENT_WAIT)
 
-   
     def execute(self, sql: str, *parameters: Any) -> None:
         """
         Execute a sql statement.
@@ -416,13 +406,15 @@ class LivyCursor:
         ------
         https://github.com/mkleehammer/pyodbc/wiki/Cursor#executesql-parameters
         """
-        #print(sql)
+        # print(sql)
 
-        
         sql = sql % parameters
 
         # Extract the comments from the SQL
         comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
+
+        # Get the remainder of the string
+        remainder = re.sub(r'/\*(.*?)\*/', '', sql, flags=re.DOTALL)
 
         # Convert each comment to a JSON object
         merged_json = {}
@@ -433,8 +425,8 @@ class LivyCursor:
             except json.JSONDecodeError:
                 pass
 
-        # Print the JSON objects        
-        #print(merged_json)    
+        # Print the JSON objects
+        # print(merged_json)
 
         # Extract the node_id
         if 'node_id' in merged_json.keys():
@@ -442,8 +434,7 @@ class LivyCursor:
         else:
             print("Node ID not found in the SQL")
             print(sql)
-        
-       
+
         project_root = merged_json['project_root']
         notebook_dir = f'{project_root}/target/notebooks/'
         # Use the node_id as the filename
@@ -457,36 +448,41 @@ class LivyCursor:
             if os.path.exists(filename):
                 with open(filename, 'r') as f:
                     nb = nbf.read(f, as_version=4)
-            else: 
+            else:
                 nb = None
         else:
             nb = None
 
-         
         if node_id.startswith('test.'):
             node_type = 'test'
         else:
             node_type = 'model'
 
-        mnb: dbt.adapters.fabricsparknb.utils.ModelNotebook = dbt.adapters.fabricsparknb.utils.ModelNotebook(nb=nb, node_type=node_type)
-        ssc = mnb.GetSparkSqlCells()
+        mnb: dbt.adapters.fabricsparknb.notebook.ModelNotebook = dbt.adapters.fabricsparknb.notebook.ModelNotebook(nb=nb, node_type=node_type)
+        # ssc = mnb.GetSparkSqlCells()
 
-        # Create a new code cell with the SQL
-        code = f"%%sql\n{sql}"
+        # Create a new code cell with the SQL remainder
+        # Split the remainder into lines
+        lines = remainder.split('\n')
+        # Filter out blank lines
+        non_blank_lines = [line for line in lines if line.strip() != '']
+        # Join the lines back together
+        remainder_without_blank_lines = '\n'.join(non_blank_lines)
+        code = f"%%sql\n{remainder_without_blank_lines}"
         cell = nbf.v4.new_code_cell(source=code)
 
         # Add the cell to the notebook
         mnb.AddCell(cell)
-        mnb.GatherSql()
-        mnb.SetTheSqlVariable()
-        
+        # mnb.GatherSql()
+        # mnb.SetTheSqlVariable()
+
         # Write the notebook to a file
         with open(filename, 'w') as f:
             nbf.write(mnb.nb, f)
 
-         # If node_id begins with 'test.' then it is a test node and we should return failures, should_warn, should_error
+        # If node_id begins with 'test.' then it is a test node and we should return failures, should_warn, should_error
         if node_id.startswith('test.'):
-            self._rows = [[0,0,0]]
+            self._rows = [[0, 0, 0]]
             self._schema = []
 
             for c in ['failures', 'should_warn', 'should_error']:
@@ -496,14 +492,13 @@ class LivyCursor:
                 col["nullable"] = True
                 self._schema.append(col)
 
-        else:        
+        else:
             self._rows = []
             self._schema = []
-        
+
         self.executed.append(node_id)
-        
+
         return
-        
 
     def fetchall(self):
         """
@@ -626,7 +621,7 @@ class LivySessionManager:
 
     @staticmethod
     def disconnect() -> None:
-        return 
+        return
         if __class__.livy_global_session.is_valid_session():
             __class__.livy_global_session.delete_session()
             __class__.livy_global_session.is_new_session_required = True
