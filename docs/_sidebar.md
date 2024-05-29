@@ -6,11 +6,9 @@
   * [Why?](./#why-did-we-build-it)
   * [How?](./#how-does-it-work)
   * [Who?](./#who-is-it-for)
-* [User Guide for Data Engineers](./dbt-adapter-user-guide)
-  * [Development Workflow](./tutorials/tomcat/index)
-  * [Initial Deployment](./tutorials/cloud/index)
-  * [Ongoing Development Lifecycle](./tutorials/java/index)
-
-* [Adpater Developer Guide](./dbt-adapter-developer-documentation)
+* [User Guide for Data Engineers](./user_guide/initial_setup.md)
+  * [Initial Setup](./user_guide/initial_setup.md)
+  * [Development Workflow](./user_guide/development_workflow.md)
+* [Adpater Developer Guide](./developer_guide/initial_setup.md)
 
 * [Contact](./contact/index)

@@ -101,8 +101,8 @@ Next we will create a new dbt project and configure it to use the dbt-fabricspar
 
 Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
 
-| :memo:        | Note when asked to select the adapter choose dbt-fabricksparknb.</br></br> During this process you will also be asked for the workspace id, lakehouse id, and workspace name. Use the values you gathered from the Power BI Portal.  |
-|---------------|:------------------------|
+!> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
+
 
 ```powershell
 # Create your dbt project directories and profiles.yml file
@@ -188,48 +188,3 @@ $env:DBT_PROJECT_DIR = "my_project" #this is the name of the project you created
 dbt build
 
 ```
-
-[filename](diagrams/drawio/development_flow.drawio ':include :type=code')
-
-
-**Inital Setup**
-1. Provision Workspace
-   - **Development Environment:** Fabric Portal
-   - **Re-occurence:** Do once per development environment set-up
-   - **Instructions:** Create a new workspace in the Power BI Portal, or use an existing workspace.
-
-2. Get Workspace Connection Details
-   - **Development Environment:** Fabric Portal
-   - **Re-occurence:** Do once per development environment set-up
-   - **Instructions:** Get the workspace connection details from the Power BI Portal.
-   
-3. Create or Update `profiles.yml`
-   - **Development Environment:** VS Code on local, developemnt machine
-   - 
-
-4. Create or Update `dbt_project.yml`
-   ![](./assets/dbt_project.yml.png)
-5. Build Project
-6. Manually Upload Notebooks 
-7. Run Meta Data Extract
-
-**Ongoing Development Cycle**
-
-8. Download Metadata: 
-   
-9.  Update Dbt Project 
-10. Build Dbt Project 
-11. Verify Outputs 
-12. Update Notebooks
-    <ol type="a">
-        <li>Upload to Onelake</li>
-        <li>Update to GIT repo</li>   
-    </ol>    
-13. Promote to Workspace
-    <ol type="a">
-        <li>Run Import Notebook</li>
-        <li>Promote GIT branch</li>   
-    </ol>   
-14. Run Master Notebook 
-15. Validate Results 
-16. Run Metadata Extract

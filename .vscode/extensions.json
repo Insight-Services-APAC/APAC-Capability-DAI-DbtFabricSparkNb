@@ -20,7 +20,8 @@
         "hediet.vscode-drawio",
 
         //HTML Web Server
-        "ms-vscode.live-server"
+        "ms-vscode.live-server",
+        "streetsidesoftware.code-spell-checker"
         
     ]
 }
