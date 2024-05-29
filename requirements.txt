@@ -3,4 +3,3 @@ dbt-fabricspark
 nbformat
 types-PyYAML
 types-python-dateutil
-azure-storage-file-datalake
