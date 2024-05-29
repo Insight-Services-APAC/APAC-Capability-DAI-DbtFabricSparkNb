@@ -5,7 +5,7 @@
    - **Development Environment:** Fabric Portal
    - **Re-occurence:** Do once per development environment set-up
    - **Instructions:** Create a new workspace in the Power BI Portal, or use an existing workspace.
- # link to powerbi documentation on creating a workspace
+
 2. Get Workspace Connection Details
    - **Development Environment:** Fabric Portal
    - **Re-occurence:** Do once per development environment set-up

@@ -1,10 +1,26 @@
 {
     "recommendations": [
-        "hediet.vscode-drawio",
+        //Mardown Helpers, 
+        "yoshi389111.markdown-table-rainbow",
+        "davidanson.vscode-markdownlint",
+        "takumii.markdowntable",
+
+        //Python
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.flake8",
         "ms-python.debugpy",
-        "oderwat.indent-rainbow"
+        "donjayamanne.python-environment-manager",
+
+        //Text Editors
+        "oderwat.indent-rainbow",
+        "mechatroner.rainbow-csv",
+
+        //Diagrams
+        "hediet.vscode-drawio",
+
+        //HTML Web Server
+        "ms-vscode.live-server"
+        
     ]
 }
