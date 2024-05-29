@@ -1,6 +1,7 @@
 
 import os
 import re
+import io 
 import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader
 
@@ -10,8 +11,9 @@ class ModelNotebook:
         if nb is None:
             filename = f'dbt/include/fabricsparknb/notebooks/{node_type}_notebook.ipynb'
             if os.path.exists(filename):
-                with open(filename, 'r') as f:
-                    nb = nbf.read(f, as_version=4)
+                with io.open(file=filename, mode='r', encoding='utf-8') as f:
+                    file_str = f.read()
+                    nb = nbf.reads(file_str, as_version=4)
 
         self.nb: nbf.NotebookNode = nb
         self.sql: list[str] = []

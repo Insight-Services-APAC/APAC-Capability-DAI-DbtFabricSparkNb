@@ -1,4 +1,4 @@
-
+import io
 import re
 from jinja2 import Environment, FileSystemLoader
 import nbformat as nbf
@@ -84,9 +84,16 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb = nbf.reads(rendered_template, as_version=4)
 
         # Write the notebook to a file
-        with open(notebook_dir + f'master_notebook_{sort_order}.ipynb', 'w') as f:
-            nbf.write(nb, f)
-            print(f"master_notebook_{sort_order}.ipynb created")
+        target_file_name = f'master_notebook_{sort_order}.ipynb'
+        with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:            
+            try:
+                nb_str = nbf.writes(nb)
+                f.write(nb_str)
+                print(f"{target_file_name} created")
+            except Exception as ex:
+                print(f"Error creating: {target_file_name}")
+                raise ex
+            
 
     # Define the directory containing the Jinja templates
     template_dir = 'dbt/include/fabricsparknb/notebooks/'
@@ -120,11 +127,17 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
-
+   
     # Write the notebook to a file
-    with open(notebook_dir + 'master_notebook.ipynb', 'w') as f:
-        nbf.write(nb, f)
-        print("master_notebook.ipynb created")
+    target_file_name = 'master_notebook.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            print(f"{target_file_name} created")
+        except Exception as ex:
+            print(f"Error creating: {target_file_name}")
+            raise ex
 
 
 def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name):
@@ -144,10 +157,16 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
-    # Write the notebook to a file
-    with open(notebook_dir + 'metadata_extract.ipynb', 'w') as f:
-        nbf.write(nb, f)
-        print("metadata_extract.ipynb created")
+    # Write the notebook to a file    
+    target_file_name = 'metadata_extract.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            print(f"{target_file_name} created")
+        except Exception as ex:
+            print(f"Error creating: {target_file_name}")
+            raise ex
 
 
 def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name):
@@ -166,11 +185,17 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
-
-    # Write the notebook to a file
-    with open(notebook_dir + 'import_notebook.ipynb', 'w') as f:
-        nbf.write(nb, f)
-        print("import_notebook.ipynb created")
+    
+    # Write the notebook to a file    
+    target_file_name = 'import_notebook.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            print(f"{target_file_name} created")
+        except Exception as ex:
+            print(f"Error creating: {target_file_name}")
+            raise ex
 
 
 def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
@@ -190,7 +215,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
     rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with open(notebook_dir + 'upload.ps1', 'w') as f:
+    with io.open(notebook_dir + 'upload.ps1', 'w') as f:
         f.write(rendered_template)
         print("upload.ps1 created")
 
@@ -201,7 +226,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
     rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with open(notebook_dir + 'download.ps1', 'w') as f:
+    with io.open(notebook_dir + 'download.ps1', 'w') as f:
         f.write(rendered_template)
         print("download.ps1 created")
 
@@ -214,8 +239,9 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
 
     for notebook_file in notebook_files:
         # Load the notebook
-        with open(notebook_dir + notebook_file, 'r') as f:
-            nb = nbf.read(f, as_version=4)
+        with io.open(file=notebook_dir + notebook_file, mode='r', encoding='utf-8') as f:
+            file_str = f.read()
+            nb = nbf.reads(file_str, as_version=4)
         
         if notebook_file.startswith('test.'):
             node_type = 'test'
@@ -230,9 +256,15 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
 
         # Write the notebook to a file
-        with open(notebook_dir + notebook_file, 'w') as f:
-            nbf.write(nb, f)
-            print(f"{notebook_file} updated")
+        target_file_name = notebook_file
+        with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+            try:
+                nb_str = nbf.writes(nb)
+                f.write(nb_str)
+                print(f"{target_file_name} updated")
+            except Exception as ex:
+                print(f"Error updating: {target_file_name}")
+                raise ex
 
 
 @staticmethod
@@ -304,7 +336,7 @@ def SortManifest(nodes_orig):
 @staticmethod
 def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
     file_client = directory_client.get_file_client(file_name)
-    with open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
+    with io.open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
         file_client.upload_data(data, overwrite=True)
 
 

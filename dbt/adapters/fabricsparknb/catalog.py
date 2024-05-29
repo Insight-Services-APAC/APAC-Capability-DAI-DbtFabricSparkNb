@@ -1,3 +1,4 @@
+import io
 from types import SimpleNamespace
 import json
 import agate
@@ -6,7 +7,7 @@ import agate
 @staticmethod
 def ListRelations(profile):
     # Open the file
-    with open(profile.project_root + '/metaextracts/ListRelations.json', 'r') as file:
+    with io.open(profile.project_root + '/metaextracts/ListRelations.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
 
@@ -46,7 +47,7 @@ def ListRelations(profile):
 @staticmethod
 def GetColumnsInRelation(profile, schema, identifier):
     # Open the file
-    with open(profile.project_root + '/metaextracts/DescribeRelations.json', 'r') as file:
+    with io.open(profile.project_root + '/metaextracts/DescribeRelations.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
    
@@ -61,7 +62,7 @@ def GetColumnsInRelation(profile, schema, identifier):
 @staticmethod
 def ListSchemas(profile):
     # Open the file
-    with open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
+    with io.open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
    
@@ -71,7 +72,7 @@ def ListSchemas(profile):
 
 def ListSchema(profile, schema):
     # Open the file
-    with open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
+    with io.open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
    
