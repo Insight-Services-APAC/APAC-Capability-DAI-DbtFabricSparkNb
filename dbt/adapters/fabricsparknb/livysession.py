@@ -1,4 +1,5 @@
 from __future__ import annotations
+import io
 import json
 import time
 import requests
@@ -261,7 +262,7 @@ class LivySession:
         filename = f'/target/notebooks/{node_id}.ipynb'
 
         # Write the notebook to a file
-        with open(filename, 'w') as f:
+        with io.open(filename, 'w') as f:
             nbf.write(nb, f)
 
 
@@ -446,8 +447,9 @@ class LivyCursor:
         # If the notebook exists, read it, otherwise create a new one
         if node_id in self.executed:
             if os.path.exists(filename):
-                with open(filename, 'r') as f:
-                    nb = nbf.read(f, as_version=4)
+                with io.open(file=filename, mode='r', encoding='utf-8') as f:
+                    file_str = f.read()
+                    nb = nbf.reads(file_str, as_version=4)
             else:
                 nb = None
         else:
@@ -477,8 +479,13 @@ class LivyCursor:
         # mnb.SetTheSqlVariable()
 
         # Write the notebook to a file
-        with open(filename, 'w') as f:
-            nbf.write(mnb.nb, f)
+        with io.open(file=filename, mode='w', encoding='utf-8') as f:
+            try:
+                nb_str = nbf.writes(mnb.nb)
+                f.write(nb_str)
+            except Exception as ex:
+                print("Error writing notebook file")
+                raise ex
 
         # If node_id begins with 'test.' then it is a test node and we should return failures, should_warn, should_error
         if node_id.startswith('test.'):
