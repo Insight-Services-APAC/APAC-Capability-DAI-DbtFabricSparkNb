@@ -27,6 +27,7 @@
       name: 'Dbt Fabric Spark Adapter for Notebooks',
       repo: 'https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb',
       loadSidebar: true,
+      coverpage: true,
       tabs: {
           persist: true, // default
           sync: true, // default
@@ -40,9 +41,18 @@
         errorText: 'Error',
         successText: 'Copied',
       },
+      //timeUpdater: {
+      //  text: ">last update time: {docsify-updated}",
+      //  formatUpdated: "{YYYY}/{MM}/{DD}",
+      //  whereToPlace: "bottom",  // "top" or "bottom", default to "bottom"
+      //},
+      //progress: {
+      //  position: "top",
+      //  color: "var(--theme-color,#42b983)",
+      //  height: "3px",
+      //},
       markdown: {
         renderer: {
-
           code: function (code, lang) {
             if (lang === 'drawio') {
               if (window.drawioConverter) {
@@ -80,7 +90,7 @@
   <!-- Recommended -->
   <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
-
-
+  <!--<script src="https://cdn.jsdelivr.net/npm/docsify-updated/src/time-updater.min.js"></script>-->
+  
 </body>
 </html>

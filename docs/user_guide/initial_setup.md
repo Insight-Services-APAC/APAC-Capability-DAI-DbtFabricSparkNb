@@ -88,7 +88,7 @@ pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capabili
 
 ```
 
-# New Dbt Project Creation and Configuration
+# Fabric Workspace Setup
 
 Next we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:
 
@@ -99,6 +99,8 @@ Next we will create a new dbt project and configure it to use the dbt-fabricspar
 
 > https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 
+
+# Create Dbt Project
 Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
 
 !> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
