@@ -1,0 +1,40 @@
+
+version: 2
+
+models:
+  - name: cd_fact_sales
+    description: "Sales fact"
+    columns:
+      - name: InvoiceLineID
+        tests:
+          - unique
+          - not_null
+      - name: InvoiceID   
+      - name: StockItemID
+      - name: Description
+      - name: PackageTypeID
+      - name: Quantity
+      - name: UnitPrice
+      - name: TaxRate
+      - name: TaxAmount
+      - name: LineProfit
+      - name: CustomerID
+      - name: InvoiceDate
+      - name: DeliveryMethodID
+
+
+          
+
+  - name: cd_dim_customer
+    description: "Customer dimension"
+    columns:
+      - name: CustomerID
+        tests:
+          - unique
+          - not_null
+      - name: CustomerName
+      - name: BillToCustomerID
+      - name: CustomerCategoryID
+      - name: CustomerCategoryID
+      - name: CustomerCategoryName
+
