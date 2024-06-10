@@ -25,3 +25,4 @@ The `dbt-fabricsparkdb` package contains all of the code enabling dbt to work wi
 ## Code of Conduct
 
 Everyone interacting in the dbt project's codebases, issue trackers, chat rooms, and mailing lists is expected to follow the [dbt Code of Conduct](https://community.getdbt.com/code-of-conduct).
+ 
