@@ -106,6 +106,127 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+ 
+
+  - name: cf_cities
+    description: "cities"
+    columns:
+      - name: CityID
+        tests:
+          - unique
+          - not_null
+      - name: CityName
+      - name: StateProvinceID
+      - name: LatestRecordedPopulation
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
+ 
+
+  - name: cf_countries
+    description: "countries"
+    columns:
+      - name: CountryID
+        tests:
+          - unique
+          - not_null
+      - name: CountryName
+      - name: FormalName
+      - name: IsoAlpha3Code
+      - name: IsoNumericCode
+      - name: CountryType
+      - name: LatestRecordedPopulation
+      - name: Continent
+      - name: Region
+      - name: Subregion
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
+ 
+
+  - name: cf_deliverymethods
+    description: "delivery methods"
+    columns:
+      - name: DeliveryMethodID
+        tests:
+          - unique
+          - not_null
+      - name: DeliveryMethodName
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
+ 
+
+  - name: cf_people
+    description: "people"
+    columns:
+      - name: PersonID
+        tests:
+          - unique
+          - not_null
+      - name: FullName
+      - name: PreferredName
+      - name: SearchName
+      - name: IsPermittedToLogin
+      - name: LogonName
+      - name: IsExternalLogonProvider
+      - name: HashedPassword
+      - name: IsSystemUser
+      - name: IsEmployee
+      - name: IsSalesperson
+      - name: UserPreferences
+      - name: PhoneNumber
+      - name: FaxNumber
+      - name: EmailAddress
+      - name: Photo
+      - name: CustomFields
+      - name: OtherLanguages
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
+ 
+
+  - name: cf_stateprovinces
+    description: "state provinces"
+    columns:
+      - name: StateProvinceID
+        tests:
+          - unique
+          - not_null
+      - name: StateProvinceCode
+      - name: StateProvinceName
+      - name: SalesTerritory
+      - name: LastestRecordedPopulation
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
+ 
+
+  - name: cf_dates
+    description: "dates"
+    columns:
+      - name: DateKey
+        tests:
+          - unique
+          - not_null
+      - name: Date
+      - name: Day
+      - name: MonthName
+      - name: MonthNumber
+      - name: Year
+ 
+
+  - name: cf_buyinggroups
+    description: "buying groups"
+    columns:
+      - name: BuyingGroupID
+        tests:
+          - unique
+          - not_null
+      - name: BuyinggroupName
+      - name: LastEditedBy
+      - name: ValidFrom
+      - name: ValidTo
 
 
 
