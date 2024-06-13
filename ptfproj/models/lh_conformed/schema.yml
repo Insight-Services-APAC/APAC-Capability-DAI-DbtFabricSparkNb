@@ -22,6 +22,7 @@ models:
       - name:  ExtendedPrice
       - name:  LastEditedBy
       - name:  LastEditedWhen
+      - name: ETL_Date
 
           
 
@@ -56,6 +57,7 @@ models:
       - name:  ConfirmedReceivedBy
       - name:  LastEditedBy
       - name:  LastEditedWhen
+      - name: ETL_Date
 
   - name: cf_customers
     description: "Customers"
@@ -93,6 +95,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_customercategories
@@ -106,6 +109,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_cities
@@ -121,6 +125,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_countries
@@ -142,6 +147,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_deliverymethods
@@ -155,6 +161,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_people
@@ -167,7 +174,7 @@ models:
       - name: FullName
       - name: PreferredName
       - name: SearchName
-      - name: IsPermittedToLogin
+      - name: IsPermittedToLogon
       - name: LogonName
       - name: IsExternalLogonProvider
       - name: HashedPassword
@@ -184,6 +191,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_stateprovinces
@@ -195,11 +203,13 @@ models:
           - not_null
       - name: StateProvinceCode
       - name: StateProvinceName
+      - name: CountryID
       - name: SalesTerritory
-      - name: LastestRecordedPopulation
+      - name: LatestRecordedPopulation
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
  
 
   - name: cf_dates
@@ -214,6 +224,7 @@ models:
       - name: MonthName
       - name: MonthNumber
       - name: Year
+      - name: ETL_Date
  
 
   - name: cf_buyinggroups
@@ -227,6 +238,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: ETL_Date
 
 
 

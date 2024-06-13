@@ -16,7 +16,8 @@ CustomerCategoryID,
 CustomerCategoryName,
 LastEditedBy,
 ValidFrom,
-ValidTo
+ValidTo,
+current_timestamp() as ETL_Date
 from lh_raw.sales_customercategories
 
 )

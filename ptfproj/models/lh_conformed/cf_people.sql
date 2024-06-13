@@ -16,7 +16,7 @@ PersonID,
 FullName,
 PreferredName,
 SearchName,
-IsPermittedToLogin,
+IsPermittedToLogon,
 LogonName,
 IsExternalLogonProvider,
 HashedPassword,
@@ -32,7 +32,8 @@ CustomFields,
 OtherLanguages,
 LastEditedBy,
 ValidFrom,
-ValidTo
+ValidTo,
+current_timestamp() as ETL_Date
 from lh_raw.application_people
 
 )

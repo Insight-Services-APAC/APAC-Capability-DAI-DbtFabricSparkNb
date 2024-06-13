@@ -11,7 +11,7 @@ models:
       - name: OrderID
       - name: InvoiceID
       - name: InvoiceLineID
-      - name: SbespersonPersonKey
+      - name: SalespersonPersonID
       - name: InvoiceDateKey
       - name: CustomerPurchaseOrderNumber
       - name: IsCreditNote

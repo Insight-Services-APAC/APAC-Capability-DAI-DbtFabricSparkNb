@@ -18,7 +18,8 @@ StateProvinceID,
 LatestRecordedPopulation,
 LastEditedBy,
 ValidFrom,
-ValidTo
+ValidTo,
+current_timestamp() as ETL_Date
 from lh_raw.application_cities
 
 )

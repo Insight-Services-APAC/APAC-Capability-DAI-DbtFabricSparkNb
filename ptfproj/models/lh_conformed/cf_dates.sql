@@ -17,7 +17,8 @@ Date,
 Day,
 MonthName,
 MonthNumber,
-Year
+Year,
+current_timestamp() as ETL_Date
 from lh_raw.dates
 
 )
