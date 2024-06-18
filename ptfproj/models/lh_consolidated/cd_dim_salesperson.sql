@@ -5,7 +5,6 @@ with source_data as (
 select 
 a.PersonID as SalesPersonKey,
 a.FullName,
-current_timestamp() as ETL_Date,
 row_number () over (
     partition by 
     a.PersonID,
@@ -19,7 +18,6 @@ from {{ ref('cf_people') }} a
 
 select 
     SalesPersonKey,
-    FullName,
-    ETL_Date
+    FullName
 from source_data
 where LatestRecord = 1

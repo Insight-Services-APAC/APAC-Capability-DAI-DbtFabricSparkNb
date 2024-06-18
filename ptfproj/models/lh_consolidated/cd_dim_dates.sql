@@ -10,7 +10,6 @@ a.Day,
 a.MonthName,
 a.MonthNumber,
 a.Year,
-current_timestamp() as ETL_Date,
 row_number () over (
     partition by 
     a.DateKey
@@ -27,7 +26,6 @@ select
     Day,
     MonthName,
     MonthNumber,
-    Year,
-    ETL_Date
+    Year
 from source_data
 where LatestRecord = 1

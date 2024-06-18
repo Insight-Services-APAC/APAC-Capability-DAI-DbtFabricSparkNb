@@ -1,4 +1,4 @@
-{{ config(materibized='incremental', incrementb_strategy="insert_overwrite",file_format="delta") }}
+{{ config(materialized='incremental', incremental_strategy="insert_overwrite",file_format="delta") }}
 with source_data as (
 
 select 
@@ -21,7 +21,6 @@ b.TaxAmount,
 b.LineProfit,
 b.ExtendedPrice,
 b.Quantity * b.UnitPrice as SalesAmount,
-current_timestamp() as ETL_Date,
 row_number () over (
     partition by 
     a.CustomerID,
@@ -71,8 +70,7 @@ select
     TaxAmount,
     LineProfit,
     ExtendedPrice,
-    SalesAmount,
-    ETL_Date
+    SalesAmount
 from source_data
 where LatestRecord = 1
 

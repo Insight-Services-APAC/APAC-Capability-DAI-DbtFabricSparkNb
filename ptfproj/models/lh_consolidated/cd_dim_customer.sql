@@ -15,7 +15,6 @@ f.CountryName,
 f.Continent,
 f.Region,
 f.SubRegion,
-current_timestamp() as ETL_Date,
 row_number () over (
     partition by a.CustomerID,
     a.CustomerName,
@@ -61,8 +60,7 @@ select
     CountryName,
     Continent,
     Region,
-    SubRegion,
-    ETL_Date
+    SubRegion
 from source_data
 where LatestRecord = 1
 

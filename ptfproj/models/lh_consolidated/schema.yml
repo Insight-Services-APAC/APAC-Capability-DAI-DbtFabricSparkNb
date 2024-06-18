@@ -24,7 +24,6 @@ models:
       - name: LineProfit
       - name: ExtendedPrice
       - name: SalesAmount
-      - name: ETL_Date
 
 
   - name: cd_dim_customer
@@ -44,7 +43,6 @@ models:
       - name: Continent
       - name: Region
       - name: SubRegion
-      - name: ETL_Date
       
 
   - name: cd_dim_date
@@ -59,7 +57,6 @@ models:
       - name: MonthName
       - name: MonthNumber
       - name: Year
-      - name: ETL_Date
 
 
   - name: cd_dim_deliverymethods
@@ -70,7 +67,6 @@ models:
           - unique
           - not_null
       - name: DeliveryMethodName
-      - name: ETL_Date
 
 
   - name: cd_dim_salesperson
@@ -81,5 +77,4 @@ models:
           - unique
           - not_null
       - name: FullName
-      - name: ETL_Date
 
