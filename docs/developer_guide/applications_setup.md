@@ -5,6 +5,7 @@ This section covers the applications required for developing using the dbt frame
 - python (latest version available)
 - Visual Studio Code
 - GIT for Windows
+- OneLake Explorer (Preview)
 
 ### Install python
 First you need to install python. This can be done from this link [Download Python | Python.org](https://www.python.org/downloads/) download the latest version and install it. 
@@ -43,5 +44,14 @@ This step will ask you about your default git console, please select Use Windows
 ![image info](./images/defaultconsole.png)
 
 The rest of the installation options should be standard unless you need to change them for other reasons.
+
+### OneLake Explorer (Preview)
+Browse to website [OneLake Explorer](https://learn.microsoft.com/en-us/fabric/onelake/onelake-file-explorer) and browse down the page to Installation instructions and download OneLake file explorer and then open the file.
+
+Click install and follow standard install options. 
+
+Opening up for the first time will require you to login using your Fabric tenant details. You will then be able to access the Lakehouses from your Windows Explorer.
+
+![image info](./images/onelake.png)
 
 This concludes the required applications.
