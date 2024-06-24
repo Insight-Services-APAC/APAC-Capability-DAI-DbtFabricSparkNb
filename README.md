@@ -1,6 +1,6 @@
 ## dbt-fabricspark
 
-The `dbt-fabricsparkdb` package contains all of the code enabling dbt to work with Microsoft Fabric WITHOUT a connection endpoint like livy or the Datawarehouse SQL endpoint. For more information, consult [the docs](https://fluffy-couscous-p8yev1r.pages.github.io/#/).
+The `dbt-fabricsparknb` package contains all of the code enabling dbt to work with Microsoft Fabric WITHOUT a connection endpoint like livy or the Datawarehouse SQL endpoint. For more information, consult [the docs](https://fluffy-couscous-p8yev1r.pages.github.io/#/).
 
 
 
@@ -9,7 +9,7 @@ The `dbt-fabricsparkdb` package contains all of the code enabling dbt to work wi
 
 ## Developer Guides
 
-The developer guides and other documentation for the dbt-fabricsparkdb adaptor can be found at [dbt-fabricsparkdb Readme](docs/README.md)
+The developer guides and other documentation for the dbt-fabricsparknb adaptor can be found at [dbt-fabricsparknb Readme](docs/README.md)
 
 ### Reporting bugs and contributing code
 
