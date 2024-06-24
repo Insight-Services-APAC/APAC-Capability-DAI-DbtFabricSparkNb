@@ -47,3 +47,4 @@ dbt-insightfabric/
 .hive-metastore/
 .spark-warehouse/
 dbt-integration-tests
+ptfproj/target/
