@@ -47,6 +47,6 @@ Still in the bash console and having your virtual environment active, you can ex
 pip install -r requirements.txt
 
 ```
-*NOTE:* The installation can take sometime to complete. It may look like it's hanging but it is busy executing. If you close the installation you can restart it using the same command above. It will skip any components already installed. 
+**NOTE:** The installation can take sometime to complete. It may look like it's hanging but it is busy executing. If you close the installation you can restart it using the same command above. It will skip any components already installed. 
 
 This concludes the dbt installation.
