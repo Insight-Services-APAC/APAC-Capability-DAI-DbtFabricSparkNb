@@ -38,4 +38,12 @@ Developer guides have been created to assist with the setup of applications requ
 
 ## Community
 
-**TBA**
+### Logging to Delta
+
+Logging was previously done to a log file saved in the lakehouse and in json format. This has been changed to now log to a delta table in the lakehouse.
+
+It works using 2 tables *"batch"* and *"execution_log"*. At the start of the ETL the Prepare step will check if the tables exist and if they done they will be created. This is followed by a check for an *"open"* batch and where the batch is still open it will fail. 
+
+If you need to close the batch manually, this code is available at the end of the master notebook. 
+
+If this check passes, a batch will be opened. There are steps in each master numbered notebook to check for failures in previousn notebook runs and this is done using the open batch so previous ETL executions with failures are not picked up and return false stops on the current execution.
