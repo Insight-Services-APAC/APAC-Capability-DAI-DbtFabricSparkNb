@@ -7,6 +7,7 @@ import copy
 import dbt.logger as logger
 import json
 from dbt.contracts.graph.manifest import Manifest
+import dbt.adapters.fabricsparknb.catalog as Catalog
 from dbt.clients.system import load_file_contents
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from pathlib import Path
@@ -104,8 +105,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     # Load the template
     template = env.get_template('master_notebook.ipynb')
 
+    MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)

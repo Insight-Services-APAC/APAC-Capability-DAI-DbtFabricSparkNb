@@ -22,6 +22,7 @@ profile = dbt.config.profile.read_profile(profile_path)
 config = dbt.config.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
 profile_info = profile[config['profile']]
 target_info = profile_info['outputs'][profile_info['target']]
+print(target_info['lakehouse'])
 lakehouse = target_info['lakehouse']
 
 
