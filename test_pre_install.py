@@ -2,6 +2,7 @@ import dbt.cli
 import dbt.cli.flags
 import dbt.config.renderer
 import dbt.config.utils
+import dbt.docs.source.conf
 import dbt.parser
 import dbt.parser.manifest
 import dbt.tests.util
@@ -14,6 +15,10 @@ import dbt.tests
 from pathlib import Path
 import os
 import shutil
+
+import dbt.docs
+
+import dbt.docs.source
 
 os.environ['DBT_PROJECT_DIR'] = "testproj"
 
@@ -30,6 +35,7 @@ shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
 utils.GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
 
 dbt.tests.util.run_dbt(['build'])
+
 
 utils.SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
 utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
