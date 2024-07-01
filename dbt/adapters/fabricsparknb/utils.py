@@ -7,13 +7,14 @@ import copy
 import dbt.logger as logger
 import json
 from dbt.contracts.graph.manifest import Manifest
+import dbt.adapters.fabricsparknb.catalog as Catalog
 from dbt.clients.system import load_file_contents
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from pathlib import Path
-from azure.storage.filedatalake import (
-    DataLakeServiceClient,
-    DataLakeDirectoryClient,
-)
+#from azure.storage.filedatalake import (
+#    DataLakeServiceClient,
+#    DataLakeDirectoryClient,
+#)
 from azure.identity import DefaultAzureCredential
 
 
@@ -104,8 +105,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     # Load the template
     template = env.get_template('master_notebook.ipynb')
 
+    MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -333,35 +335,35 @@ def SortManifest(nodes_orig):
     return nodes_orig
 
 
-@staticmethod
-def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
-    file_client = directory_client.get_file_client(file_name)
-    with io.open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
-        file_client.upload_data(data, overwrite=True)
+#@staticmethod
+#def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
+#    file_client = directory_client.get_file_client(file_name)
+#    with io.open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
+#        file_client.upload_data(data, overwrite=True)
 
 
-@staticmethod
-def UploadAllNotebooks(workspacename: str, datapath: str):
-    print("Started uploading to :" + workspacename + " file path " + datapath)
-    account_name = "onelake"  # always this
-    account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
-    local_notebook_path = os.environ['DBT_PROJECT_DIR'] + '/target/notebooks'
-    token_credential = DefaultAzureCredential()
-    service_client = DataLakeServiceClient(account_url, credential=token_credential)
-    file_system_client = service_client.get_file_system_client(workspacename)
-    print("File System Client Created")
-    print(datapath)
-    paths = file_system_client.get_paths(path=datapath)
-    print("\nCurrent paths in the workspace:")
-
-    for path in paths:
-        print(path.name + '\n')
-
-    # directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
-    notebookarr = os.listdir(Path(local_notebook_path))
-
-    for notebook in notebookarr:
-        # UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
-        print("Uploaded:" + notebook)
-    print("Completed uploading to :" + workspacename + " file path " + datapath)
-    print("Be sure to run the notebook import from Fabric")
+#@staticmethod
+#def UploadAllNotebooks(workspacename: str, datapath: str):
+#    print("Started uploading to :" + workspacename + " file path " + datapath)
+#    account_name = "onelake"  # always this
+#    account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
+#    local_notebook_path = os.environ['DBT_PROJECT_DIR'] + '/target/notebooks'
+#    token_credential = DefaultAzureCredential()
+#    service_client = DataLakeServiceClient(account_url, credential=token_credential)
+#    file_system_client = service_client.get_file_system_client(workspacename)
+#    print("File System Client Created")
+#    print(datapath)
+#    paths = file_system_client.get_paths(path=datapath)
+#    print("\nCurrent paths in the workspace:")
+#
+#    for path in paths:
+#        print(path.name + '\n')
+#
+#    # directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
+#    notebookarr = os.listdir(Path(local_notebook_path))
+#
+#    for notebook in notebookarr:
+#        # UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
+#        print("Uploaded:" + notebook)
+#    print("Completed uploading to :" + workspacename + " file path " + datapath)
+#    print("Be sure to run the notebook import from Fabric")

@@ -11,7 +11,7 @@ CustomerCategoryName,
 LastEditedBy,
 ValidFrom,
 ValidTo,
-current_date() as updated_at
+current_timestamp() as ETL_Date
 from lh_raw.sales_customercategories
 
 )

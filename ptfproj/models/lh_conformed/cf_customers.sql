@@ -35,7 +35,8 @@ PostalAddressLine2,
 PostalPostalCode,
 LastEditedBy,
 ValidFrom,
-ValidTo
+ValidTo,
+current_timestamp() as ETL_Date
 from lh_raw.sales_customers
 
 )

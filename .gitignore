@@ -31,6 +31,7 @@ test.env
 # Pyenv
 .python-version
 dbt-env/
+dbt-insightfabric/
 #test
 
 # pycharm
@@ -46,3 +47,4 @@ dbt-env/
 .hive-metastore/
 .spark-warehouse/
 dbt-integration-tests
+ptfproj/target/
