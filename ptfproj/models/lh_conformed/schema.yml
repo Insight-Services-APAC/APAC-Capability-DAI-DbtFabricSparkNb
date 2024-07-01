@@ -106,6 +106,7 @@ models:
       - name: LastEditedBy
       - name: ValidFrom
       - name: ValidTo
+      - name: updated_at
 
 
 

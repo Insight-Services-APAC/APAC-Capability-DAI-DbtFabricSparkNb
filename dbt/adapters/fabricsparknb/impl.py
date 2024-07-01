@@ -475,9 +475,9 @@ class SparkAdapter(SQLAdapter):
             )
 
         database = information_schema.database
-        logger.debug("database name is ", database)
+        
         schema = list(schemas)[0]
-
+        #logger.debug("Datalake name is ", schema)
         columns: List[Dict[str, Any]] = []
         for relation in self.list_relations(database, schema):
             logger.debug("Getting table schema for relation {}", str(relation))
@@ -517,8 +517,8 @@ class SparkAdapter(SQLAdapter):
 
 
     def check_schema_exists(self, database: str, schema: str) -> bool:
-        logger.debug("database name is ", database)
-        results = catalog.ListSchemas(profile=self.config, schema=schema)
+        #logger.debug("Datalake name is ", schema)
+        results = catalog.ListSchema(profile=self.config, schema=schema)
 
         exists = True if schema in [row[0] for row in results] else False
         return exists
