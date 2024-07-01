@@ -44,6 +44,7 @@ def ListRelations(profile):
 
     return table
 
+
 @staticmethod
 def GetColumnsInRelation(profile, schema, identifier):
     # Open the file
@@ -60,6 +61,16 @@ def GetColumnsInRelation(profile, schema, identifier):
 
 
 @staticmethod
+def GetMetaHashes(project_root):
+    # Open the file
+    with io.open(project_root + '/metaextracts/MetaHashes.json', 'r') as file:
+        # Load JSON data from file
+        data = json.load(file)
+   
+    return data
+
+
+@staticmethod
 def ListSchemas(profile):
     # Open the file
     with io.open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
@@ -69,6 +80,7 @@ def ListSchemas(profile):
     table = agate.Table.from_object(data)    
 
     return table
+
 
 def ListSchema(profile, schema):
     # Open the file
