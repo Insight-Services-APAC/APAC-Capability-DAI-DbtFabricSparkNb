@@ -1,6 +1,6 @@
 # Dbt Fabric Spark Notebook Generator (Dbt-FabricSparkNb)
 
-> The first and only dbt adapter for a true, modern, software-as-a-service (SAAS) Lakehouse.
+The first and only dbt adapter for a true, modern, software-as-a-service (SAAS) Lakehouse.
 
 ## What is it
 
@@ -34,6 +34,9 @@ Developer guides have been created to assist with the setup of applications requ
 - [dbt Setup](developer_guide/dbt_setup.md)
 
 - [Framework Setup](developer_guide/framework_setup.md)
+
+#### Branching
+When creating a branch to work on from please use the branch name of "feature/YourBranchName". The case on "feature/" matters so please make sure to keep it lower case. Pull requests are to be made into the "dev" branch only. Any pull requests made into "Main" will be removed and not merged.
 
 
 ## Community
