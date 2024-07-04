@@ -8,7 +8,7 @@ For more documentation and developer guides go here:
 ## dbt-fabricspark (community version)
 
 This is the adaptor that the Insight version is based on and references in code. Go here for more documentation specific to this version.
-- [Click here for Full Documentation](https://fluffy-couscous-p8yev1r.pages.github.io/#/)
+- [Click here for Repo](https://github.com/microsoft/dbt-fabricspark)
 
 
 ### Reporting bugs and contributing code
