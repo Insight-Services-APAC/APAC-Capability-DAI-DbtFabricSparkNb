@@ -16,6 +16,7 @@ import os
 import shutil
 
 os.environ['DBT_PROJECT_DIR'] = "ptfproj"
+curr_dir = os.getcwd()
 
 profile_path = Path(os.path.expanduser('~')) / '.dbt/'
 profile = dbt.config.profile.read_profile(profile_path)
@@ -24,6 +25,7 @@ profile_info = profile[config['profile']]
 target_info = profile_info['outputs'][profile_info['target']]
 lakehouse = target_info['lakehouse']
 
+dbt_project_dir = os.path.join(curr_dir,os.environ['DBT_PROJECT_DIR'])
 
 shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
 utils.GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
@@ -34,5 +36,5 @@ utils.SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
 utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
 utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
 utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
-
+utils.IPYNBtoFabricPYFile(dbt_project_dir)
 

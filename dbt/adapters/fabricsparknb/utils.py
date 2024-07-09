@@ -16,6 +16,7 @@ from pathlib import Path
 #    DataLakeDirectoryClient,
 #)
 from azure.identity import DefaultAzureCredential
+import uuid
 
 
 @staticmethod
@@ -283,6 +284,65 @@ def GetManifest():
     # Convert the dictionary into a Manifest object
     manifest = Manifest.from_dict(data)
     return manifest
+
+@staticmethod
+def GetFabricPlatformContent(displayName):
+            logicalId = str(uuid.uuid4())  
+            
+            platformcontent = """{ 
+                                    "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+                                    "metadata": {
+                                        "type": "Notebook",
+                                        "displayName": \""""+displayName+"""\",
+                                        "description": "New notebook"
+                                    },
+                                    "config": {
+                                        "version": "2.0",
+                                        "logicalId": \""""+logicalId+"""\"
+                                    }
+                                 } """
+            return platformcontent
+
+@staticmethod
+def IPYNBtoFabricPYFile(dbt_project_dir):
+    target_dir = os.path.join(dbt_project_dir,"target")
+    notebooks_dir = os.path.join(target_dir,"notebooks")
+    os.chdir(notebooks_dir)
+    list_of_notebooks = os.listdir(notebooks_dir)
+    for filename in list_of_notebooks:
+        notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
+        notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filename+".Notebook")
+        py_fabric_file = os.path.join(notebook_file_fabric_py_dir,"notebook-content.py")
+        platform_file = os.path.join(notebook_file_fabric_py_dir,".platform")
+        os.makedirs(notebook_file_fabric_py_dir, exist_ok=True)
+        path = dbt_project_dir
+        os.makedirs(path, exist_ok=True)
+        with open(platform_file, "w", encoding="utf-8") as platform_config_file:            
+            FabricPlatformContent = GetFabricPlatformContent(filename)          
+            platform_config_file.write(FabricPlatformContent)
+            with open(py_fabric_file, "w", encoding="utf-8") as python_file:
+                python_file.write("# Fabric notebook source\n\n\n")
+                f = open (filename, "r", encoding="utf-8") 
+                data = json.loads(f.read())
+                for cell in data['cells']:
+                    if (cell["cell_type"] == "code"):
+                        if (cell["source"][0][:2] == "%%"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC "+ sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                        else:
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                python_file.write(sourceline)
+                            python_file.write("\n\n")
+                    elif (cell["cell_type"] == "markdown"):
+                        python_file.write("# MARKDOWN ********************\n\n")
+                        for sourceline in cell['source']:
+                            line = "# "+ sourceline
+                            python_file.write(line)
+                        python_file.write("\n\n")
 
 
 @staticmethod
