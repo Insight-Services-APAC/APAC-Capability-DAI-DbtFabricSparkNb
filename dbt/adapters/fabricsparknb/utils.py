@@ -305,20 +305,22 @@ def GetFabricPlatformContent(displayName):
 
 @staticmethod
 def IPYNBtoFabricPYFile(dbt_project_dir):
+    print("Converting notebooks to Fabric PY format")
     target_dir = os.path.join(dbt_project_dir,"target")
     notebooks_dir = os.path.join(target_dir,"notebooks")
     os.chdir(notebooks_dir)
     list_of_notebooks = os.listdir(notebooks_dir)
     for filename in list_of_notebooks:
+        filenamewithoutext = filename[:-6]  ## remove .ipynb
         notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
-        notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filename+".Notebook")
+        notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filenamewithoutext+".Notebook")
         py_fabric_file = os.path.join(notebook_file_fabric_py_dir,"notebook-content.py")
         platform_file = os.path.join(notebook_file_fabric_py_dir,".platform")
         os.makedirs(notebook_file_fabric_py_dir, exist_ok=True)
         path = dbt_project_dir
         os.makedirs(path, exist_ok=True)
         with open(platform_file, "w", encoding="utf-8") as platform_config_file:            
-            FabricPlatformContent = GetFabricPlatformContent(filename)          
+            FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
             platform_config_file.write(FabricPlatformContent)
             with open(py_fabric_file, "w", encoding="utf-8") as python_file:
                 python_file.write("# Fabric notebook source\n\n\n")
@@ -343,6 +345,8 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
                             line = "# "+ sourceline
                             python_file.write(line)
                         python_file.write("\n\n")
+        print("Completed fabric py conversion for "+filenamewithoutext)
+    print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
 
 
 @staticmethod
