@@ -42,7 +42,7 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -81,13 +81,13 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
 
         # Write the notebook to a file
-        target_file_name = f'master_notebook_{sort_order}.ipynb'
+        target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:            
             try:
                 nb_str = nbf.writes(nb)
@@ -109,7 +109,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -126,14 +126,14 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = 'mssparkutils.notebook.run("master_notebook_' + str(sort_order) + '")'
+        code = f'mssparkutils.notebook.run("master_{project_name}_notebook_' + str(sort_order) + '")'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
    
     # Write the notebook to a file
-    target_file_name = 'master_notebook.ipynb'
+    target_file_name = f'master_{project_name}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -144,7 +144,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -162,7 +162,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     nb = nbf.reads(rendered_template, as_version=4)
 
     # Write the notebook to a file    
-    target_file_name = 'metadata_extract.ipynb'
+    target_file_name = f'metadata_{project_name}_extract.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -173,7 +173,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -191,7 +191,7 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
     nb = nbf.reads(rendered_template, as_version=4)
     
     # Write the notebook to a file    
-    target_file_name = 'import_notebook.ipynb'
+    target_file_name = f'import_{project_name}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
