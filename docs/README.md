@@ -24,16 +24,11 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 - Opensource and free to use
 - Extensible and customisable
 
+## Adapter User Guide
+For data engineers looking to use the adapter, the user guide can be found [here](./user_guide/initial_setup.md)
 
-## Developer Guides
-
-Developer guides have been created to assist with the setup of applications required, the installation of dbt and framework setup.
-
-- [Windows Application Setup](developer_guide/applications_setup.md)
-
-- [dbt Setup](developer_guide/dbt_setup.md)
-
-- [Framework Setup](developer_guide/framework_setup.md)
+## Adapter Developer Guides
+For advanced users looking to extend or customise the adapter the adapter developer guide can be found [here]()
 
 #### Branching
 When creating a branch to work on from please use the branch name of "feature/YourBranchName". The case on "feature/" matters so please make sure to keep it lower case. Pull requests are to be made into the "dev" branch only. Any pull requests made into "Main" will be removed and not merged.
