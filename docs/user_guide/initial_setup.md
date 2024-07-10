@@ -203,3 +203,5 @@ pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capabili
 
 ```
 <!-- tabs:end -->
+
+You are now ready to move to the next step in which you will set up your dbt project. Follow the [Dbt Project Setup](./dbt_project_setup.md) guide.

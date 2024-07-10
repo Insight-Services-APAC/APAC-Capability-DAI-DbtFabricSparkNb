@@ -118,9 +118,7 @@ Now we are ready to run our dbt project for the first time. But first we need to
 
 This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at [https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py). Alternatively, you can copy the code in the code block titled [Python Build script template](#python-build-script-template) below. Paste the code into a new file in the root of your source code directory. You can create this file using vscode using the command line shown in the code block titled [New file creation in vscode](#New-file-creation-in-vscode) below.
 
-> [!IMPORTANT]
-> Be sure to change the line below replacing "testproj" with the folder name of your dbt project.</br>
-> `os.environ['DBT_PROJECT_DIR'] = "testproj"`
+!> **Important** Be sure to change the line `os.environ['DBT_PROJECT_DIR'] = "testproj"` by replacing "testproj" with the folder name of your dbt project.
 
 #### New file creation in vscode
 
