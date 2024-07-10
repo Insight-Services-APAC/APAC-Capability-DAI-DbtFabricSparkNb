@@ -203,6 +203,6 @@ Now lets create and activate our Python environment and install the required pac
 
 
 !!! info
-    You are now ready to move to the next step in which you will set up your dbt project. Follow the [Dbt Project Setup](./user_guide/dbt_project_setup.md) guide.
+    You are now ready to move to the next step in which you will set up your dbt project. Follow the [Dbt Project Setup](./dbt_project_setup.md) guide.
 
 

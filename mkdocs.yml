@@ -20,6 +20,7 @@ theme:
     - navigation.sections
     - navigation.tabs
     - navigation.tabs.sticky
+    - navigation.indexes
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -57,6 +58,11 @@ plugins:
   - macros:
       include_yaml:
         - bundle: docs/data/bundle.yml
+  - redirects:
+      redirect_maps:
+        'user_guide/index.md': 'user_guide/initial_setup.md'
+        'developer_guide/index.md': 'developer_guide/initial_setup.md'
+        'documentation_guide/index.md': 'documentation_guide/initial_setup.md'
 exclude_docs: |
   data/*
 extra_javascript:
