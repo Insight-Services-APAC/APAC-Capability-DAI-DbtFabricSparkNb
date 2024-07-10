@@ -1,3 +1,7 @@
+---
+  weight: 2
+---
+
 # DBT Project Setup 
 
 ## Fabric Workspace Setup

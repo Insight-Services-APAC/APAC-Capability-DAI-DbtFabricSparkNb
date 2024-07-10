@@ -1,3 +1,6 @@
+---
+    title: Home
+---
 # Dbt Fabric Spark Notebook Generator (Dbt-FabricSparkNb)
 
 The first and only dbt adapter for a true, modern, software-as-a-service (SAAS) Lakehouse.

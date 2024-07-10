@@ -1,3 +1,7 @@
+---
+  weight: 3
+---
+
 # Development Workflow
 
 The following diagram illustrates the development workflow for a dbt project that uses the Dbt-FabricSparkNb adapter.
