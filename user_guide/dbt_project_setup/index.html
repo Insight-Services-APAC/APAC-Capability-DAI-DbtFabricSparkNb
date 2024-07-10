@@ -8,8 +8,10 @@
       
       
       
+        <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/dbt_project_setup/">
       
-        <link rel="prev" href="../_sidebar/">
+      
+        <link rel="prev" href="../initial_setup/">
       
       
         <link rel="next" href="../development_workflow/">
@@ -46,6 +48,8 @@
       
     
     
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -61,7 +65,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="insight" data-md-color-primary="custom" data-md-color-accent="custom">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -70,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#macro-syntax-error" class="md-skip">
+        <a href="#dbt-project-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -84,7 +88,7 @@
 
   
 
-<header class="md-header md-header--shadow" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Dbt Adapter for Fabric Spark - By Insight" class="md-header__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
       
@@ -155,15 +159,135 @@
 </div>
     
     
+      <div class="md-header__source">
+        <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Dbt Fabric Spark
+  </div>
+</a>
+      </div>
+    
   </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+    
+  
+  User guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer_guide/" class="md-tabs__link">
+          
+  
+    
+  
+  Developer guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../documentation_guide/" class="md-tabs__link">
+          
+  
+    
+  
+  Documentation guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../zzz_archive/" class="md-tabs__link">
+          
+  
+    
+  
+  Zzz archive
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
   
 </header>
     
     <div class="md-container" data-md-component="container">
       
       
-        
-          
         
       
       <main class="md-main" data-md-component="main">
@@ -177,10 +301,12 @@
                     
 
 
+  
+
 
   
 
-<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Dbt Adapter for Fabric Spark - By Insight" class="md-nav__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
       
@@ -189,6 +315,18 @@
     </a>
     Dbt Adapter for Fabric Spark - By Insight
   </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Dbt Fabric Spark
+  </div>
+</a>
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -203,7 +341,7 @@
         
   
   <span class="md-ellipsis">
-    Dbt Fabric Spark Notebook Generator (Dbt-FabricSparkNb)
+    Home
   </span>
   
 
@@ -216,90 +354,77 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../1-Why/" class="md-nav__link">
+  
+    
+    
+      
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
   
   <span class="md-ellipsis">
-    Objective of this project
+    User guide
   </span>
   
 
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../_coverpage/" class="md-nav__link">
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
-  
-  <span class="md-ellipsis">
-     coverpage
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../../_sidebar%20copy/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-     sidebar copy
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../_sidebar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-     sidebar
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../dbt-adapter-user-guide/" class="md-nav__link">
+      <a href="../initial_setup/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -311,61 +436,119 @@
     </li>
   
 
+              
+            
+              
+                
+  
+  
     
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
   
+  <span class="md-ellipsis">
+    DBT Project Setup
+  </span>
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../../test/" class="md-nav__link">
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Test
+    DBT Project Setup
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fabric-workspace-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fabric Workspace Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-dbt-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Dbt Project
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Create Dbt Project">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-python-build-script-that-will-wrap-our-dbt-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a python build script that will wrap our dbt process
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-the-build-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run the build script
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-build-steps-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Post Build Steps &amp; Checks
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Developer guide
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
-            <span class="md-nav__icon md-icon"></span>
-            Developer guide
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
+              
             
               
                 
@@ -374,11 +557,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer_guide/_sidebar/" class="md-nav__link">
+      <a href="../development_workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-     sidebar
+    Development Workflow
   </span>
   
 
@@ -386,6 +569,77 @@
     </li>
   
 
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer_guide/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Developer guide
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Developer guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
             
               
@@ -483,86 +737,136 @@
       
   
   
-    
   
   
-  
     
     
+      
+        
+          
+        
+      
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
-            
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../documentation_guide/" class="md-nav__link ">
+              
   
   <span class="md-ellipsis">
-    User guide
+    Documentation guide
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+          </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            User guide
+            Documentation guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
               
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../_sidebar/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-     sidebar
-  </span>
-  
-
-      </a>
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
+  
+  
   
   
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
+    
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
       
       
         
       
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../zzz_archive/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Zzz archive
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Zzz archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../zzz_archive/1-Why/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    DBT Project Setup
+    Objective of this project
   </span>
   
 
       </a>
-      
     </li>
   
 
@@ -575,28 +879,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development_workflow/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Development Workflow
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../initial_setup/" class="md-nav__link">
+      <a href="../../zzz_archive/dbt-adapter-user-guide/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -631,18 +914,194 @@
                 
                   
 
+  
+    <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/user_guide/dbt_project_setup.md" title="Edit this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
+    </a>
+  
+  
 
-<h1 id="macro-syntax-error"><em>Macro Syntax Error</em><a class="headerlink" href="#macro-syntax-error" title="Permanent link">&para;</a></h1>
-<p><em>File</em>: <code>user_guide\dbt_project_setup.md</code></p>
-<p><em>Line 58 in Markdown file:</em> <strong>unexpected '.'</strong>
-<div class="highlight"><pre><span></span><code><span class="gh"># files using the `{{ config(...) }}` macro.</span>
+
+<h1 id="dbt-project-setup">DBT Project Setup<a class="headerlink" href="#dbt-project-setup" title="Permanent link">&para;</a></h1>
+<h2 id="fabric-workspace-setup">Fabric Workspace Setup<a class="headerlink" href="#fabric-workspace-setup" title="Permanent link">&para;</a></h2>
+<p>Next we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:</p>
+<ul>
+<li>Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.</li>
+<li>Ensure that the workspace is Fabric enabled. If not, enable it.</li>
+<li>Make sure that there is at least one Datalake in the workspace.</li>
+<li>Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is <code>4f0cb887-047a-48a1-98c3-ebdb38c784c2</code> and the lakehouse id is <code>aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9</code>.</li>
+</ul>
+<div class="highlight"><span class="filename">Example URL</span><pre><span></span><code>https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
+</code></pre></div>
+<h2 id="create-dbt-project">Create Dbt Project<a class="headerlink" href="#create-dbt-project" title="Permanent link">&para;</a></h2>
+<p>Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Create your dbt project directories and profiles.yml file</span>
+<span class="n">dbt</span> <span class="n">init</span> <span class="n">my_project</span> <span class="c"># Note that the name of the project is arbitrary... call it whatever you like</span>
+</code></pre></div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Note when asked to select the adapter choose <code>dbt-fabricksparknb</code>. During this process you will also be asked for the <code>workspace id</code>, <code>lakehouse id</code>, and <code>workspace name</code>. Use the values you gathered from the Power BI Portal. </p>
+</div>
+<p>The command above will create a new directory called <code>my_project</code>. Within this directory you will find a <code>project.yml</code> file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:</p>
+<div class="highlight"><span class="filename">project.yml</span><pre><span></span><code><span class="c1"># Name your project! Project names should contain only lowercase characters</span>
+<span class="c1"># and underscores. A good package name should reflect your organization&#39;s</span>
+<span class="c1"># name or the intended use of these models</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1.0.0&#39;</span>
+
+<span class="c1"># This setting configures which &quot;profile&quot; dbt uses for this project.</span>
+<span class="nt">profile</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+
+<span class="c1"># These configurations specify where dbt should look for different types of files.</span>
+<span class="c1"># The `model-paths` config, for example, states that models in this project can be</span>
+<span class="c1"># found in the &quot;models/&quot; directory. You probably won&#39;t need to change these!</span>
+<span class="nt">model-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;models&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">analysis-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;analyses&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">test-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;tests&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">seed-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;seeds&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">macro-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;macros&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">snapshot-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;snapshots&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">clean-targets</span><span class="p">:</span><span class="w">         </span><span class="c1"># directories to be removed by `dbt clean`</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;target&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;dbt_packages&quot;</span>
+
+
+<span class="c1"># Configuring models</span>
+<span class="c1"># Full documentation: https://docs.getdbt.com/docs/configuring-models</span>
+
+<span class="nt">models</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test4</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Config indicated by + and applies to all files under models/example/</span>
+<span class="w">    </span><span class="nt">example</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">+materialized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">view</span>
+</code></pre></div>
+<p>The dbt init command will also update your <code>profiles.yml</code> file with a profile matching your dbt project name. Open this file in your favourite text editor using the command below:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">MacOS</label><label for="__tabbed_1_3">Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="nv">$home</span><span class="p">/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>When run this will display a file similar to the one below. Check that your details are correct.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">test4</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dev</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">auth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cli</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">client_scrent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">connect_retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">connect_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dkld</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">lakehouse</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;lakehouse&#39;</span><span class="w"> </span><span class="c1">#the name of your lakehouse</span>
+<span class="w">      </span><span class="nt">lakehouseid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9&#39;</span><span class="w"> </span><span class="c1">#the guid of your lakehouse</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">livy</span>
+<span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbo</span><span class="w"> </span><span class="c1">#the schema you want to use</span>
+<span class="w">      </span><span class="nt">tenant_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;72f988bf-86f1-41af-91ab-2d7cd011db47&#39;</span><span class="w"> </span><span class="c1">#your power bi tenant id</span>
+<span class="w">      </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"> </span><span class="c1">#the number of threads to use</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fabricsparknb</span><span class="w"> </span><span class="c1">#the type of adapter to use.. always use fabricsparknb</span>
+<span class="w">      </span><span class="nt">workspaceid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4f0cb887-047a-48a1-98c3-ebdb38c784c2&#39;</span><span class="w"> </span><span class="c1">#the guid of your workspace</span>
+<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
+</code></pre></div>
+<p>Now we are ready to run our dbt project for the first time. But first we need to create a build script.</p>
+<h3 id="create-a-python-build-script-that-will-wrap-our-dbt-process">Create a python build script that will wrap our dbt process<a class="headerlink" href="#create-a-python-build-script-that-will-wrap-our-dbt-process" title="Permanent link">&para;</a></h3>
+<p>This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py">https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py</a>. Alternatively, you can copy the code in the code block titled <a href="#python-build-script-template">Python Build script template</a> below. Paste the code into a new file in the root of your source code directory. You can create this file using vscode using the command line shown in the code block titled <a href="#New-file-creation-in-vscode">New file creation in vscode</a> below.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Be sure to change the line <code>os.environ['DBT_PROJECT_DIR'] = "testproj"</code> by replacing "testproj" with the folder name of your dbt project.</p>
+</div>
+<div class="highlight"><span class="filename">New file creation in vscode</span><pre><span></span><code><span class="n">code</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">dbt</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;testproj&quot;</span>  <span class="c1"># !!!! Change this to the path of your dbt project</span>
+
+<span class="c1"># Get Config and Profile Information from dbt</span>
+<span class="n">profile_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="s1">&#39;.dbt/&#39;</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">read_profile</span><span class="p">(</span><span class="n">profile_path</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">load_raw_project</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">])</span>
+
+<span class="n">profile_info</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]]</span>
+<span class="n">target_info</span> <span class="o">=</span> <span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
+<span class="n">lakehouse</span> <span class="o">=</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouse&#39;</span><span class="p">]</span>
+
+<span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate AzCopy Scripts and Metadata Extract Notebooks</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateAzCopyScripts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">])</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">)</span>
+
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateMetadataExtract</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateNotebookUpload</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Check if metaextracts directory exists in os.environ[&#39;DBT_PROJECT_DIR&#39;] and create it if it doesn&#39;t</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">)</span>
+
+<span class="c1"># count files in metaextracts directory</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;33;48m&#39;</span><span class="p">,</span> <span class="s2">&quot;It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/upload.ps1&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;3. Manually upload the following notebook to your workspace: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/notebooks/import_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;5. A new notebook should appear in the workspace called metadata_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;6. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;7. Re-run this script to generate the model and master notebooks.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Call dbt build</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;dbt&quot;</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Generate Model Notebooks and Master Notebooks</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">SetSqlVariableForAllNotebooks</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">GenerateMasterNotebook</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="run-the-build-script">Run the build script<a class="headerlink" href="#run-the-build-script" title="Permanent link">&para;</a></h3>
+<p>Run the build script using the code below in the terminal.
+<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be <em>"fabricsparknb"</em> not <em>"fabricspark"</em>.</p>
+</div>
+<h3 id="post-build-steps-checks">Post Build Steps &amp; Checks<a class="headerlink" href="#post-build-steps-checks" title="Permanent link">&para;</a></h3>
+<p>After successful execution and number of notebooks have been created in your project/target folder under notebooks. </p>
+<p><em>import_notebook.ipynb</em> this will be used to import notebook files into your lakehouse.</p>
+<p><em>metadata_extract.ipynb</em> is used to update the metadata json files in your project. </p>
+<p>These 2 can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder using Onelake explorer. </p>
+<p>You then open the <em>import_notebook.ipynb</em> in fabric and <em>Run All</em> to import the notebooks from the Files/Notebooks directory in fabric. </p>
+<p>Executing the <em>master_notebook.ipynb</em> notebook will execute all notebooks created in your project.</p>
+<p>This concludes the Framework setup.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 
@@ -689,10 +1148,14 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../javascripts/tablesort.js"></script>
       
     
   </body>
