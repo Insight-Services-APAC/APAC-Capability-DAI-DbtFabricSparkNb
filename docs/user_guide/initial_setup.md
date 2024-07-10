@@ -103,9 +103,8 @@ Remove-Item AzCopy.zip -Force
 ```
 <!-- tabs:end -->
 
-## Create new Source code directory and Python Environment Setup
+## Source Directory & Python Env
 Now lets create and activate our Python environment and install the required packages.
-
 
 <!-- tabs:start -->
 
@@ -203,3 +202,4 @@ pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capabili
 
 
 ```
+<!-- tabs:end -->
