@@ -49,9 +49,9 @@ dbt init my_project # Note that the name of the project is arbitrary... call it 
     13. `schema (default schema that dbt will build objects in):` <br/>**Enter `dbo`**
     14. threads (1 or more) [1]: <br/>**Enter 1**
     
-The command above will create a new directory called `my_project`. Within this directory you will find a `project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
+The command above will create a new directory called `my_project`. Within this directory you will find a `dbt_project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
 
-``` yaml title="project.yml"
+``` yaml title="dbt_project.yml"
 
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
