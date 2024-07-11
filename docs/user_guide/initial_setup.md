@@ -106,7 +106,7 @@ Now lets create and activate our Python environment and install the required pac
 
 
 !!! tip
-    When doing pip install dbt-fabricspark below it can take a few minutes to complete on some machines. Occasionally pip may ge stuck and in such cases break the execution using ctrl-c and run the same pip again, 
+    When doing pip install dbt-fabricspark below it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
 
 
 === "Windows"
