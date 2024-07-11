@@ -926,94 +926,139 @@
 <h1 id="dbt-project-setup">DBT Project Setup<a class="headerlink" href="#dbt-project-setup" title="Permanent link">&para;</a></h1>
 <h2 id="fabric-workspace-setup">Fabric Workspace Setup<a class="headerlink" href="#fabric-workspace-setup" title="Permanent link">&para;</a></h2>
 <p>Next we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:</p>
-<ul>
+<ol>
 <li>Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.</li>
 <li>Ensure that the workspace is Fabric enabled. If not, enable it.</li>
 <li>Make sure that there is at least one Datalake in the workspace.</li>
-<li>Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is <code>4f0cb887-047a-48a1-98c3-ebdb38c784c2</code> and the lakehouse id is <code>aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9</code>.</li>
-</ul>
-<div class="highlight"><span class="filename">Example URL</span><pre><span></span><code>https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
+<li>
+<p>Get the connection details for the workspace.</p>
+<ol>
+<li>You will need to get the <mark>workspace name</mark>, <mark>workspace id</mark>, <mark>lakehouse id</mark>, and <mark>lakehouse name</mark>. </li>
+<li>The <mark>lakehouse name</mark> and <mark>workspace name</mark> are easily viewed from the fabric / power bi portal. </li>
+<li>The easiest way to get the id information is to:<ol>
+<li>Navigate to a file or folder in your target lakehouse.</li>
+<li>Click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window.</li>
+<li>From these properties select copy url and paste it into a text editor. The <mark>workspace id</mark> is the first GUID in the URL, the <mark>lakehouse id</mark> is the second GUID in the URL.</li>
+<li>In the example below, the workspace id is <code>4f0cb887-047a-48a1-98c3-ebdb38c784c2</code> and the lakehouse id is <code>aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9</code>.</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<div class="highlight"><span class="filename">Example URL</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 </code></pre></div>
 <h2 id="create-dbt-project">Create Dbt Project<a class="headerlink" href="#create-dbt-project" title="Permanent link">&para;</a></h2>
-<p>Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:</p>
-<div class="highlight"><pre><span></span><code><span class="c"># Create your dbt project directories and profiles.yml file</span>
-<span class="n">dbt</span> <span class="n">init</span> <span class="n">my_project</span> <span class="c"># Note that the name of the project is arbitrary... call it whatever you like</span>
+<p>Once you have taken note of the <mark>workspace id</mark>, <mark>lakehouse id</mark>, <mark>workspace name</mark> and <mark>lakehouse name</mark> you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c"># Create your dbt project directories and profiles.yml file</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">dbt</span> <span class="n">init</span> <span class="n">my_project</span> <span class="c"># Note that the name of the project is arbitrary... call it whatever you like</span>
 </code></pre></div>
 <div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Note when asked to select the adapter choose <code>dbt-fabricksparknb</code>. During this process you will also be asked for the <code>workspace id</code>, <code>lakehouse id</code>, and <code>workspace name</code>. Use the values you gathered from the Power BI Portal. </p>
+<p class="admonition-title">When asked the questions below, provide the answers in bold below:</p>
+<ol>
+<li><code>Which data base would you like to use?</code> <br/><strong>select <code>dbt-fabricksparknb</code></strong></li>
+<li><code>Desired authentication method option (enter a number):</code> <br/><strong>select <code>livy</code></strong></li>
+<li><code>workspaceid (GUID of the workspace. Open the workspace from fabric.microsoft.com and copy the workspace url):</code> <br/><strong>Enter the workspace id</strong></li>
+<li><code>lakehouse (Name of the Lakehouse in the workspace that you want to connect to):</code> <br/><strong>Enter the lakehouse name</strong></li>
+<li><code>lakehouseid (GUID of the lakehouse, which can be extracted from url when you open lakehouse artifact from fabric.microsoft.com):</code> <br/><strong>Enter the lakehouse id</strong></li>
+<li><code>endpoint [https://api.fabric.microsoft.com/v1]:</code> <br/><strong>Press enter to accept the default</strong></li>
+<li><code>auth (Use CLI (az login) for interactive execution or SPN for automation) [CLI]:</code> <br/><strong>select <code>cli</code></strong></li>
+<li><code>client_id (Use when SPN auth is used.):</code> <br/><strong>Enter a single space and press enter</strong></li>
+<li><code>client_scrent (Use when SPN auth is used.):</code> <br/><strong>Enter a single space and press enter</strong></li>
+<li><code>tenant_id (Use when SPN auth is used.):</code> <br/><strong>Enter a single space and press enter</strong></li>
+<li><code>connect_retries [0]:</code> <br/><strong>Enter 0</strong></li>
+<li><code>connect_timeout [10]:</code> <br/><strong>Enter 10</strong></li>
+<li><code>schema (default schema that dbt will build objects in):</code> <br/><strong>Enter <code>dbo</code></strong></li>
+<li>threads (1 or more) [1]: <br/><strong>Enter 1</strong></li>
+</ol>
 </div>
 <p>The command above will create a new directory called <code>my_project</code>. Within this directory you will find a <code>project.yml</code> file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:</p>
-<div class="highlight"><span class="filename">project.yml</span><pre><span></span><code><span class="c1"># Name your project! Project names should contain only lowercase characters</span>
-<span class="c1"># and underscores. A good package name should reflect your organization&#39;s</span>
-<span class="c1"># name or the intended use of these models</span>
-<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
-<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1.0.0&#39;</span>
-
-<span class="c1"># This setting configures which &quot;profile&quot; dbt uses for this project.</span>
-<span class="nt">profile</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
-
-<span class="c1"># These configurations specify where dbt should look for different types of files.</span>
-<span class="c1"># The `model-paths` config, for example, states that models in this project can be</span>
-<span class="c1"># found in the &quot;models/&quot; directory. You probably won&#39;t need to change these!</span>
-<span class="nt">model-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;models&quot;</span><span class="p p-Indicator">]</span>
-<span class="nt">analysis-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;analyses&quot;</span><span class="p p-Indicator">]</span>
-<span class="nt">test-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;tests&quot;</span><span class="p p-Indicator">]</span>
-<span class="nt">seed-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;seeds&quot;</span><span class="p p-Indicator">]</span>
-<span class="nt">macro-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;macros&quot;</span><span class="p p-Indicator">]</span>
-<span class="nt">snapshot-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;snapshots&quot;</span><span class="p p-Indicator">]</span>
-
-<span class="nt">clean-targets</span><span class="p">:</span><span class="w">         </span><span class="c1"># directories to be removed by `dbt clean`</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;target&quot;</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;dbt_packages&quot;</span>
-
-
-<span class="c1"># Configuring models</span>
-<span class="c1"># Full documentation: https://docs.getdbt.com/docs/configuring-models</span>
-
-<span class="nt">models</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">test4</span><span class="p">:</span>
-<span class="w">    </span><span class="c1"># Config indicated by + and applies to all files under models/example/</span>
-<span class="w">    </span><span class="nt">example</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">+materialized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">view</span>
+<div class="highlight"><span class="filename">project.yml</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Name your project! Project names should contain only lowercase characters</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># and underscores. A good package name should reflect your organization&#39;s</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># name or the intended use of these models</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1.0.0&#39;</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># This setting configures which &quot;profile&quot; dbt uses for this project.</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nt">profile</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># These configurations specify where dbt should look for different types of files.</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># The `model-paths` config, for example, states that models in this project can be</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1"># found in the &quot;models/&quot; directory. You probably won&#39;t need to change these!</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="nt">model-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;models&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="nt">analysis-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;analyses&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="nt">test-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;tests&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="nt">seed-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;seeds&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="nt">macro-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;macros&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="nt">snapshot-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;snapshots&quot;</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="nt">clean-targets</span><span class="p">:</span><span class="w">         </span><span class="c1"># directories to be removed by `dbt clean`</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;target&quot;</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;dbt_packages&quot;</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="c1"># Configuring models</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="c1"># Full documentation: https://docs.getdbt.com/docs/configuring-models</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="nt">models</span><span class="p">:</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">  </span><span class="nt">test4</span><span class="p">:</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">    </span><span class="c1"># Config indicated by + and applies to all files under models/example/</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">    </span><span class="nt">example</span><span class="p">:</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">      </span><span class="nt">+materialized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">view</span>
 </code></pre></div>
 <p>The dbt init command will also update your <code>profiles.yml</code> file with a profile matching your dbt project name. Open this file in your favourite text editor using the command below:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">MacOS</label><label for="__tabbed_1_3">Linux</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="nv">$home</span><span class="p">/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">code</span>  <span class="nv">$home</span><span class="p">/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">code</span>  <span class="p">~/.</span><span class="n">dbt</span><span class="p">/</span><span class="n">profiles</span><span class="p">.</span><span class="n">yml</span>
 </code></pre></div>
 </div>
 </div>
 </div>
 <p>When run this will display a file similar to the one below. Check that your details are correct.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">test4</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">dev</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">auth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cli</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">client_scrent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">connect_retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">connect_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dkld</span><span class="w"> </span><span class="c1">#remove</span>
-<span class="w">      </span><span class="nt">lakehouse</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;lakehouse&#39;</span><span class="w"> </span><span class="c1">#the name of your lakehouse</span>
-<span class="w">      </span><span class="nt">lakehouseid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9&#39;</span><span class="w"> </span><span class="c1">#the guid of your lakehouse</span>
-<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">livy</span>
-<span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbo</span><span class="w"> </span><span class="c1">#the schema you want to use</span>
-<span class="w">      </span><span class="nt">tenant_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;72f988bf-86f1-41af-91ab-2d7cd011db47&#39;</span><span class="w"> </span><span class="c1">#your power bi tenant id</span>
-<span class="w">      </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"> </span><span class="c1">#the number of threads to use</span>
-<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fabricsparknb</span><span class="w"> </span><span class="c1">#the type of adapter to use.. always use fabricsparknb</span>
-<span class="w">      </span><span class="nt">workspaceid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4f0cb887-047a-48a1-98c3-ebdb38c784c2&#39;</span><span class="w"> </span><span class="c1">#the guid of your workspace</span>
-<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
-</code></pre></div>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">profiles.yml</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-6-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-6-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-6-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-6-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-6-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-6-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-6-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-6-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-6-10">10</a></span>
+<span class="normal"><a href="#__codelineno-6-11">11</a></span>
+<span class="normal"><a href="#__codelineno-6-12">12</a></span>
+<span class="normal"><a href="#__codelineno-6-13">13</a></span>
+<span class="normal"><a href="#__codelineno-6-14">14</a></span>
+<span class="normal"><a href="#__codelineno-6-15">15</a></span>
+<span class="normal"><a href="#__codelineno-6-16">16</a></span>
+<span class="normal"><a href="#__codelineno-6-17">17</a></span>
+<span class="normal"><a href="#__codelineno-6-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="nt">my_project</span><span class="p">:</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_project_target</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="w">    </span><span class="nt">my_project_target</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="w">      </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CLI</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">livy</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="w">      </span><span class="nt">connect_retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="w">      </span><span class="nt">connect_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="w">      </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://api.fabric.microsoft.com/v1</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="hll"><span class="w">      </span><span class="nt">workspaceid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4f0cb887-047a-48a1-98c3-ebdb38c784c2</span>
+</span><a id="__codelineno-6-11" name="__codelineno-6-11"></a><span class="hll"><span class="w">      </span><span class="nt">workspacename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+</span><a id="__codelineno-6-12" name="__codelineno-6-12"></a><span class="w">      </span><span class="nt">lakehousedatapath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/lakehouse</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13"></a><span class="hll"><span class="w">      </span><span class="nt">lakehouseid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">031feff6-071d-42df-818a-984771c083c4</span>
+</span><a id="__codelineno-6-14" name="__codelineno-6-14"></a><span class="hll"><span class="w">      </span><span class="nt">lakehouse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">datalake</span>
+</span><a id="__codelineno-6-15" name="__codelineno-6-15"></a><span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbo</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="w">      </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fabricsparknb</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18"></a><span class="w">      </span><span class="nt">retry_all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div></td></tr></table></div>
 <p>Now we are ready to run our dbt project for the first time. But first we need to create a build script.</p>
 <h3 id="create-a-python-build-script-that-will-wrap-our-dbt-process">Create a python build script that will wrap our dbt process<a class="headerlink" href="#create-a-python-build-script-that-will-wrap-our-dbt-process" title="Permanent link">&para;</a></h3>
 <p>This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py">https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py</a>. Alternatively, you can copy the code in the code block titled <a href="#python-build-script-template">Python Build script template</a> below. Paste the code into a new file in the root of your source code directory. You can create this file using vscode using the command line shown in the code block titled <a href="#New-file-creation-in-vscode">New file creation in vscode</a> below.</p>
@@ -1021,61 +1066,61 @@
 <p class="admonition-title">Important</p>
 <p>Be sure to change the line <code>os.environ['DBT_PROJECT_DIR'] = "testproj"</code> by replacing "testproj" with the folder name of your dbt project.</p>
 </div>
-<div class="highlight"><span class="filename">New file creation in vscode</span><pre><span></span><code><span class="n">code</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
+<div class="highlight"><span class="filename">New file creation in vscode</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">code</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
-<span class="kn">import</span> <span class="nn">dbt</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;testproj&quot;</span>  <span class="c1"># !!!! Change this to the path of your dbt project</span>
-
-<span class="c1"># Get Config and Profile Information from dbt</span>
-<span class="n">profile_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="s1">&#39;.dbt/&#39;</span>
-<span class="n">profile</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">read_profile</span><span class="p">(</span><span class="n">profile_path</span><span class="p">)</span>
-<span class="n">config</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">load_raw_project</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">])</span>
-
-<span class="n">profile_info</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]]</span>
-<span class="n">target_info</span> <span class="o">=</span> <span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
-<span class="n">lakehouse</span> <span class="o">=</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouse&#39;</span><span class="p">]</span>
-
-<span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target&quot;</span><span class="p">)</span>
-
-<span class="c1"># Generate AzCopy Scripts and Metadata Extract Notebooks</span>
-<span class="n">utils</span><span class="o">.</span><span class="n">GenerateAzCopyScripts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">])</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">)</span>
-
-<span class="n">utils</span><span class="o">.</span><span class="n">GenerateMetadataExtract</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-<span class="n">utils</span><span class="o">.</span><span class="n">GenerateNotebookUpload</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-
-
-<span class="c1"># Check if metaextracts directory exists in os.environ[&#39;DBT_PROJECT_DIR&#39;] and create it if it doesn&#39;t</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">)</span>
-
-<span class="c1"># count files in metaextracts directory</span>
-<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;33;48m&#39;</span><span class="p">,</span> <span class="s2">&quot;It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/upload.ps1&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;3. Manually upload the following notebook to your workspace: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/notebooks/import_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;5. A new notebook should appear in the workspace called metadata_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;6. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;7. Re-run this script to generate the model and master notebooks.&quot;</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="c1"># Call dbt build</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;dbt&quot;</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="c1"># Generate Model Notebooks and Master Notebooks</span>
-    <span class="n">utils</span><span class="o">.</span><span class="n">SetSqlVariableForAllNotebooks</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
-    <span class="n">utils</span><span class="o">.</span><span class="n">GenerateMasterNotebook</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+<div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span> <span class="nn">subprocess</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">import</span> <span class="nn">dbt</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="kn">import</span> <span class="nn">shutil</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;testproj&quot;</span>  <span class="c1"># !!!! Change this to the path of your dbt project</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Get Config and Profile Information from dbt</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">profile_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="s1">&#39;.dbt/&#39;</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="n">profile</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">read_profile</span><span class="p">(</span><span class="n">profile_path</span><span class="p">)</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="n">config</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">load_raw_project</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">])</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="n">profile_info</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]]</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="n">target_info</span> <span class="o">=</span> <span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="n">lakehouse</span> <span class="o">=</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouse&#39;</span><span class="p">]</span>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="c1"># Generate AzCopy Scripts and Metadata Extract Notebooks</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="n">utils</span><span class="o">.</span><span class="n">GenerateAzCopyScripts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">])</span>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">):</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target/notebooks&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="n">utils</span><span class="o">.</span><span class="n">GenerateMetadataExtract</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="n">utils</span><span class="o">.</span><span class="n">GenerateNotebookUpload</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="c1"># Check if metaextracts directory exists in os.environ[&#39;DBT_PROJECT_DIR&#39;] and create it if it doesn&#39;t</span>
+<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">):</span>
+<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>
+<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="c1"># count files in metaextracts directory</span>
+<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/metaextracts&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;33;48m&#39;</span><span class="p">,</span> <span class="s2">&quot;It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;1. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/upload.ps1&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;3. Manually upload the following notebook to your workspace: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/notebooks/import_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;5. A new notebook should appear in the workspace called metadata_</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;6. Run ./</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;7. Re-run this script to generate the model and master notebooks.&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a><span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a>    <span class="c1"># Call dbt build</span>
+<a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a>    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;dbt&quot;</span><span class="p">,</span> <span class="s2">&quot;build&quot;</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a>    <span class="c1"># Generate Model Notebooks and Master Notebooks</span>
+<a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a>    <span class="n">utils</span><span class="o">.</span><span class="n">SetSqlVariableForAllNotebooks</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+<a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a>    <span class="n">utils</span><span class="o">.</span><span class="n">GenerateMasterNotebook</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
 </code></pre></div>
 <h3 id="run-the-build-script">Run the build script<a class="headerlink" href="#run-the-build-script" title="Permanent link">&para;</a></h3>
 <p>Run the build script using the code below in the terminal.
-<div class="highlight"><pre><span></span><code><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div></p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
