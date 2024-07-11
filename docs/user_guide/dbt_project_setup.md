@@ -2,7 +2,7 @@
   weight: 2
 ---
 
-# DBT Project Setup 
+# DBT Project Setup
 
 ## Fabric Workspace Setup
 
@@ -13,23 +13,26 @@ Next we will create a new dbt project and configure it to use the dbt-fabricspar
 - Make sure that there is at least one Datalake in the workspace.
 - Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
 
-> https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
-
+```plaintext title="Example URL"
+https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
+```
 
 ## Create Dbt Project
 Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
-
-!> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
-
 
 ```powershell
 # Create your dbt project directories and profiles.yml file
 dbt init my_project # Note that the name of the project is arbitrary... call it whatever you like
 ```
+!!! Important 
+    Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
 
-The command above will create a new directory called `my_project`. Within this directory you will find a `profiles.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
 
-```yaml
+
+The command above will create a new directory called `my_project`. Within this directory you will find a `project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
+
+``` yaml title="dbt_project.yml"
+
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
@@ -57,9 +60,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
 
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
   test4:
     # Config indicated by + and applies to all files under models/example/
@@ -70,50 +70,47 @@ models:
 
 The dbt init command will also update your `profiles.yml` file with a profile matching your dbt project name. Open this file in your favourite text editor using the command below:
 
-<!-- tabs:start -->
+=== "Windows"
 
-#### **Windows**
+    ```powershell
 
-```powershell
+    code  $home/.dbt/profiles.yml
 
-code  $home/.dbt/profiles.yml
+    ```
 
-```
+=== "MacOS"
 
-#### **MacOS**
+    ```powershell
+    code  ~/.dbt/profiles.yml
+    ```
 
-```powershell
-code  ~/.dbt/profiles.yml
-```
+=== "Linux"
 
-#### **Linux**
-
-```powershell
-code  ~/.dbt/profiles.yml
-```
-<!-- tabs:end -->
+    ```powershell
+    code  ~/.dbt/profiles.yml
+    ```
 
 When run this will display a file similar to the one below. Check that your details are correct.
 
-```yaml
-test4:
+```{.yaml hl_lines="10 11 13 14" linenums="1" title="profiles.yml"}
+my_project:
+  target: my_project_target
   outputs:
-    dev:
-      auth: cli #remove
-      client_id: dlkdjl #remove
-      client_scrent: dlkdjl #remove
-      connect_retries: 0 #remove
-      connect_timeout: 0 #remove
-      endpoint: dkld #remove
-      lakehouse: 'lakehouse' #the name of your lakehouse
-      lakehouseid: 'aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9' #the guid of your lakehouse
+    my_project_target:
+      authentication: CLI
       method: livy
-      schema: dbo #the schema you want to use
-      tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' #your power bi tenant id
-      threads: 1 #the number of threads to use
-      type: fabricsparknb #the type of adapter to use.. always use fabricsparknb
-      workspaceid: '4f0cb887-047a-48a1-98c3-ebdb38c784c2' #the guid of your workspace
-  target: dev
+      connect_retries: 0
+      connect_timeout: 10
+      endpoint: https://api.fabric.microsoft.com/v1
+      workspaceid: 4f0cb887-047a-48a1-98c3-ebdb38c784c2
+      workspacename: test
+      lakehousedatapath: /lakehouse
+      lakehouseid: 031feff6-071d-42df-818a-984771c083c4
+      lakehouse: datalake
+      schema: dbo
+      threads: 1
+      type: fabricsparknb
+      retry_all: true
 ```
 
 Now we are ready to run our dbt project for the first time. But first we need to create a build script.
@@ -122,16 +119,14 @@ Now we are ready to run our dbt project for the first time. But first we need to
 
 This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at [https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py). Alternatively, you can copy the code in the code block titled [Python Build script template](#python-build-script-template) below. Paste the code into a new file in the root of your source code directory. You can create this file using vscode using the command line shown in the code block titled [New file creation in vscode](#New-file-creation-in-vscode) below.
 
-!> **Important** Be sure to change the line `os.environ['DBT_PROJECT_DIR'] = "testproj"` by replacing "testproj" with the folder name of your dbt project.
+!!! Important
+    Be sure to change the line `os.environ['DBT_PROJECT_DIR'] = "testproj"` by replacing "testproj" with the folder name of your dbt project.
 
-#### New file creation in vscode
-
-```powershell
+``` powershell title="New file creation in vscode"
 code post_install.py
 ```
 
-#### Python Build script template
-```python
+```python title="Python Build script template"
 import subprocess
 from dbt.adapters.fabricsparknb import utils as utils
 import dbt
@@ -186,14 +181,14 @@ else:
 ### Run the build script
 Run the build script using the code below in the terminal.
 ```powershell
-python <YourProjectName>_post_install.py
+python post_install.py
 ```
 
-> [!TIP]
-> The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.
+!!! tip
+    The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.
 
-> [!TIP]
-> If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
+!!! tip 
+    If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
 
 ### Post Build Steps & Checks
 
