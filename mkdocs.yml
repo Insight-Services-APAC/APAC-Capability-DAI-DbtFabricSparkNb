@@ -23,6 +23,9 @@ theme:
     - navigation.indexes
 markdown_extensions:
   - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
   - pymdownx.details
   - attr_list
   - pymdownx.emoji:

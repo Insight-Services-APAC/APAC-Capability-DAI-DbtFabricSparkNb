@@ -55,7 +55,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 # In this example config, we tell dbt to build all models in the example/
 # directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
+# files using the ` config(...) ` macro.
 models:
   test4:
     # Config indicated by + and applies to all files under models/example/

@@ -2,34 +2,53 @@
   weight: 2
 ---
 
-# DBT Project Setup 
+# DBT Project Setup
 
 ## Fabric Workspace Setup
 
 Next we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:
 
-- Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
-- Ensure that the workspace is Fabric enabled. If not, enable it.
-- Make sure that there is at least one Datalake in the workspace.
-- Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
+
+1. Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
+1. Ensure that the workspace is Fabric enabled. If not, enable it.
+1. Make sure that there is at least one Datalake in the workspace.
+1. Get the connection details for the workspace.
+  
+    1. You will need to get the ==workspace name==, ==workspace id==, ==lakehouse id==, and ==lakehouse name==. 
+    1. The ==lakehouse name== and ==workspace name== are easily viewed from the fabric / power bi portal. 
+    1. The easiest way to get the id information is to:
+          1. Navigate to a file or folder in your target lakehouse.
+          2. Click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window.
+          3. From these properties select copy url and paste it into a text editor. The ==workspace id== is the first GUID in the URL, the ==lakehouse id== is the second GUID in the URL.
+          4. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
 
 ```plaintext title="Example URL"
 https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 ```
 
-
 ## Create Dbt Project
-Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
+Once you have taken note of the ==workspace id==, ==lakehouse id==, ==workspace name== and ==lakehouse name== you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
 
 ```powershell
 # Create your dbt project directories and profiles.yml file
 dbt init my_project # Note that the name of the project is arbitrary... call it whatever you like
 ```
-!!! Important 
-    Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
-
-
-
+!!! Important "When asked the questions below, provide the answers in bold below:"
+    1. `Which data base would you like to use?` <br/>**select `dbt-fabricksparknb`**
+    2. `Desired authentication method option (enter a number):` <br/>**select `livy`**
+    3. `workspaceid (GUID of the workspace. Open the workspace from fabric.microsoft.com and copy the workspace url):` <br/>**Enter the workspace id**
+    4. `lakehouse (Name of the Lakehouse in the workspace that you want to connect to):` <br/>**Enter the lakehouse name**
+    5. `lakehouseid (GUID of the lakehouse, which can be extracted from url when you open lakehouse artifact from fabric.microsoft.com):` <br/>**Enter the lakehouse id**
+    6. `endpoint [https://api.fabric.microsoft.com/v1]:` <br/>**Press enter to accept the default**
+    7. `auth (Use CLI (az login) for interactive execution or SPN for automation) [CLI]:` <br/>**select `cli`**
+    8. `client_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    9. `client_scrent (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    10. `tenant_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    11. `connect_retries [0]:` <br/>**Enter 0**
+    12. `connect_timeout [10]:` <br/>**Enter 10**
+    13. `schema (default schema that dbt will build objects in):` <br/>**Enter `dbo`**
+    14. threads (1 or more) [1]: <br/>**Enter 1**
+    
 The command above will create a new directory called `my_project`. Within this directory you will find a `project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
 
 ``` yaml title="project.yml"
@@ -93,25 +112,25 @@ The dbt init command will also update your `profiles.yml` file with a profile ma
 
 When run this will display a file similar to the one below. Check that your details are correct.
 
-```yaml
-test4:
+```{.yaml hl_lines="10 11 13 14" linenums="1" title="profiles.yml"}
+my_project:
+  target: my_project_target
   outputs:
-    dev:
-      auth: cli #remove
-      client_id: dlkdjl #remove
-      client_scrent: dlkdjl #remove
-      connect_retries: 0 #remove
-      connect_timeout: 0 #remove
-      endpoint: dkld #remove
-      lakehouse: 'lakehouse' #the name of your lakehouse
-      lakehouseid: 'aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9' #the guid of your lakehouse
+    my_project_target:
+      authentication: CLI
       method: livy
-      schema: dbo #the schema you want to use
-      tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' #your power bi tenant id
-      threads: 1 #the number of threads to use
-      type: fabricsparknb #the type of adapter to use.. always use fabricsparknb
-      workspaceid: '4f0cb887-047a-48a1-98c3-ebdb38c784c2' #the guid of your workspace
-  target: dev
+      connect_retries: 0
+      connect_timeout: 10
+      endpoint: https://api.fabric.microsoft.com/v1
+      workspaceid: 4f0cb887-047a-48a1-98c3-ebdb38c784c2
+      workspacename: test
+      lakehousedatapath: /lakehouse
+      lakehouseid: 031feff6-071d-42df-818a-984771c083c4
+      lakehouse: datalake
+      schema: dbo
+      threads: 1
+      type: fabricsparknb
+      retry_all: true
 ```
 
 Now we are ready to run our dbt project for the first time. But first we need to create a build script.

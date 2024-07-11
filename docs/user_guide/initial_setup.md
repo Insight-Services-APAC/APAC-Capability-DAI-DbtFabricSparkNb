@@ -35,7 +35,7 @@ Next we will install Python and development tools such as vscode.
 
     ```powershell
     # Winget Installs 
-    winget install -e --id Python.Python -v 3.12.0
+    winget install -e --id Python.Python -v 3.12
     winget install -e --id Microsoft.VisualStudioCode
     winget install --id Git.Git -e --source winget
 
@@ -104,6 +104,9 @@ Now that we have pwsh installed, we can use it as a cross platform shell to inst
 ## Source Directory & Python Env
 Now lets create and activate our Python environment and install the required packages.
 
+
+!!! tip
+    When doing pip install dbt-fabricspark below it can take a few minutes to complete on some machines. Occasionally pip may ge stuck and in such cases break the execution using ctrl-c and run the same pip again, 
 
 
 === "Windows"
