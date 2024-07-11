@@ -289,19 +289,31 @@ def GetManifest():
 def GetFabricPlatformContent(displayName):
             logicalId = str(uuid.uuid4())  
             
-            platformcontent = """{ 
-                                    "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
-                                    "metadata": {
-                                        "type": "Notebook",
-                                        "displayName": \""""+displayName+"""\",
-                                        "description": "New notebook"
-                                    },
-                                    "config": {
-                                        "version": "2.0",
-                                        "logicalId": \""""+logicalId+"""\"
-                                    }
-                                 } """
+            platformcontent = """{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": \""""+displayName+"""\",
+    "description": "New notebook"
+   },
+   "config": {
+     "version": "2.0",
+     "logicalId": \""""+logicalId+"""\"
+   }
+}"""
             return platformcontent
+
+@staticmethod
+def remove_last_line(py_fabric_file: str):
+    with open(py_fabric_file, "r+", encoding="utf-8") as file:
+        lines = file.readlines()
+        file.seek(0)
+        file.truncate()
+        file.writelines(lines[:-1])
+
+
+
+  
 
 @staticmethod
 def IPYNBtoFabricPYFile(dbt_project_dir):
@@ -323,12 +335,42 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
             FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
             platform_config_file.write(FabricPlatformContent)
             with open(py_fabric_file, "w", encoding="utf-8") as python_file:
-                python_file.write("# Fabric notebook source\n\n\n")
+                python_file.write("# Fabric notebook source\n\n")
+                python_file.write("# METADATA ********************\n\n")
+                python_file.write("# META {\n")
+                python_file.write("# META   \"kernel_info\": {\n")
+                python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
+                python_file.write("# META   }\n")
+                python_file.write("# META }\n\n")
+
+
                 f = open (filename, "r", encoding="utf-8") 
                 data = json.loads(f.read())
                 for cell in data['cells']:
                     if (cell["cell_type"] == "code"):
-                        if (cell["source"][0][:2] == "%%"):
+                        if (cell["source"][0][:5] == "%%sql"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC "+ sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"sparksql\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")                   
+                        elif (cell["source"][0][:11] == "%%configure"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC "+ sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"python\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")
+                        elif (cell["source"][0][:2] == "%%"):
                             python_file.write("# CELL ********************\n\n")
                             for sourceline in cell['source']:
                                 line = "# MAGIC "+ sourceline
@@ -339,12 +381,19 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
                             for sourceline in cell['source']:
                                 python_file.write(sourceline)
                             python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"python\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")
                     elif (cell["cell_type"] == "markdown"):
                         python_file.write("# MARKDOWN ********************\n\n")
                         for sourceline in cell['source']:
                             line = "# "+ sourceline
                             python_file.write(line)
                         python_file.write("\n\n")
+                
+            remove_last_line(py_fabric_file)
         print("Completed fabric py conversion for "+filenamewithoutext)
     print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
 
