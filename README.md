@@ -2,7 +2,7 @@
 
 The `dbt-fabricsparknb` package contains all of the code enabling dbt to work with Microsoft Fabric WITHOUT a connection endpoint like livy or the Datawarehouse SQL endpoint. 
 For more documentation and developer guides go here:
-- [dbt-fabricsparknb Readme](docs/README.md)
+- [dbt-fabricsparknb Readme]([docs/README.md](https://insight-services-apac.github.io/APAC-Capability-DAI-DbtFabricSparkNb/))
 
 
 ## dbt-fabricspark (community version)
