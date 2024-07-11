@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#macro-syntax-error" class="md-skip">
+        <a href="#framework-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -609,6 +609,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Framework Setup
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -618,6 +629,52 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fabric-workspace-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fabric Workspace Setup
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-dbt-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Dbt Project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-build-python-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a build python Script
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -842,11 +899,140 @@
   
 
 
-<h1 id="macro-syntax-error"><em>Macro Syntax Error</em><a class="headerlink" href="#macro-syntax-error" title="Permanent link">&para;</a></h1>
-<p><em>File</em>: <code>developer_guide\framework_setup.md</code></p>
-<p><em>Line 58 in Markdown file:</em> <strong>unexpected '.'</strong>
-<div class="highlight"><pre><span></span><code><span class="gh"># files using the `{{ config(...) }}` macro.</span>
+<h1 id="framework-setup">Framework Setup<a class="headerlink" href="#framework-setup" title="Permanent link">&para;</a></h1>
+<h3 id="fabric-workspace-setup">Fabric Workspace Setup<a class="headerlink" href="#fabric-workspace-setup" title="Permanent link">&para;</a></h3>
+<p>Here we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:</p>
+<ul>
+<li>Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.</li>
+<li>Ensure that the workspace is Fabric enabled. If not, enable it.</li>
+<li>Make sure that there is at least one Datalake in the workspace.</li>
+<li>Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is <code>4f0cb887-047a-48a1-98c3-ebdb38c784c2</code> and the lakehouse id is <code>aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9</code>.</li>
+</ul>
+<blockquote>
+<p>https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks</p>
+</blockquote>
+<h3 id="create-dbt-project">Create Dbt Project<a class="headerlink" href="#create-dbt-project" title="Permanent link">&para;</a></h3>
+<p>Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:</p>
+<p>!&gt; <strong>Important</strong> Note when asked to select the adapter choose <code>dbt-fabricksparknb</code>. During this process you will also be asked for the <code>workspace id</code>, <code>lakehouse id</code>, and <code>workspace name</code>. Use the values you gathered from the Power BI Portal. </p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create your dbt project directories and profiles.yml file</span>
+dbt<span class="w"> </span>init<span class="w"> </span>my_project<span class="w"> </span><span class="c1"># Note that the name of the project is arbitrary... call it whatever you like</span>
+</code></pre></div>
+<p>The command above will create a new directory called <code>my_project</code>. Within this directory you will find a <code>profiles.yml</code> file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Name your project! Project names should contain only lowercase characters</span>
+<span class="c1"># and underscores. A good package name should reflect your organization&#39;s</span>
+<span class="c1"># name or the intended use of these models</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1.0.0&#39;</span>
+
+<span class="c1"># This setting configures which &quot;profile&quot; dbt uses for this project.</span>
+<span class="nt">profile</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;my_project&#39;</span>
+
+<span class="c1"># These configurations specify where dbt should look for different types of files.</span>
+<span class="c1"># The `model-paths` config, for example, states that models in this project can be</span>
+<span class="c1"># found in the &quot;models/&quot; directory. You probably won&#39;t need to change these!</span>
+<span class="nt">model-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;models&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">analysis-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;analyses&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">test-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;tests&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">seed-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;seeds&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">macro-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;macros&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">snapshot-paths</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;snapshots&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">clean-targets</span><span class="p">:</span><span class="w">         </span><span class="c1"># directories to be removed by `dbt clean`</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;target&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;dbt_packages&quot;</span>
+
+
+<span class="c1"># Configuring models</span>
+<span class="c1"># Full documentation: https://docs.getdbt.com/docs/configuring-models</span>
+
+<span class="c1"># In this example config, we tell dbt to build all models in the example/</span>
+<span class="c1"># directory as views. These settings can be overridden in the individual model</span>
+<span class="c1"># files using the ` config(...) ` macro.</span>
+<span class="nt">models</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test4</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Config indicated by + and applies to all files under models/example/</span>
+<span class="w">    </span><span class="nt">example</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">+materialized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">view</span>
+</code></pre></div>
+<p>The dbt init command will also update your <code>profiles.yml</code> file with a profile matching your dbt project name. Open this file in VS Code. This file can be found in <em>"./%USER_DIRECTORY%/.dbt/"</em></p>
+<p>When run this will display a file similar to the one below. Check that your details are correct. </p>
+<div class="highlight"><pre><span></span><code><span class="nt">test4</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">dev</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">auth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cli</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">client_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">client_scrent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlkdjl</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">connect_retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">connect_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dkld</span><span class="w"> </span><span class="c1">#remove</span>
+<span class="w">      </span><span class="nt">lakehouse</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;lakehouse&#39;</span><span class="w"> </span><span class="c1">#the name of your lakehouse</span>
+<span class="w">      </span><span class="nt">lakehouseid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9&#39;</span><span class="w"> </span><span class="c1">#the guid of your lakehouse</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">livy</span>
+<span class="w">      </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dbo</span><span class="w"> </span><span class="c1">#the schema you want to use</span>
+<span class="w">      </span><span class="nt">tenant_id</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;72f988bf-86f1-41af-91ab-2d7cd011db47&#39;</span><span class="w"> </span><span class="c1">#your power bi tenant id</span>
+<span class="w">      </span><span class="nt">threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"> </span><span class="c1">#the number of threads to use</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fabricsparknb</span><span class="w"> </span><span class="c1">#the type of adapter to use.. always use fabricsparknb</span>
+<span class="w">      </span><span class="nt">workspaceid</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;4f0cb887-047a-48a1-98c3-ebdb38c784c2&#39;</span><span class="w"> </span><span class="c1">#the guid of your workspace</span>
+<span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
+</code></pre></div>
+<p>To complete the newly created project you will need to copy some directories from the project called <em>"ptfproj"</em> dbt project. Copy <em>ptfproj/macros/</em> and <em>ptfproj/metaextracts/</em> directories with their files into your new dbt project. Overwrite any directories or files if they exist. Now in metaextracts the file ListSchemas.json contains the lakehouses in your workspace. You can manually update this file.</p>
+<div class="highlight"><pre><span></span><code><span class="p">[{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_raw&quot;</span><span class="p">},{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_conformed&quot;</span><span class="p">},{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_consolidated&quot;</span><span class="p">}]</span>
+</code></pre></div>
+<h3 id="create-a-build-python-script">Create a build python Script<a class="headerlink" href="#create-a-build-python-script" title="Permanent link">&para;</a></h3>
+<p>This repo contains a dbt build script created in python. Make a copy of this script from file <em>ptf_pre_install.py</em> found in the root. </p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">dbt.cli</span>
+<span class="kn">import</span> <span class="nn">dbt.cli.flags</span>
+<span class="kn">import</span> <span class="nn">dbt.config.renderer</span>
+<span class="kn">import</span> <span class="nn">dbt.config.utils</span>
+<span class="kn">import</span> <span class="nn">dbt.parser</span>
+<span class="kn">import</span> <span class="nn">dbt.parser.manifest</span>
+<span class="kn">import</span> <span class="nn">dbt.tests.util</span>
+<span class="kn">import</span> <span class="nn">dbt.utils</span>
+<span class="kn">import</span> <span class="nn">dbt</span>
+<span class="kn">import</span> <span class="nn">dbt.adapters.fabricspark</span>
+<span class="kn">import</span> <span class="nn">dbt.adapters.fabricsparknb</span>
+<span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">dbt.tests</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ptfproj&quot;</span>
+
+<span class="n">profile_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="s1">&#39;.dbt/&#39;</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">read_profile</span><span class="p">(</span><span class="n">profile_path</span><span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">dbt</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">load_raw_project</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">])</span>
+<span class="n">profile_info</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]]</span>
+<span class="n">target_info</span> <span class="o">=</span> <span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="n">profile_info</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
+<span class="n">lakehouse</span> <span class="o">=</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouse&#39;</span><span class="p">]</span>
+
+
+<span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/target&quot;</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateAzCopyScripts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">])</span>
+
+<span class="n">dbt</span><span class="o">.</span><span class="n">tests</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">run_dbt</span><span class="p">([</span><span class="s1">&#39;build&#39;</span><span class="p">])</span>
+
+<span class="n">utils</span><span class="o">.</span><span class="n">SetSqlVariableForAllNotebooks</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateMasterNotebook</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateMetadataExtract</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">GenerateNotebookUpload</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;workspaceid&#39;</span><span class="p">],</span> <span class="n">target_info</span><span class="p">[</span><span class="s1">&#39;lakehouseid&#39;</span><span class="p">],</span> <span class="n">lakehouse</span><span class="p">)</span>
+</code></pre></div>
+<p>Give it the name prefixed by your new project name. Update the DBT_PROJECT_DIR variable with your project name. Save this file.</p>
+<p>You can execute this file:
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>&lt;YourProjectName&gt;_pre_install.py
 </code></pre></div></p>
+<p>You may get the error:
+<div class="highlight"><pre><span></span><code>FileNotFoundError: [WinError 3] The system cannot find the path specified: &#39;ch_fabric/target&#39;
+</code></pre></div></p>
+<p>You will need to add a blank folder to your project called <em>"target"</em>.</p>
+<p>If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be <em>"fabricsparknb"</em> not <em>"fabricspark"</em>.</p>
+<p>After successful execution and number of notebooks have been created in your project/target folder under notebooks. </p>
+<p><em>import_notebook.ipynb</em> this will be used to import notebook files into your lakehouse.</p>
+<p><em>metadata_extract.ipynb</em> is used to update the metadata json files in your project. </p>
+<p>These 2 can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder using Onelake explorer. </p>
+<p>You then open the <em>import_notebook.ipynb</em> in fabric and <em>Run All</em> to import the notebooks from the Files/Notebooks directory in fabric. </p>
+<p>Executing the <em>master_notebook.ipynb</em> notebook will execute all notebooks created in your project.</p>
+<p>This concludes the Framework setup.</p>
 
 
 

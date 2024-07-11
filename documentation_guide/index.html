@@ -833,6 +833,13 @@
 
 
 <h1 id="documentation-guide">Documentation Guide<a class="headerlink" href="#documentation-guide" title="Permanent link">&para;</a></h1>
+<h2 id="building-you-environment">Building you environment<a class="headerlink" href="#building-you-environment" title="Permanent link">&para;</a></h2>
+<p>Documentation for this project is built using <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>. To contribute to the documentation you will need to create a separate python environment. I suggest that you call this <code>.env_mkdocs</code> to avoid confusion with the dbt environment. Create your environment and install the required packages as shown below:</p>
+<div class="highlight"><span class="filename">Create and activate the Python environment</span><pre><span></span><code><span class="c"># Create and activate the Python environment</span>
+<span class="n">python3</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">env_mkdocs</span>
+<span class="p">.\.</span><span class="n">env_mkdocs</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">ps1</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="p">./</span><span class="n">requirements_mkdocs</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
 
 
 
