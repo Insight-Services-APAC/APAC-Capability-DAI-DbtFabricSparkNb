@@ -7,15 +7,15 @@ Here we will create a new dbt project and configure it to use the dbt-fabricspar
 - Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
 - Ensure that the workspace is Fabric enabled. If not, enable it.
 - Make sure that there is at least one Datalake in the workspace.
-- Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
+- Get the connection details for the workspace. This will include the lakehouse name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
 
 > https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 
 
 ### Create Dbt Project
-Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
+Once you have taken note of the workspace id, lakehouse id, and lakehouse name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
 
-!> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
+!> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. If you can't see the adapter, first install the dbt-fabricsparknb package from repository. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `lakehouse name`. Use the values you gathered from the Power BI Portal. 
 
 
 ```bash
@@ -23,7 +23,7 @@ Once you have taken note of the workspace id, lakehouse id, and workspace name, 
 dbt init my_project # Note that the name of the project is arbitrary... call it whatever you like
 ```
 
-The command above will create a new directory called `my_project`. Within this directory you will find a `profiles.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
+The command above will create a new directory called `my_project`. Within this directory you will find a `dbt_project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
 
 ```yaml
 # Name your project! Project names should contain only lowercase characters

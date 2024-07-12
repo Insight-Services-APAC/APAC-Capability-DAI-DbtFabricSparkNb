@@ -43,7 +43,7 @@ dbt init my_project # Note that the name of the project is arbitrary... call it 
     7. `auth (Use CLI (az login) for interactive execution or SPN for automation) [CLI]:` <br/>**select `cli`**
     8. `client_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
     9. `client_scrent (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
-    10. `tenant_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    10. `tenant_id (Use when SPN auth is used.):` <br/>**Enter a single space or Enter your PowerBI tenant id**
     11. `connect_retries [0]:` <br/>**Enter 0**
     12. `connect_timeout [10]:` <br/>**Enter 10**
     13. `schema (default schema that dbt will build objects in):` <br/>**Enter `dbo`**
@@ -137,7 +137,7 @@ Now we are ready to run our dbt project for the first time. But first we need to
 
 ### Create a python build script that will wrap our dbt process 
 
-This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at [https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py). Alternatively, you can copy the code in the code block titled [Python Build script template](#python-build-script-template) below. Paste the code into a new file in the root of your source code directory. You can create this file using vscode using the command line shown in the code block titled [New file creation in vscode](#New-file-creation-in-vscode) below.
+This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at [https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py). Alternatively, you can copy the code in the code block titled [Python Build script template](#python-build-script-template) below. Paste the code into a new file in the root of your source code directory. You can create this file using the vscode command line shown in the code block titled [New file creation in vscode](#New-file-creation-in-vscode) below.
 
 !!! Important
     Be sure to change the line `os.environ['DBT_PROJECT_DIR'] = "testproj"` by replacing "testproj" with the folder name of your dbt project.
@@ -218,10 +218,14 @@ After successful execution and number of notebooks have been created in your pro
 
 *metadata_extract.ipynb* is used to update the metadata json files in your project. 
 
-These 2 can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder using Onelake explorer. 
+The *import_notebook.ipynb* can be imported using the standard import notebooks function in fabric.
 
 You then open the *import_notebook.ipynb* in fabric and *Run All* to import the notebooks from the Files/Notebooks directory in fabric. 
 
 Executing the *master_notebook.ipynb* notebook will execute all notebooks created in your project.
+
+Executing the *metadata_extract.ipynb* notebook will update the metadata json files in your lakehouse Files/MetaExtracts.
+
+Running ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1 will download the metadata extract json files to the project metaextracts directory.
 
 This concludes the Framework setup.

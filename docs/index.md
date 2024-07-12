@@ -81,7 +81,7 @@ When creating a branch to work on from please use the branch name of `feature/Yo
 
 Logging was previously done to a log file saved in the lakehouse and in json format. This has been changed to now log to a delta table in the lakehouse.
 
-It works using 2 tables *"batch"* and *"execution_log"*. At the start of the ETL the Prepare step will check if the tables exist and if they done they will be created. This is followed by a check for an *"open"* batch and where the batch is still open it will fail. 
+It works using 2 tables *"batch"* and *"execution_log"*. At the start of the ETL the Prepare step will check if the tables exist and if they don't they will be created. This is followed by a check for an *"open"* batch and where the batch is still open it will fail. 
 
 If you need to close the batch manually, this code is available at the end of the master notebook. 
 
