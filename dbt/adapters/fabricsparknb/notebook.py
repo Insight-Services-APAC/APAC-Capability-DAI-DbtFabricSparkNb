@@ -6,7 +6,7 @@ import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader
 from sysconfig import get_paths
 from pathlib import Path
-from sysconfig import get_paths
+
 
 
 @staticmethod
