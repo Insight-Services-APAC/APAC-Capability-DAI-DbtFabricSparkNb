@@ -14,7 +14,7 @@
         <link rel="prev" href="../initial_setup/">
       
       
-        <link rel="next" href="../development_workflow/">
+        <link rel="next" href="../dbt_build_process/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -371,6 +371,8 @@
       
         
       
+        
+      
     
     
       
@@ -518,24 +520,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#run-the-build-script" class="md-nav__link">
-    <span class="md-ellipsis">
-      Run the build script
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#post-build-steps-checks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Post Build Steps &amp; Checks
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -545,6 +529,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dbt_build_process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dbt Build Process
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1023,6 +1028,10 @@
 </div>
 </div>
 <p>When run this will display a file similar to the one below. Check that your details are correct.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code>profiles.yml</code> file should look like the example below except that in your case the highlighted lines may contain different values.</p>
+</div>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">profiles.yml</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-6-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-6-3"> 3</a></span>
@@ -1040,11 +1049,11 @@
 <span class="normal"><a href="#__codelineno-6-15">15</a></span>
 <span class="normal"><a href="#__codelineno-6-16">16</a></span>
 <span class="normal"><a href="#__codelineno-6-17">17</a></span>
-<span class="normal"><a href="#__codelineno-6-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="nt">my_project</span><span class="p">:</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_project_target</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="w">    </span><span class="nt">my_project_target</span><span class="p">:</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="w">      </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CLI</span>
+<span class="normal"><a href="#__codelineno-6-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="hll"><span class="nt">my_project</span><span class="p">:</span>
+</span><a id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="hll"><span class="w">  </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_project_target</span>
+</span><a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="w">  </span><span class="nt">outputs</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="hll"><span class="w">    </span><span class="nt">my_project_target</span><span class="p">:</span>
+</span><a id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="w">      </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CLI</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">livy</span>
 <a id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="w">      </span><span class="nt">connect_retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 <a id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="w">      </span><span class="nt">connect_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
@@ -1070,36 +1079,15 @@
 </code></pre></div>
 <div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">import</span> <span class="nn">os</span> 
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProject</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">import</span> <span class="nn">sys</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Note that the script takes your dbt project folder as an argument</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProject</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="run-the-build-script">Run the build script<a class="headerlink" href="#run-the-build-script" title="Permanent link">&para;</a></h3>
-<p>Run the build script using the code below in the terminal. </p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Be sure to replace "my_project" with the name of your dbt project folder.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>You are now ready to move to the next step in which you will build your dbt project. Follow the <a href="../dbt_build_process/">Dbt Build Process</a> guide.</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">python3</span><span class="p">.</span><span class="n">exe</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span> <span class="n">my_project</span> 
-</code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.</p>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be <em>"fabricsparknb"</em> not <em>"fabricspark"</em>.</p>
-</div>
-<h3 id="post-build-steps-checks">Post Build Steps &amp; Checks<a class="headerlink" href="#post-build-steps-checks" title="Permanent link">&para;</a></h3>
-<p>After successful execution and number of notebooks have been created in your project/target folder under notebooks. </p>
-<p><em>import_notebook.ipynb</em> this will be used to import notebook files into your lakehouse.</p>
-<p><em>metadata_extract.ipynb</em> is used to update the metadata json files in your project. </p>
-<p>The <em>import_notebook.ipynb</em> can be imported using the standard import notebooks function in fabric.</p>
-<p>You then open the <em>import_notebook.ipynb</em> in fabric and <em>Run All</em> to import the notebooks from the Files/Notebooks directory in fabric. </p>
-<p>Executing the <em>master_notebook.ipynb</em> notebook will execute all notebooks created in your project.</p>
-<p>Executing the <em>metadata_extract.ipynb</em> notebook will update the metadata json files in your lakehouse Files/MetaExtracts.</p>
-<p>Running ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1 will download the metadata extract json files to the project metaextracts directory.</p>
-<p>This concludes the Framework setup.</p>
 
 
 
@@ -1155,7 +1143,7 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.copy"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
