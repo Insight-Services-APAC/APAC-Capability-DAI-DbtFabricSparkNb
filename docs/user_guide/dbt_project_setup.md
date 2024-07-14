@@ -149,8 +149,9 @@ code post_install.py
 ```python title="Python Build script template"
 from dbt.adapters.fabricsparknb import utils as utils
 import os 
+import sys
 
-os.environ['DBT_PROJECT_DIR'] = sys.argv[1] 
+os.environ['DBT_PROJECT_DIR'] = sys.argv[1] # Note that the script takes your dbt project folder as an argument
 utils.RunDbtProject(PreInstall=False)
 ```
 
@@ -164,11 +165,9 @@ Run the build script using the code below in the terminal.
 python3.exe post_install.py my_project 
 ```
 
-!!! tip
-    The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.
-
-!!! tip 
-    If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
+!!! tip "Tips"
+    - The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.
+    - If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
 
 ### Post Build Steps & Checks
 
