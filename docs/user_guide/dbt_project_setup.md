@@ -112,7 +112,10 @@ The dbt init command will also update your `profiles.yml` file with a profile ma
 
 When run this will display a file similar to the one below. Check that your details are correct.
 
-```{.yaml hl_lines="10 11 13 14" linenums="1" title="profiles.yml"}
+!!! note 
+    The `profiles.yml` file should look like the example below except that in your case the highlighted lines may contain different values.
+
+```{.yaml hl_lines="1 2 4 10 11 13 14" linenums="1" title="profiles.yml"}
 my_project:
   target: my_project_target
   outputs:
@@ -155,36 +158,6 @@ os.environ['DBT_PROJECT_DIR'] = sys.argv[1] # Note that the script takes your db
 utils.RunDbtProject(PreInstall=False)
 ```
 
-### Run the build script
-Run the build script using the code below in the terminal. 
+!!! info
+    You are now ready to move to the next step in which you will build your dbt project. Follow the [Dbt Build Process](./dbt_build_process.md) guide.
 
-!!! Important
-    Be sure to replace "my_project" with the name of your dbt project folder.
-
-```powershell
-python3.exe post_install.py my_project 
-```
-
-!!! tip "Tips"
-    - The first time you run this you will be prompted to follow a series of steps that will download a set of metadata files from your Fabric Lakehouse. Be sure to follow these steps. You should only need to do them once.
-    - If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
-
-### Post Build Steps & Checks
-
-After successful execution and number of notebooks have been created in your project/target folder under notebooks. 
-
-*import_notebook.ipynb* this will be used to import notebook files into your lakehouse.
-
-*metadata_extract.ipynb* is used to update the metadata json files in your project. 
-
-The *import_notebook.ipynb* can be imported using the standard import notebooks function in fabric.
-
-You then open the *import_notebook.ipynb* in fabric and *Run All* to import the notebooks from the Files/Notebooks directory in fabric. 
-
-Executing the *master_notebook.ipynb* notebook will execute all notebooks created in your project.
-
-Executing the *metadata_extract.ipynb* notebook will update the metadata json files in your lakehouse Files/MetaExtracts.
-
-Running ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1 will download the metadata extract json files to the project metaextracts directory.
-
-This concludes the Framework setup.
