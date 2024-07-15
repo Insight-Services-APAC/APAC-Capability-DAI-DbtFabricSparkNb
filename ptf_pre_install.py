@@ -37,4 +37,5 @@ utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspa
 utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
 utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
 utils.IPYNBtoFabricPYFile(dbt_project_dir)
+utils.APIUpsertNotebooks(dbt_project_dir, target_info['workspaceid'])
 

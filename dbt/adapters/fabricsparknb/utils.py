@@ -17,6 +17,8 @@ from pathlib import Path
 #)
 from azure.identity import DefaultAzureCredential
 import uuid
+from msfabricpysdkcore import FabricClientCore
+import base64
 
 
 @staticmethod
@@ -312,11 +314,87 @@ def remove_last_line(py_fabric_file: str):
         file.writelines(lines[:-1])
 
 
-
+@staticmethod
+### Generate py files for api update
+def IPYNBtoFabricPYFile(dbt_project_dir):
+    print("Converting notebooks to Fabric PY format")
+    target_dir = os.path.join(dbt_project_dir,"target")
+    notebooks_dir = os.path.join(target_dir,"notebooks")
+    notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
+    os.chdir(notebooks_dir)
+    os.makedirs(notebooks_fabric_py_dir, exist_ok=True)
+    list_of_notebooks = os.listdir(notebooks_dir)
+    for filename in list_of_notebooks:
+        filenamewithoutext = filename[:-6]  ## remove .ipynb
+        py_fabric_file = os.path.join(notebooks_fabric_py_dir,filenamewithoutext+".py")
+        path = dbt_project_dir         
+        FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
+        with open(py_fabric_file, "w", encoding="utf-8") as python_file:
+            python_file.write("# Fabric notebook source\n\n")
+            python_file.write("# METADATA ********************\n\n")
+            python_file.write("# META {\n")
+            python_file.write("# META   \"kernel_info\": {\n")
+            python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
+            python_file.write("# META   }\n")
+            python_file.write("# META }\n\n")
+            f = open (filename, "r", encoding="utf-8") 
+            data = json.loads(f.read())
+            for cell in data['cells']:
+                if (cell["cell_type"] == "code"):
+                    if (cell["source"][0][:5] == "%%sql"):
+                        python_file.write("# CELL ********************\n\n")
+                        for sourceline in cell['source']:
+                            line = "# MAGIC "+ sourceline
+                            python_file.write(line)
+                        python_file.write("\n\n")
+                        python_file.write("# METADATA ********************\n\n")
+                        python_file.write("# META {\n")
+                        python_file.write("# META   \"language\": \"sparksql\",\n")
+                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                        python_file.write("# META }\n\n")                   
+                    elif (cell["source"][0][:11] == "%%configure"):
+                        python_file.write("# CELL ********************\n\n")
+                        for sourceline in cell['source']:
+                            line = "# MAGIC "+ sourceline
+                            python_file.write(line)
+                        python_file.write("\n\n")
+                        python_file.write("# METADATA ********************\n\n")
+                        python_file.write("# META {\n")
+                        python_file.write("# META   \"language\": \"python\",\n")
+                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                        python_file.write("# META }\n\n")
+                    elif (cell["source"][0][:2] == "%%"):
+                        python_file.write("# CELL ********************\n\n")
+                        for sourceline in cell['source']:
+                            line = "# MAGIC "+ sourceline
+                            python_file.write(line)
+                        python_file.write("\n\n")
+                    else:
+                        python_file.write("# CELL ********************\n\n")
+                        for sourceline in cell['source']:
+                            python_file.write(sourceline)
+                        python_file.write("\n\n")
+                        python_file.write("# METADATA ********************\n\n")
+                        python_file.write("# META {\n")
+                        python_file.write("# META   \"language\": \"python\",\n")
+                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                        python_file.write("# META }\n\n")
+                elif (cell["cell_type"] == "markdown"):
+                    python_file.write("# MARKDOWN ********************\n\n")
+                    for sourceline in cell['source']:
+                        line = "# "+ sourceline
+                        python_file.write(line)
+                    python_file.write("\n\n")
+                
+        remove_last_line(py_fabric_file)
+        print("Completed fabric py conversion for "+filenamewithoutext)
+    print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
   
 
 @staticmethod
-def IPYNBtoFabricPYFile(dbt_project_dir):
+
+### Generate py files and.platform files for git direct deployment
+def IPYNBtoFabricPYFileAndGitStructure(dbt_project_dir):
     print("Converting notebooks to Fabric PY format")
     target_dir = os.path.join(dbt_project_dir,"target")
     notebooks_dir = os.path.join(target_dir,"notebooks")
@@ -324,7 +402,7 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
     list_of_notebooks = os.listdir(notebooks_dir)
     for filename in list_of_notebooks:
         filenamewithoutext = filename[:-6]  ## remove .ipynb
-        notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
+        notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py_git")
         notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filenamewithoutext+".Notebook")
         py_fabric_file = os.path.join(notebook_file_fabric_py_dir,"notebook-content.py")
         platform_file = os.path.join(notebook_file_fabric_py_dir,".platform")
@@ -398,6 +476,8 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
     print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
 
 
+
+
 @staticmethod
 def SortManifest(nodes_orig):
     nodes = copy.deepcopy(nodes_orig)
@@ -446,6 +526,56 @@ def SortManifest(nodes_orig):
         # Increment the sort order
         sort_order += 1
     return nodes_orig
+
+def stringToBase64(s):
+    return base64.b64encode(s.encode('utf-8')).decode('utf-8')
+
+def base64ToString(b):
+    return base64.b64decode(b).decode('utf-8')
+
+def GenerateNotebookContent(notebookcontentBase64):
+    notebook_w_content = {'parts': [{'path': 'notebook-content.py', 'payload': notebookcontentBase64, 'payloadType': 'InlineBase64'}]}
+    return notebook_w_content
+
+
+def findnotebookid(notebooks,displayname):
+    for notebook in notebooks:
+        if notebook.display_name == displayname:
+            return notebook.id
+    return -1
+
+@staticmethod
+def APIUpsertNotebooks(dbt_project_dir,workspace_id):
+    target_dir = os.path.join(dbt_project_dir,"target")
+    notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
+    os.chdir(notebooks_fabric_py_dir)
+    fc = FabricClientCore()
+    workspace = fc.get_workspace_by_id(id = workspace_id)
+    workspace_id = workspace.id
+    servernotebooks = fc.list_notebooks(workspace_id)
+    list_of_notebooks = os.listdir(notebooks_fabric_py_dir)
+    for filename in list_of_notebooks:
+            with open(filename, 'r', encoding="utf8") as file:
+                notebookcontent = file.read()
+                notebookname = filename[:-3]  ## remove .py
+                notebookcontentBase64 =  stringToBase64(notebookcontent)
+                notebook_w_content_new =  GenerateNotebookContent(notebookcontentBase64)           
+
+                #notebook_w_content = fc.get_notebook(workspace_id, notebook_name=notebookname)
+                notebookid = findnotebookid(servernotebooks,notebookname)
+                if notebookid == -1:
+                    notebook = fc.create_notebook(workspace_id, definition = notebook_w_content_new, display_name=notebookname)
+                    print("Notebook created "+ notebookname)
+                else: 
+                    notebook2 = fc.update_notebook_definition(workspace_id, notebookid,definition = notebook_w_content_new)
+                    print("Notebook updated "+ notebookname) 
+
+
+
+  
+   
+
+   
 
 
 #@staticmethod
