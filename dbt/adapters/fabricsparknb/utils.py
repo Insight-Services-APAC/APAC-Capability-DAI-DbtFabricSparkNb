@@ -355,7 +355,8 @@ def RunDbtProject(PreInstall=False):
     target_info = profile_info['outputs'][profile_info['target']]    
     lakehouse = target_info['lakehouse']
 
-    shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
+    if os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target"):
+        shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
     # Generate AzCopy Scripts and Metadata Extract Notebooks
     GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
     if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks"):
