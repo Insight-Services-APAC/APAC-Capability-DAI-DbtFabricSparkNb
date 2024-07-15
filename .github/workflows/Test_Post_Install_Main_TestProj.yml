@@ -32,4 +32,4 @@ jobs:
         pip install dbt-core    
         pip install dbt-fabricspark
         pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
-        python3.exe test_post_install.py
+        python.exe test_post_install.py
