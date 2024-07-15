@@ -10,6 +10,7 @@ from dbt.contracts.graph.manifest import Manifest
 import dbt.adapters.fabricsparknb.catalog as Catalog
 from dbt.clients.system import load_file_contents
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
+import dbt.adapters.fabricsparknb.notebook as mn
 from pathlib import Path
 #from azure.storage.filedatalake import (
 #    DataLakeServiceClient,
@@ -37,6 +38,7 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
         return True
     else:
         return False
+
 
 
 @staticmethod
@@ -70,7 +72,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Do something with the files...
 
         # Define the directory containing the Jinja templates
-        template_dir = 'dbt/include/fabricsparknb/notebooks/'
+        template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
         # Create a Jinja environment
         env = Environment(loader=FileSystemLoader(template_dir))
@@ -97,7 +99,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             
 
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -145,7 +147,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -174,7 +176,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
 def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -205,7 +207,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
 
     Path(notebook_dir).mkdir(parents=True, exist_ok=True)
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/pwsh/'
+    template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
