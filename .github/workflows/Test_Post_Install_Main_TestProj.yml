@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: feature/making-delta-logging-multilake-compatible
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
@@ -33,3 +35,9 @@ jobs:
         pip install dbt-fabricspark
         pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
         python test_post_install.py samples/testproj samples/testproj
+    - name: Archive testproj artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-without-markdown
+        path: |
+            samples/testproj/target/            

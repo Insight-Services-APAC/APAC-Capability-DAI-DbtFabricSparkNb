@@ -6,7 +6,7 @@ fabric-spark-testnb:
       connect_retries: 0
       connect_timeout: 10
       endpoint: https://api.fabric.microsoft.com/v1
-      lakehouse: 'datalake'
+      lakehouse: datalake
       lakehouseid: 'ca3ea5d9-04b6-4979-a1ad-25b87f6e79b5'
       method: livy
       schema: dbo
