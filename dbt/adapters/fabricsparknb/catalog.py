@@ -51,7 +51,11 @@ def GetColumnsInRelation(profile, schema, identifier):
     with io.open(profile.project_root + '/metaextracts/DescribeRelations.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
-   
+    
+    #transforming Database/schema name and table name  to lower case
+    schema = schema.lower()
+    identifier = identifier.lower()
+    
     table = agate.Table.from_object(data)    
 
     # Filter the table
