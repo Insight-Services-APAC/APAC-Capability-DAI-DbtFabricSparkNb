@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/fabric_ci_cd_process/" rel="canonical"/>
+<link href="../development_workflow/" rel="prev"/>
+<link href="../../developer_guide/" rel="next"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.0, mkdocs-material-9.5.28" name="generator"/>
+<title>Fabric CI/CD with Git Deployment - Dbt Adapter for Fabric Spark - By Insight</title>
+<link href="../../assets/stylesheets/main.6543a935.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../assets/stylesheets/extra.css" rel="stylesheet"/>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="custom" data-md-color-primary="custom" data-md-color-scheme="insight" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#fabric-cicd-with-git-deployment">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Dbt Adapter for Fabric Spark - By Insight" class="md-header__button md-logo" data-md-component="logo" href="../.." title="Dbt Adapter for Fabric Spark - By Insight">
+<img alt="logo" src="../../assets/insight_logo_only.png"/>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Dbt Adapter for Fabric Spark - By Insight
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Fabric CI/CD with Git Deployment
+            
+          </span>
+</div>
+</div>
+</div>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    Dbt Fabric Spark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../">
+          
+  
+    
+  
+  User guide
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../developer_guide/">
+          
+  
+    
+  
+  Developer guide
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../documentation_guide/">
+          
+  
+    
+  
+  Documentation guide
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../zzz_archive/">
+          
+  
+    
+  
+  Zzz archive
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Dbt Adapter for Fabric Spark - By Insight" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="Dbt Adapter for Fabric Spark - By Insight">
+<img alt="logo" src="../../assets/insight_logo_only.png"/>
+</a>
+    Dbt Adapter for Fabric Spark - By Insight
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    Dbt Fabric Spark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    Home
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../">
+<span class="md-ellipsis">
+    User guide
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            User guide
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../initial_setup/">
+<span class="md-ellipsis">
+    Environment Setup
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../dbt_project_setup/">
+<span class="md-ellipsis">
+    DBT Project Setup
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../dbt_build_process/">
+<span class="md-ellipsis">
+    Dbt Build Process
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../development_workflow/">
+<span class="md-ellipsis">
+    Development Workflow
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    Fabric CI/CD with Git Deployment
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    Fabric CI/CD with Git Deployment
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#git-based-deployment">
+<span class="md-ellipsis">
+      Git Based Deployment
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../developer_guide/">
+<span class="md-ellipsis">
+    Developer guide
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            Developer guide
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../developer_guide/applications_setup/">
+<span class="md-ellipsis">
+    Applications Required for Development (Windows)
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../developer_guide/dbt_setup/">
+<span class="md-ellipsis">
+    Setting Up dbt
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../developer_guide/framework_setup/">
+<span class="md-ellipsis">
+    Framework Setup
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../developer_guide/initial_setup/">
+<span class="md-ellipsis">
+    Initial setup
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../documentation_guide/">
+<span class="md-ellipsis">
+    Documentation guide
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            Documentation guide
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../zzz_archive/">
+<span class="md-ellipsis">
+    Zzz archive
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            Zzz archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../zzz_archive/1-Why/">
+<span class="md-ellipsis">
+    Objective of this project
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../zzz_archive/dbt-adapter-user-guide/">
+<span class="md-ellipsis">
+    Environment Setup
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/user_guide/fabric_ci_cd_process.md" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"></path></svg>
+</a>
+<h1 id="fabric-cicd-with-git-deployment">Fabric CI/CD with Git Deployment<a class="headerlink" href="#fabric-cicd-with-git-deployment" title="Permanent link">¶</a></h1>
+<h2 id="git-based-deployment">Git Based Deployment<a class="headerlink" href="#git-based-deployment" title="Permanent link">¶</a></h2>
+<p><div class="mxgraph" data-mxgraph='{"highlight":"#0000ff","nav":true,"resize":true,"toolbar":"zoom layers tags lightbox","edit":"_blank","xml":"&lt;mxfile host=\"app.diagrams.net\" modified=\"2024-07-16T04:17:11.852Z\" agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0\" etag=\"VdR4Z_hyA7HE4JQ-7D1m\" version=\"24.6.5\" type=\"device\"&gt;  &lt;diagram name=\"Page-1\" id=\"91A2L8vZQP4N7L5JP--f\"&gt;    &lt;mxGraphModel dx=\"1434\" dy=\"827\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"1100\" pageHeight=\"850\" background=\"none\" math=\"0\" shadow=\"1\"&gt;      &lt;root&gt;        &lt;mxCell id=\"0\"/&gt;        &lt;mxCell id=\"1\" parent=\"0\"/&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-1\" value=\"\" style=\"verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=default;fillColor=#00BEF2;shape=mxgraph.azure.computer;pointerEvents=1;gradientColor=default;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"22\" y=\"255\" width=\"100\" height=\"100\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-3\" value=\"\" style=\"shape=singleArrow;direction=west;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"132\" y=\"275\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-4\" value=\"\" style=\"shape=singleArrow;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"132\" y=\"295\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-6\" value=\"Pull\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"157\" y=\"255\" width=\"40\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-7\" value=\"Push\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"152\" y=\"315\" width=\"50\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-10\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"482\" y=\"260\" width=\"120\" height=\"80\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-11\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=right;fontSize=12;image=img/lib/azure2/general/Branch.svg;shadow=0;textShadow=0;labelPosition=left;verticalLabelPosition=top;verticalAlign=bottom;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"472\" y=\"250\" width=\"30\" height=\"30\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-15\" value=\"\" style=\"verticalLabelPosition=middle;html=1;verticalAlign=middle;align=center;strokeColor=default;fillColor=#00BEF2;shape=mxgraph.azure.git_repository;shadow=0;textShadow=0;labelPosition=center;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"512\" y=\"270\" width=\"50\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-20\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;glass=0;direction=east;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"242\" y=\"260\" width=\"120\" height=\"80\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-21\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=right;fontSize=12;image=img/lib/azure2/general/Branch.svg;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;labelPosition=left;verticalLabelPosition=top;verticalAlign=bottom;direction=east;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"232\" y=\"250\" width=\"30\" height=\"30\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-22\" value=\"\" style=\"verticalLabelPosition=middle;html=1;verticalAlign=middle;align=center;strokeColor=default;fillColor=#00BEF2;shape=mxgraph.azure.git_repository;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;labelPosition=center;direction=east;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"272\" y=\"270\" width=\"50\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-44\" value=\"Sync\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;glass=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"239\" y=\"210\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-49\" value=\"\" style=\"shape=singleArrow;direction=west;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"372\" y=\"275\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-50\" value=\"\" style=\"shape=singleArrow;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"372\" y=\"295\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-51\" value=\"Branch\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"387\" y=\"255\" width=\"70\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-52\" value=\"Merge\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"392\" y=\"315\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-54\" value=\"Feature\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"272\" y=\"355\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-55\" value=\"Development\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"487\" y=\"355\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-61\" value=\"\" style=\"shape=singleArrow;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"607\" y=\"285\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-62\" value=\"Pull Request &amp;amp;amp; Merge\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"602\" y=\"305\" width=\"105\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-66\" value=\"\" style=\"shape=singleArrow;direction=north;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"531.5\" y=\"190\" width=\"20\" height=\"60\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-67\" value=\"Update\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"471.5\" y=\"210\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-76\" value=\"\" style=\"image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Pipelines.svg;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"551.5\" y=\"210\" width=\"20\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-78\" value=\"\" style=\"image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Pipelines.svg;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"642\" y=\"260\" width=\"20\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-81\" value=\"\" style=\"shape=doubleArrow;direction=south;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"290.5\" y=\"190\" width=\"20\" height=\"60\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-87\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"717\" y=\"260\" width=\"120\" height=\"80\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-88\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=right;fontSize=12;image=img/lib/azure2/general/Branch.svg;shadow=0;textShadow=0;labelPosition=left;verticalLabelPosition=top;verticalAlign=bottom;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"707\" y=\"250\" width=\"30\" height=\"30\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-89\" value=\"\" style=\"verticalLabelPosition=middle;html=1;verticalAlign=middle;align=center;strokeColor=default;fillColor=#00BEF2;shape=mxgraph.azure.git_repository;shadow=0;textShadow=0;labelPosition=center;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"747\" y=\"270\" width=\"50\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-90\" value=\"Test\" style=\"rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"752\" y=\"355\" width=\"50\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-91\" value=\"\" style=\"shape=singleArrow;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"842\" y=\"285\" width=\"100\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-92\" value=\"Pull Request &amp;amp;amp; Merge\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"837\" y=\"305\" width=\"105\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-93\" value=\"\" style=\"shape=singleArrow;direction=north;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"766.5\" y=\"190\" width=\"20\" height=\"60\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-94\" value=\"Update\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"711.5\" y=\"210\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-95\" value=\"\" style=\"image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Pipelines.svg;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"791.5\" y=\"210\" width=\"20\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-96\" value=\"\" style=\"image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Pipelines.svg;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"877\" y=\"260\" width=\"20\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-97\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;textShadow=1;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"957\" y=\"260\" width=\"120\" height=\"80\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-98\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=right;fontSize=12;image=img/lib/azure2/general/Branch.svg;shadow=0;textShadow=0;labelPosition=left;verticalLabelPosition=top;verticalAlign=bottom;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"947\" y=\"250\" width=\"30\" height=\"30\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-99\" value=\"\" style=\"verticalLabelPosition=middle;html=1;verticalAlign=middle;align=center;strokeColor=default;fillColor=#00BEF2;shape=mxgraph.azure.git_repository;shadow=0;textShadow=0;labelPosition=center;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"987\" y=\"270\" width=\"50\" height=\"50\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-100\" value=\"Production\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"962\" y=\"355\" width=\"110\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-103\" value=\"\" style=\"shape=singleArrow;direction=north;whiteSpace=wrap;html=1;gradientColor=default;shadow=0;textShadow=0;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"1012.5\" y=\"190\" width=\"20\" height=\"60\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-104\" value=\"Update\" style=\"rounded=0;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=14;spacing=10;textShadow=0;labelBorderColor=none;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"952.5\" y=\"210\" width=\"60\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-105\" value=\"\" style=\"image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Pipelines.svg;shadow=0;textShadow=0;direction=east;flipH=0;flipV=0;strokeColor=default;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"1032.5\" y=\"210\" width=\"20\" height=\"20\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-111\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;glass=0;direction=east;flipV=0;strokeColor=#36393d;fillColor=#eeeeee;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"239\" y=\"30\" width=\"120\" height=\"150\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-110\" value=\"\" style=\"shape=image;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;image=https://www.brasoftware.com.br/Marketing/Microsoft/2023/ebook/fabric/img/icon-microsoft-fabric.png;shadow=0;textShadow=1;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"189\" y=\"10\" width=\"75\" height=\"75\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-112\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/compute/Workspaces.svg;shadow=0;textShadow=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"266.5\" y=\"77\" width=\"65\" height=\"56.00000000000001\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-126\" value=\"Feature Workspaces\" style=\"rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=10;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"240.5\" y=\"133\" width=\"120\" height=\"27\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-129\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;glass=0;direction=east;flipV=0;strokeColor=#36393d;fillColor=#eeeeee;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"479\" y=\"30\" width=\"120\" height=\"150\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-130\" value=\"\" style=\"shape=image;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;image=https://www.brasoftware.com.br/Marketing/Microsoft/2023/ebook/fabric/img/icon-microsoft-fabric.png;shadow=0;textShadow=1;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"429\" y=\"10\" width=\"75\" height=\"75\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-131\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/compute/Workspaces.svg;shadow=0;textShadow=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"506.5\" y=\"77\" width=\"65\" height=\"56.00000000000001\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-132\" value=\"Dev Workspace\" style=\"rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=10;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"489\" y=\"133\" width=\"110\" height=\"27\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-133\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBorderColor=none;textShadow=0;flipH=0;glass=0;direction=east;flipV=0;strokeColor=#36393d;fillColor=#eeeeee;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"719\" y=\"30\" width=\"120\" height=\"150\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-135\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/compute/Workspaces.svg;shadow=0;textShadow=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"746.5\" y=\"77\" width=\"65\" height=\"56.00000000000001\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-136\" value=\"Test Workspace\" style=\"rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=10;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"732\" y=\"133\" width=\"97\" height=\"27\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-137\" value=\"\" style=\"shape=ext;double=1;rounded=1;whiteSpace=wrap;html=1;shadow=0;labelBorderColor=none;textShadow=1;flipH=0;glass=0;direction=east;flipV=0;strokeColor=#36393d;fillColor=#eeeeee;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"961\" y=\"30\" width=\"118\" height=\"150\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-139\" value=\"\" style=\"image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/compute/Workspaces.svg;shadow=0;textShadow=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"987.5\" y=\"77\" width=\"65\" height=\"56.00000000000001\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;        &lt;mxCell id=\"OZZ9g6hAlIJ2NX25TWjm-140\" value=\"Prod Workspace\" style=\"rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeColor=none;strokeWidth=1;fillColor=none;fontColor=#000000;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=0;fontStyle=1;fontSize=10;spacing=10;textShadow=0;shadow=0;direction=east;flipH=0;flipV=0;\" vertex=\"1\" parent=\"1\"&gt;          &lt;mxGeometry x=\"972\" y=\"133\" width=\"97\" height=\"27\" as=\"geometry\"/&gt;        &lt;/mxCell&gt;      &lt;/root&gt;    &lt;/mxGraphModel&gt;  &lt;/diagram&gt;&lt;/mxfile&gt;"}' style="max-width:100%;border:1px solid transparent;"></div></p>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.copy", "content.code.select", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+<script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+<script src="https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js"></script>
+<script src="../../javascripts/tablesort.js"></script>
+<script src="https://viewer.diagrams.net/js/viewer-static.min.js"></script></body>
+</html>
