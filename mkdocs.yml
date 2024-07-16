@@ -1,0 +1,83 @@
+site_name: Dbt Adapter for Fabric Spark - By Insight
+site_url: https://fluffy-couscous-p8yev1r.pages.github.io/
+repo_url: https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+repo_name: Dbt Fabric Spark
+edit_uri: edit/main/docs/
+theme:
+  name : material      
+  custom_dir: docs/overrides
+  logo: assets/insight_logo_only.png
+  palette:
+    scheme: insight
+    primary: custom
+    accent: custom
+  features:
+    - content.tooltips
+    - navigation.top
+    - navigation.path
+    - toc.integrate
+    - content.action.edit
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.details
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - docs/overrides/.icons
+  - md_in_html
+  - tables
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.superfences:
+      custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+plugins:
+  - search
+  - mkdocs-nav-weight
+  - table-reader
+  - drawio
+  - macros:
+      include_yaml:
+        - bundle: docs/data/bundle.yml
+  - redirects:
+      redirect_maps:
+        'user_guide/index.md': 'user_guide/initial_setup.md'
+        'developer_guide/index.md': 'developer_guide/initial_setup.md'
+        'documentation_guide/index.md': 'documentation_guide/initial_setup.md'
+exclude_docs: |
+  data/*
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - javascripts/tablesort.js
+extra_css:
+  - assets/stylesheets/extra.css
+extra:
+  site_url: https://legendary-adventure-22vkokv.pages.github.io
+  client_organisation: "AdventureWorks"
+  project_start: "2024-07-01"
+  
