@@ -74,9 +74,9 @@ If you study the files shown above you will notice that there is a naming conven
 ??? Question "Notebooks with the Prefix `"model."`"
     These are dbt **model** notebooks. A notebook will be generated for each dbt **model** that you define. You will be able to run, debug and monitor execution of these notebooks directly in the Fabric portal independently of dbt.
 
-    ![alt text](./image.png)
+    ![alt text](./assets/images/model_notebook0.png)
 
-    ![alt text](./image-1.png)
+    ![alt text](./assets/images/model_notebook1.png)
 
 ??? Question "Notebooks with the Prefix `"test."`"
     These are dbt **test** notebooks. A notebook will be generated for each dbt **test** that you define. You will be able to run, debug and monitor execution of these notebooks directly in the Fabric portal independently of dbt.
