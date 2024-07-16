@@ -129,7 +129,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = f'mssparkutils.notebook.run("master_{project_name}_notebook_' + str(sort_order) + '")'
+        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id)'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
@@ -343,14 +343,20 @@ def SortManifest(nodes_orig):
 @staticmethod
 def RunDbtProject(PreInstall=False):
     # Get Config and Profile Information from dbt
-    profile_path = Path(os.path.expanduser('~')) / '.dbt/'
+    if (os.environ.get('DBT_PROFILES_DIR') is not None):
+        profile_path = Path(os.environ['DBT_PROFILES_DIR'])
+        print(profile_path)
+    else:
+        profile_path = Path(os.path.expanduser('~')) / '.dbt/'
+
     profile = dbtconfig.profile.read_profile(profile_path)
     config = dbtconfig.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
     profile_info = profile[config['profile']]
     target_info = profile_info['outputs'][profile_info['target']]    
     lakehouse = target_info['lakehouse']
 
-    shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
+    if os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target"):
+        shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
     # Generate AzCopy Scripts and Metadata Extract Notebooks
     GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
     if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks"):
