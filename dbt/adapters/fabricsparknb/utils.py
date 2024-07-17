@@ -216,6 +216,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
     template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
 
     # Create a Jinja environment
+
     env = Environment(loader=FileSystemLoader(template_dir))
 
     # Load the template
@@ -396,89 +397,89 @@ def IPYNBtoFabricPYFile(dbt_project_dir):
     print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
   
 
-@staticmethod
+#@staticmethod
 
 ### Generate py files and.platform files for git direct deployment
-def IPYNBtoFabricPYFileAndGitStructure(dbt_project_dir):
-    print("Converting notebooks to Fabric PY format")
-    target_dir = os.path.join(dbt_project_dir,"target")
-    notebooks_dir = os.path.join(target_dir,"notebooks")
-    os.chdir(notebooks_dir)
-    list_of_notebooks = os.listdir(notebooks_dir)
-    for filename in list_of_notebooks:
-        filenamewithoutext = filename[:-6]  ## remove .ipynb
-        notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py_git")
-        notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filenamewithoutext+".Notebook")
-        py_fabric_file = os.path.join(notebook_file_fabric_py_dir,"notebook-content.py")
-        platform_file = os.path.join(notebook_file_fabric_py_dir,".platform")
-        os.makedirs(notebook_file_fabric_py_dir, exist_ok=True)
-        path = dbt_project_dir
-        os.makedirs(path, exist_ok=True)
-        with open(platform_file, "w", encoding="utf-8") as platform_config_file:            
-            FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
-            platform_config_file.write(FabricPlatformContent)
-            with open(py_fabric_file, "w", encoding="utf-8") as python_file:
-                python_file.write("# Fabric notebook source\n\n")
-                python_file.write("# METADATA ********************\n\n")
-                python_file.write("# META {\n")
-                python_file.write("# META   \"kernel_info\": {\n")
-                python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
-                python_file.write("# META   }\n")
-                python_file.write("# META }\n\n")
+#def IPYNBtoFabricPYFileAndGitStructure(dbt_project_dir):
+#    print("Converting notebooks to Fabric PY format")
+#    target_dir = os.path.join(dbt_project_dir,"target")
+#    notebooks_dir = os.path.join(target_dir,"notebooks")
+#    os.chdir(notebooks_dir)
+#    list_of_notebooks = os.listdir(notebooks_dir)
+#    for filename in list_of_notebooks:
+#        filenamewithoutext = filename[:-6]  ## remove .ipynb
+#        notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py_git")
+#        notebook_file_fabric_py_dir = os.path.join(notebooks_fabric_py_dir,filenamewithoutext+".Notebook")
+#        py_fabric_file = os.path.join(notebook_file_fabric_py_dir,"notebook-content.py")
+#        platform_file = os.path.join(notebook_file_fabric_py_dir,".platform")
+#        os.makedirs(notebook_file_fabric_py_dir, exist_ok=True)
+#        path = dbt_project_dir
+#        os.makedirs(path, exist_ok=True)
+#        with open(platform_file, "w", encoding="utf-8") as platform_config_file:            
+#            FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
+#            platform_config_file.write(FabricPlatformContent)
+#            with open(py_fabric_file, "w", encoding="utf-8") as python_file:
+#                python_file.write("# Fabric notebook source\n\n")
+#                python_file.write("# METADATA ********************\n\n")
+#                python_file.write("# META {\n")
+#                python_file.write("# META   \"kernel_info\": {\n")
+#                python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
+#                python_file.write("# META   }\n")
+#                python_file.write("# META }\n\n")
 
 
-                f = open (filename, "r", encoding="utf-8") 
-                data = json.loads(f.read())
-                for cell in data['cells']:
-                    if (cell["cell_type"] == "code"):
-                        if (cell["source"][0][:5] == "%%sql"):
-                            python_file.write("# CELL ********************\n\n")
-                            for sourceline in cell['source']:
-                                line = "# MAGIC "+ sourceline
-                                python_file.write(line)
-                            python_file.write("\n\n")
-                            python_file.write("# METADATA ********************\n\n")
-                            python_file.write("# META {\n")
-                            python_file.write("# META   \"language\": \"sparksql\",\n")
-                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                            python_file.write("# META }\n\n")                   
-                        elif (cell["source"][0][:11] == "%%configure"):
-                            python_file.write("# CELL ********************\n\n")
-                            for sourceline in cell['source']:
-                                line = "# MAGIC "+ sourceline
-                                python_file.write(line)
-                            python_file.write("\n\n")
-                            python_file.write("# METADATA ********************\n\n")
-                            python_file.write("# META {\n")
-                            python_file.write("# META   \"language\": \"python\",\n")
-                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                            python_file.write("# META }\n\n")
-                        elif (cell["source"][0][:2] == "%%"):
-                            python_file.write("# CELL ********************\n\n")
-                            for sourceline in cell['source']:
-                                line = "# MAGIC "+ sourceline
-                                python_file.write(line)
-                            python_file.write("\n\n")
-                        else:
-                            python_file.write("# CELL ********************\n\n")
-                            for sourceline in cell['source']:
-                                python_file.write(sourceline)
-                            python_file.write("\n\n")
-                            python_file.write("# METADATA ********************\n\n")
-                            python_file.write("# META {\n")
-                            python_file.write("# META   \"language\": \"python\",\n")
-                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                            python_file.write("# META }\n\n")
-                    elif (cell["cell_type"] == "markdown"):
-                        python_file.write("# MARKDOWN ********************\n\n")
-                        for sourceline in cell['source']:
-                            line = "# "+ sourceline
-                            python_file.write(line)
-                        python_file.write("\n\n")
-                
-            remove_last_line(py_fabric_file)
-        print("Completed fabric py conversion for "+filenamewithoutext)
-    print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
+#                f = open (filename, "r", encoding="utf-8") 
+#                data = json.loads(f.read())
+#                for cell in data['cells']:
+#                    if (cell["cell_type"] == "code"):
+#                        if (cell["source"][0][:5] == "%%sql"):
+#                            python_file.write("# CELL ********************\n\n")
+#                            for sourceline in cell['source']:
+#                                line = "# MAGIC "+ sourceline
+#                                python_file.write(line)
+#                            python_file.write("\n\n")
+#                            python_file.write("# METADATA ********************\n\n")
+#                            python_file.write("# META {\n")
+#                            python_file.write("# META   \"language\": \"sparksql\",\n")
+#                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+#                            python_file.write("# META }\n\n")                   
+#                        elif (cell["source"][0][:11] == "%%configure"):
+#                            python_file.write("# CELL ********************\n\n")
+#                            for sourceline in cell['source']:
+#                                line = "# MAGIC "+ sourceline
+#                                python_file.write(line)
+#                            python_file.write("\n\n")
+#                            python_file.write("# METADATA ********************\n\n")
+#                            python_file.write("# META {\n")
+#                            python_file.write("# META   \"language\": \"python\",\n")
+#                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+#                            python_file.write("# META }\n\n")
+#                        elif (cell["source"][0][:2] == "%%"):
+#                            python_file.write("# CELL ********************\n\n")
+#                            for sourceline in cell['source']:
+#                                line = "# MAGIC "+ sourceline
+#                                python_file.write(line)
+#                            python_file.write("\n\n")
+#                        else:
+#                            python_file.write("# CELL ********************\n\n")
+#                           for sourceline in cell['source']:
+#                                python_file.write(sourceline)
+#                            python_file.write("\n\n")
+#                            python_file.write("# METADATA ********************\n\n")
+#                            python_file.write("# META {\n")
+#                            python_file.write("# META   \"language\": \"python\",\n")
+#                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+#                            python_file.write("# META }\n\n")
+#                    elif (cell["cell_type"] == "markdown"):
+#                        python_file.write("# MARKDOWN ********************\n\n")
+#                        for sourceline in cell['source']:
+#                            line = "# "+ sourceline
+#                            python_file.write(line)
+#                        python_file.write("\n\n")
+#                
+#            remove_last_line(py_fabric_file)
+#        print("Completed fabric py conversion for "+filenamewithoutext)
+#    print("Completed all Fabric PY conversions saved to : "+notebooks_fabric_py_dir)
 
 
 
@@ -551,6 +552,8 @@ def findnotebookid(notebooks,displayname):
 
 @staticmethod
 def APIUpsertNotebooks(dbt_project_dir,workspace_id):
+    print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric")
+    print("Uploading notebooks via API ...")
     target_dir = os.path.join(dbt_project_dir,"target")
     notebooks_fabric_py_dir = os.path.join(target_dir,"notebooks_fabric_py")
     os.chdir(notebooks_fabric_py_dir)
@@ -574,23 +577,34 @@ def APIUpsertNotebooks(dbt_project_dir,workspace_id):
                 else: 
                     notebook2 = fc.update_notebook_definition(workspace_id, notebookid,definition = notebook_w_content_new)
                     print("Notebook updated "+ notebookname) 
+    print("Completed uploading notebooks via API")
 
-
-
-  
-   
-
-   
+def PrintFirstTimeRunningMessage():
+    print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
+    print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
+    print("2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using")
+    print(f"3. Manually upload the following notebook to your workspace: {os.environ['DBT_PROJECT_DIR']}/target/notebooks/import_{os.environ['DBT_PROJECT_DIR']}_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks")
+    print(f"4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.")
+    print(f"5. A new notebook should appear in the workspace called metadata_{os.environ['DBT_PROJECT_DIR']}_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.")
+    print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
+    print(f"7. Re-run this script to generate the model and master notebooks.") 
 
 
 @staticmethod
-def RunDbtProject(PreInstall=False):
+def RunDbtProject(PreInstall=False,Upload=False):
     # Get Config and Profile Information from dbt
+
+
+
     if (os.environ.get('DBT_PROFILES_DIR') is not None):
         profile_path = Path(os.environ['DBT_PROFILES_DIR'])
         print(profile_path)
     else:
         profile_path = Path(os.path.expanduser('~')) / '.dbt/'
+    
+    if (PreInstall is True): 
+        if mn.PureLibIncludeDirExists():
+            raise Exception('When running pre-install development version please uninstall the pip installation by running : `pip uninstall dbt-fabricsparknb` before continuing')
 
     profile = dbtconfig.profile.read_profile(profile_path)
     config = dbtconfig.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
@@ -609,17 +623,12 @@ def RunDbtProject(PreInstall=False):
     GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
 
     # count files in metaextracts directory
-    if len(os.listdir(os.environ['DBT_PROJECT_DIR'] + "/metaextracts")) == 0:
-        print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
-        print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
-        print("2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using")
-        print(f"3. Manually upload the following notebook to your workspace: {os.environ['DBT_PROJECT_DIR']}/target/notebooks/import_{os.environ['DBT_PROJECT_DIR']}_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks")
-        print(f"4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.")
-        print(f"5. A new notebook should appear in the workspace called metadata_{os.environ['DBT_PROJECT_DIR']}_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.")
-        print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
-        print(f"7. Re-run this script to generate the model and master notebooks.")
+    if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/metaextracts"):
+        PrintFirstTimeRunningMessage()
+    elif len(os.listdir(os.environ['DBT_PROJECT_DIR'] + "/metaextracts")) == 0:
+        PrintFirstTimeRunningMessage()
     else:
-        if (PreInstall is True):
+        if (PreInstall is True):           
             utilpath = Path(get_paths()['purelib']) / Path('dbt/tests/util.py')
             spec = importlib.util.spec_from_file_location("util.name", utilpath)
             foo = importlib.util.module_from_spec(spec)
@@ -630,9 +639,16 @@ def RunDbtProject(PreInstall=False):
             # Call dbt build
             subprocess.run(["dbt", "build"], check=True)
             # Generate Model Notebooks and Master Notebooks
-            SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
-            GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
+        
+        SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
+        GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
+        curr_dir = os.getcwd()
+        dbt_project_dir = os.path.join(curr_dir,os.environ['DBT_PROJECT_DIR'])
+        IPYNBtoFabricPYFile(dbt_project_dir)
+        if (Upload == True):
+            APIUpsertNotebooks(dbt_project_dir, target_info['workspaceid'])
 
+        
 
 #@staticmethod
 #def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
