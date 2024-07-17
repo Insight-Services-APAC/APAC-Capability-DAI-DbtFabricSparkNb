@@ -1,20 +1,24 @@
 import io
 import re
+import shutil
 from jinja2 import Environment, FileSystemLoader
 import nbformat as nbf
 import os
 import copy
 import dbt.logger as logger
+import dbt.tests as dbttests
+import dbt.config as dbtconfig
 import json
 from dbt.contracts.graph.manifest import Manifest
 import dbt.adapters.fabricsparknb.catalog as Catalog
 from dbt.clients.system import load_file_contents
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
+import dbt.adapters.fabricsparknb.notebook as mn
 from pathlib import Path
-#from azure.storage.filedatalake import (
-#    DataLakeServiceClient,
-#    DataLakeDirectoryClient,
-#)
+from sysconfig import get_paths
+import importlib.util
+import sys
+import subprocess
 from azure.identity import DefaultAzureCredential
 import uuid
 from msfabricpysdkcore import FabricClientCore
@@ -42,8 +46,9 @@ def CheckSqlForModelCommentBlock(sql) -> bool:
         return False
 
 
+
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -73,7 +78,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Do something with the files...
 
         # Define the directory containing the Jinja templates
-        template_dir = 'dbt/include/fabricsparknb/notebooks/'
+        template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
         # Create a Jinja environment
         env = Environment(loader=FileSystemLoader(template_dir))
@@ -82,13 +87,13 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
 
         # Write the notebook to a file
-        target_file_name = f'master_notebook_{sort_order}.ipynb'
+        target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:            
             try:
                 nb_str = nbf.writes(nb)
@@ -100,7 +105,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             
 
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -110,7 +115,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -127,14 +132,14 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = 'mssparkutils.notebook.run("master_notebook_' + str(sort_order) + '")'
+        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id)'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
    
     # Write the notebook to a file
-    target_file_name = 'master_notebook.ipynb'
+    target_file_name = f'master_{project_name}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -145,10 +150,10 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -163,7 +168,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     nb = nbf.reads(rendered_template, as_version=4)
 
     # Write the notebook to a file    
-    target_file_name = 'metadata_extract.ipynb'
+    target_file_name = f'metadata_{project_name}_extract.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -174,10 +179,10 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/notebooks/'
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -192,7 +197,7 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
     nb = nbf.reads(rendered_template, as_version=4)
     
     # Write the notebook to a file    
-    target_file_name = 'import_notebook.ipynb'
+    target_file_name = f'import_{project_name}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -208,7 +213,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
 
     Path(notebook_dir).mkdir(parents=True, exist_ok=True)
     # Define the directory containing the Jinja templates
-    template_dir = 'dbt/include/fabricsparknb/pwsh/'
+    template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
@@ -576,6 +581,57 @@ def APIUpsertNotebooks(dbt_project_dir,workspace_id):
    
 
    
+
+
+@staticmethod
+def RunDbtProject(PreInstall=False):
+    # Get Config and Profile Information from dbt
+    if (os.environ.get('DBT_PROFILES_DIR') is not None):
+        profile_path = Path(os.environ['DBT_PROFILES_DIR'])
+        print(profile_path)
+    else:
+        profile_path = Path(os.path.expanduser('~')) / '.dbt/'
+
+    profile = dbtconfig.profile.read_profile(profile_path)
+    config = dbtconfig.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
+    profile_info = profile[config['profile']]
+    target_info = profile_info['outputs'][profile_info['target']]    
+    lakehouse = target_info['lakehouse']
+
+    if os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target"):
+        shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
+    # Generate AzCopy Scripts and Metadata Extract Notebooks
+    GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
+    if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks"):
+        os.makedirs(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks")
+
+    GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
+    GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
+
+    # count files in metaextracts directory
+    if len(os.listdir(os.environ['DBT_PROJECT_DIR'] + "/metaextracts")) == 0:
+        print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
+        print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
+        print("2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using")
+        print(f"3. Manually upload the following notebook to your workspace: {os.environ['DBT_PROJECT_DIR']}/target/notebooks/import_{os.environ['DBT_PROJECT_DIR']}_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks")
+        print(f"4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.")
+        print(f"5. A new notebook should appear in the workspace called metadata_{os.environ['DBT_PROJECT_DIR']}_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.")
+        print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
+        print(f"7. Re-run this script to generate the model and master notebooks.")
+    else:
+        if (PreInstall is True):
+            utilpath = Path(get_paths()['purelib']) / Path('dbt/tests/util.py')
+            spec = importlib.util.spec_from_file_location("util.name", utilpath)
+            foo = importlib.util.module_from_spec(spec)
+            sys.modules["module.name"] = foo
+            spec.loader.exec_module(foo)
+            foo.run_dbt(['build'])
+        else:
+            # Call dbt build
+            subprocess.run(["dbt", "build"], check=True)
+            # Generate Model Notebooks and Master Notebooks
+            SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
+            GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse, config['name'])
 
 
 #@staticmethod

@@ -4,16 +4,34 @@ import re
 import io 
 import nbformat as nbf
 from jinja2 import Environment, FileSystemLoader
+from sysconfig import get_paths
+from pathlib import Path
 
+
+
+@staticmethod
+def GetIncludeDir():
+    ChkPath = Path(get_paths()['purelib']) / Path(f'dbt/include/fabricsparknb/')
+    # print(ChkPath)
+    # Does Check for the path
+    if os.path.exists(ChkPath):
+        return ChkPath
+    else:        
+        path = Path(os.getcwd()) / Path('dbt/include/fabricsparknb/')
+        # print(str(path))
+        return (path)
 
 class ModelNotebook:
     def __init__(self, nb : nbf.NotebookNode = None, node_type='model'):
+        
         if nb is None:
-            filename = f'dbt/include/fabricsparknb/notebooks/{node_type}_notebook.ipynb'
+            filename = str((GetIncludeDir()) / Path(f'notebooks/{node_type}_notebook.ipynb'))            
             if os.path.exists(filename):
                 with io.open(file=filename, mode='r', encoding='utf-8') as f:
                     file_str = f.read()
                     nb = nbf.reads(file_str, as_version=4)
+            else: 
+                raise Exception(f"Notebook file {filename} does not exist")
 
         self.nb: nbf.NotebookNode = nb
         self.sql: list[str] = []
@@ -55,16 +73,18 @@ class ModelNotebook:
 
     def Render(self):        
         # Define the directory containing the Jinja templates
-        template_dir = 'dbt/include/fabricsparknb/notebooks/'
+        template_dir = str((GetIncludeDir()) / Path('notebooks/'))
+        if os.path.exists(template_dir):
+            # Create a Jinja environment
+            env = Environment(loader=FileSystemLoader(template_dir))
 
-        # Create a Jinja environment
-        env = Environment(loader=FileSystemLoader(template_dir))
+            # Load the template
+            template = env.get_template('model_notebook.ipynb')
 
-        # Load the template
-        template = env.get_template('model_notebook.ipynb')
+            # Render the template with the notebook_file variable
+            rendered_template = template.render()
 
-        # Render the template with the notebook_file variable
-        rendered_template = template.render()
-
-        # Parse the rendered template as a notebook
-        self.nb = nbf.reads(rendered_template, as_version=4)
+            # Parse the rendered template as a notebook
+            self.nb = nbf.reads(rendered_template, as_version=4)
+        else:
+            raise Exception(f"Directory {template_dir} does not exist")

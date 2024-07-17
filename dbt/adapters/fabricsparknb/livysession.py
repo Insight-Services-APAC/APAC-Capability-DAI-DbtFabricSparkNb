@@ -457,6 +457,8 @@ class LivyCursor:
 
         if node_id.startswith('test.'):
             node_type = 'test'
+        elif node_id.startswith('seed.'):
+            node_type = 'model'
         else:
             node_type = 'model'
 
