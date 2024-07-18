@@ -44,12 +44,14 @@ The first time that you run this script you will get a warning that the metadata
     ```powershell
     ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1
     ```
+!!! Important
+    Note that the above script runs azcopy to download the metadata extract json files from the lakehouse. Prior to running the script you may need to log in to the appropriate environment. Usually this is done using `azcopy login`. However, if you have access to multiple Microsoft entra domains you may need to specify the tenant id. This can be done by running `azcopy login --tenant-id <tenant_id>`. 
 - [x] Now re-run the dbt build script.
     ```powershell
     python3.exe post_install.py my_project 
     ```
 !!! Important
-    Be sure to replace ==my_project== with the name of your dbt project folder.
+    In the script above be sure to replace ==my_project== with the name of your dbt project folder.
 
 When you run this build script successfully, you will see a series of notebooks generated in your ==my_project==/target/notebooks directory. This is the `"special sauce"` of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. 
 

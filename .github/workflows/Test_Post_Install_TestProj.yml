@@ -5,9 +5,9 @@ name: Build_TestProj_Post_Install_Main
 
 on:
   push:
-    branches: [ "feature/making-delta-logging-multilake-compatible" ]
+    branches: [ "main", "dev"]
   pull_request:
-    branches: [ "feature/making-delta-logging-multilake-compatible" ]
+    branches: [ "main", "dev"]
 
 permissions:
   contents: read
@@ -19,8 +19,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: feature/making-delta-logging-multilake-compatible
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:

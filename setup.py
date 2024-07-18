@@ -64,15 +64,16 @@ setup(
     long_description_content_type="text/markdown",
     author="John Rampono",
     author_email="john.rampono@insight.com",
-    url="https://github.com/microsoft/dbt-fabricsparknb",
-    packages=find_namespace_packages(include=["dbt", "dbt.*"]),
+    url="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb",
+    packages=find_namespace_packages(include=["dbt", "dbt.*", "dbt_wrapper"]),
     include_package_data=True,
     install_requires=[
         "dbt-core~={}".format(dbt_core_version),
         "sqlparams>=3.0.0",
         "azure-identity>=1.13.0",
         "azure-core>=1.26.4",
-        "requests==2.31.0"
+        "requests==2.31.0",
+        "typer>=0.12.3"
         # "pyspark>=3.0.0,<4.0.0",
     ],
     zip_safe=False,
@@ -88,4 +89,9 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     python_requires=">=3.8",
+    entry_points={
+        "console_scripts": [
+            "dbt_wrapper = dbt_wrapper.main:app"
+        ]
+    }
 )
