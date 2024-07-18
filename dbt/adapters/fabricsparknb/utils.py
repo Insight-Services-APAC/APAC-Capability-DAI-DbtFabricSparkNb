@@ -648,6 +648,26 @@ def RunDbtProject(PreInstall=False,Upload=False):
         if (Upload == True):
             APIUpsertNotebooks(dbt_project_dir, target_info['workspaceid'])
 
+@staticmethod
+def RunDbtProjectArg(PreInstall:bool, argv:list[str]):
+    Upload = False
+    if len(sys.argv) == 2:    
+        os.environ['DBT_PROJECT_DIR'] = argv[1] 
+        RunDbtProject(PreInstall=PreInstall,Upload=Upload)
+    elif len(sys.argv) == 3:  
+        os.environ['DBT_PROJECT_DIR'] = argv[1]   
+        if sys.argv[2] == "1":
+            Upload = True 
+        RunDbtProject(PreInstall=PreInstall,Upload=Upload)
+    elif len(sys.argv) == 4:    
+        os.environ['DBT_PROJECT_DIR'] = argv[1]   
+        if sys.argv[2] == "1":
+            Upload = True 
+        os.environ['DBT_PROFILES_DIR'] = sys.argv[3]
+        RunDbtProject(PreInstall=PreInstall,Upload=Upload)
+    else:
+        print("Please supply at least DBT project directory as a parameter.")
+
         
 
 #@staticmethod
