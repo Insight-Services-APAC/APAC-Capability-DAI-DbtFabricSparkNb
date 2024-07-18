@@ -151,11 +151,10 @@ code post_install.py
 
 ```python title="Python Build script template"
 from dbt.adapters.fabricsparknb import utils as utils
-import os 
+import os
 import sys
-
-os.environ['DBT_PROJECT_DIR'] = sys.argv[1] # Note that the script takes your dbt project folder as an argument
-utils.RunDbtProject(PreInstall=False)
+ 
+utils.RunDbtProjectArg(PreInstall=False,argv = sys.argv)
 ```
 
 !!! info
