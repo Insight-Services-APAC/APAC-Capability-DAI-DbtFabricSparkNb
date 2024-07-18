@@ -123,17 +123,7 @@ Now lets create and activate our Python environment and install the required pac
 
     # Create and activate the Python environment
     python3 -m venv .env
-    ./.env/Scripts/Activate.ps1   
-
-    # Install dbt-core 
-    pip install dbt-core
-
-    # Install dbt-fabricspark
-    pip install dbt-fabricspark
-
-    # Install the dbt-fabricsparknb pre-requisites 
-    pip install azure-storage-file-datalake
-    pip install nbformat
+    ./.env/Scripts/Activate.ps1
 
     # Install the dbt-fabricsparknb package from the repository
     pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
@@ -157,15 +147,6 @@ Now lets create and activate our Python environment and install the required pac
     python3 -m venv .env
     ./.env/bin/Activate.ps1   
 
-    # Install dbt-core 
-    pip install dbt-core
-
-    # Install dbt-fabricspark
-    pip install dbt-fabricspark
-
-    # Install the dbt-fabricsparknb pre-requisites 
-    pip install azure-storage-file-datalake
-    pip install nbformat
 
     # Install the dbt-fabricsparknb package from the repository
     pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
@@ -176,33 +157,11 @@ Now lets create and activate our Python environment and install the required pac
 === "Linux"
 
     ```powershell
-    # Ensure that you are in the pwsh shell
-    pwsh
 
-    # Create a new source code directory
-    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
-    # Navigate to the new directory
-    cd dbt-fabricsparknb-test
-
-    # Create and activate the Python environment
-    python3 -m venv .env
-    ./.env/bin/Activate.ps1   
-
-    # Install dbt-core 
-    pip install dbt-core
-
-    # Install dbt-fabricspark
-    pip install dbt-fabricspark
-
-    # Install the dbt-fabricsparknb pre-requisites 
-    pip install azure-storage-file-datalake
-    pip install nbformat
-
-    # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    # TBA
 
 
-```
+    ```
 
 
 !!! info
