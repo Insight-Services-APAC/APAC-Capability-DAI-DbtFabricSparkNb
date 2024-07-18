@@ -50,6 +50,7 @@ def _get_dbt_core_version():
     return f"{minor}{pre}"
 
 
+
 package_name = "dbt-fabricsparknb"
 package_version = "1.7.0"
 dbt_core_version = _get_dbt_core_version()
@@ -74,7 +75,7 @@ setup(
         "azure-core>=1.26.4",
         "requests==2.31.0",
         "typer>=0.12.3"
-        # "pyspark>=3.0.0,<4.0.0",
+        "msfabricpysdkcore==0.1.1"
     ],
     zip_safe=False,
     classifiers=[
