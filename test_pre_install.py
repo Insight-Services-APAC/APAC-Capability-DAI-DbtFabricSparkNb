@@ -1,7 +1,4 @@
-from dbt.adapters.fabricsparknb import utils as utils
-import os 
-import sys
+import dbt.adapters.fabricsparknb.utils as utils
+import dbt_wrapper.main as main
 
-utils.RunDbtProjectArg(PreInstall=True,argv = sys.argv)
-###
-###
+main = main.app()

@@ -496,7 +496,7 @@ class SparkAdapter(SQLAdapter):
         :rtype: Tuple[AdapterResponse, agate.Table]
         """
         # Convert self.config to a JSON string
-        project_root = self.config.project_root
+        project_root = (self.config.project_root).replace('\\', '/')
 
         # Inject the JSON into the SQL as a comment
         sql = '/*{"project_root": "'+ project_root + '"}*/' + f'\n{sql}'

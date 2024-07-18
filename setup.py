@@ -68,15 +68,20 @@ setup(
     url="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb",
     packages=find_namespace_packages(include=["dbt", "dbt.*", "dbt_wrapper"]),
     include_package_data=True,
-    install_requires=[
-        "dbt-core~={}".format(dbt_core_version),
+    install_requires=[   ##ensure this aligns to requirements.txt in project
+        "sqlparse>=0.4.2",
+        "dbt-fabricspark",
+        "nbformat",
+        "types-PyYAML",
+        "types-python-dateutil",
+        "msfabricpysdkcore",
         "sqlparams>=3.0.0",
         "azure-identity>=1.13.0",
         "azure-core>=1.26.4",
         "requests==2.31.0",
         "typer>=0.12.3"
-        "msfabricpysdkcore==0.1.1"
-    ],
+       
+   ],
     zip_safe=False,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -96,3 +101,5 @@ setup(
         ]
     }
 )
+
+

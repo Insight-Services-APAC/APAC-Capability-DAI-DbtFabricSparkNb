@@ -9,6 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "./test_pre_install.py",
+            "args": ["samples\\testproj"],
             "console": "integratedTerminal"
         }
     ]

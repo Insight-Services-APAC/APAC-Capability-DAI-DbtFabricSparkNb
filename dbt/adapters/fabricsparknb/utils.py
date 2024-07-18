@@ -25,6 +25,7 @@ from msfabricpysdkcore import FabricClientCore
 import base64
 
 
+
 @staticmethod
 def CheckSqlForModelCommentBlock(sql) -> bool:
     # Extract the comments from the SQL
@@ -594,8 +595,6 @@ def PrintFirstTimeRunningMessage():
 def RunDbtProject(PreInstall=False,Upload=False):
     # Get Config and Profile Information from dbt
 
-
-
     if (os.environ.get('DBT_PROFILES_DIR') is not None):
         profile_path = Path(os.environ['DBT_PROFILES_DIR'])
         print(profile_path)
@@ -628,7 +627,8 @@ def RunDbtProject(PreInstall=False,Upload=False):
     elif len(os.listdir(os.environ['DBT_PROJECT_DIR'] + "/metaextracts")) == 0:
         PrintFirstTimeRunningMessage()
     else:
-        if (PreInstall is True):           
+        if (PreInstall is True):
+            #make sure we are using the installed dbt version
             utilpath = Path(get_paths()['purelib']) / Path('dbt/tests/util.py')
             spec = importlib.util.spec_from_file_location("util.name", utilpath)
             foo = importlib.util.module_from_spec(spec)
@@ -651,16 +651,17 @@ def RunDbtProject(PreInstall=False,Upload=False):
 @staticmethod
 def RunDbtProjectArg(PreInstall:bool, argv:list[str]):
     Upload = False
+    project_root = argv[1].replace("\\", "/")
     if len(sys.argv) == 2:    
-        os.environ['DBT_PROJECT_DIR'] = argv[1] 
+        os.environ['DBT_PROJECT_DIR'] = project_root
         RunDbtProject(PreInstall=PreInstall,Upload=Upload)
     elif len(sys.argv) == 3:  
-        os.environ['DBT_PROJECT_DIR'] = argv[1]   
+        os.environ['DBT_PROJECT_DIR'] = project_root
         if sys.argv[2] == "1":
             Upload = True 
         RunDbtProject(PreInstall=PreInstall,Upload=Upload)
     elif len(sys.argv) == 4:    
-        os.environ['DBT_PROJECT_DIR'] = argv[1]   
+        os.environ['DBT_PROJECT_DIR'] = project_root
         if sys.argv[2] == "1":
             Upload = True 
         os.environ['DBT_PROFILES_DIR'] = sys.argv[3]
