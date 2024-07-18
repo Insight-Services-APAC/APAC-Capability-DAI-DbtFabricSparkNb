@@ -13,7 +13,7 @@ If you do not get the Clone Repository option when selecting Source Control from
 
 ![image info](./images/CloneRepo.png)
 
-### Python Eevironment Setup
+### Python Environment Setup
 
 Once the repo has been cloned you can open a terminal window in VS Code and open a bash console.
 
