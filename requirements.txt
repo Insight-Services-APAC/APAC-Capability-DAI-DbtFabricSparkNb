@@ -3,4 +3,4 @@ dbt-fabricspark
 nbformat
 types-PyYAML
 types-python-dateutil
-msfabricpysdkcore
+msfabricpysdkcore=0.1.1
