@@ -50,6 +50,7 @@ def _get_dbt_core_version():
     return f"{minor}{pre}"
 
 
+
 package_name = "dbt-fabricsparknb"
 package_version = "1.7.0"
 dbt_core_version = _get_dbt_core_version()

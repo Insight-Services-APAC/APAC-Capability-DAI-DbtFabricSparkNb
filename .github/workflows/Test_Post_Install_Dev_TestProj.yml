@@ -35,7 +35,7 @@ jobs:
         pip install flake8 pytest
         pip install dbt-core    
         pip install dbt-fabricspark
-        pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+        pip install . 
         python test_post_install.py samples/testproj 0 samples/testproj
     - name: Archive testproj artifacts
       uses: actions/upload-artifact@v4
