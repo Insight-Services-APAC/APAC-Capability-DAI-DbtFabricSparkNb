@@ -72,7 +72,8 @@ setup(
         "sqlparams>=3.0.0",
         "azure-identity>=1.13.0",
         "azure-core>=1.26.4",
-        "requests==2.31.0"
+        "requests==2.31.0",
+        "msfabricpysdkcore=0.1.1"
         # "pyspark>=3.0.0,<4.0.0",
     ],
     zip_safe=False,
