@@ -1101,11 +1101,10 @@
 <div class="highlight"><span class="filename">New file creation in vscode</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">code</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span>
 </code></pre></div>
 <div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">import</span> <span class="nn">os</span> 
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">import</span> <span class="nn">os</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">import</span> <span class="nn">sys</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBT_PROJECT_DIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Note that the script takes your dbt project folder as an argument</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProject</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProjectArg</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
