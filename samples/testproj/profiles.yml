@@ -1,0 +1,18 @@
+# Note this is a sample file and should be modified to match your environment
+fabric-spark-testnb:
+  outputs:
+    dev:
+      auth: CLI      
+      connect_retries: 0
+      connect_timeout: 10
+      endpoint: https://api.fabric.microsoft.com/v1
+      lakehouse: datalake
+      lakehouseid: 'ca3ea5d9-04b6-4979-a1ad-25b87f6e79b5'
+      method: livy
+      schema: dbo
+      tenant_id: ca3ea5d9-04b6-4979-a1ad-25b87f6e79b5
+      threads: 1
+      type: fabricsparknb
+      workspaceid: 'ca3ea5d9-04b6-4979-a1ad-25b87f6e79b5'
+  target: dev
+  

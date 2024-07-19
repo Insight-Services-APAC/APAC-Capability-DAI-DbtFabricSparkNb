@@ -1,192 +1,169 @@
+---
+  weight: 1
+---
 # Environment Setup
 This section outlines the steps required to setup the development environment to use this dbt-adapter as part of a dbt data transformation project.
 
 To provide a common, cross-platform set of instructions we will first install Powershell. To facilitate the installation process we will use package managers such as [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) for Windows, [brew](https://brew.sh/) for MacOS and `apt` for Linux.
 
-<!-- tabs:start -->
+## Core Tools Installation
 
-#### **Windows**
+=== "Windows"
 
-```powershell
-# Winget Installs 
-winget install Microsoft.PowerShell
-```
+    ```powershell
+    # Winget Installs 
+    winget install Microsoft.PowerShell
+    ```
 
-#### **MacOS**
+=== "MacOS"
 
-```bash
-brew install powershell/tap/powershell
-```
+    ```bash
+    brew install powershell/tap/powershell
+    ```
 
-#### **Linux**
-```bash
-# TBA
-```
+=== "Linux"
+    ```bash
+    # TBA
+    ```
 
-<!-- tabs:end -->
+
 
 Next we will install Python and development tools such as vscode.
-<!-- tabs:start -->
 
-#### **Windows**
 
-```powershell
-# Winget Installs 
-winget install -e --id Python.Python -v 3.12.0
-winget install -e --id Microsoft.VisualStudioCode
-winget install --id Git.Git -e --source winget
+=== "Windows"
 
-# Python Environment Manager
-Python3 -m pip install --user virtualenv
+    ```powershell
+    # Winget Installs 
+    winget install -e --id Python.Python -v 3.12
+    winget install -e --id Microsoft.VisualStudioCode
+    winget install --id Git.Git -e --source winget
 
-```
+    # Python Environment Manager
+    Python -m pip install --user virtualenv
+    ```
 
-#### **MacOS**
+=== "MacOS"
 
-```bash
-# Brew Installs
-brew install python@3.12
-brew install --cask visual-studio-code
-brew install git
+    ```bash
+    # Brew Installs
+    brew install python@3.12
+    brew install --cask visual-studio-code
+    brew install git
 
-# Python Environment Manager
-Python3 -m pip install --user virtualenv
+    # Python Environment Manager
+    Python -m pip install --user virtualenv
 
-```
+    # TODO 
+    # Add OSX AZ Copy Instructions
 
-#### **Linux**
-```bash
-# TBA
-```
+    ```
 
-<!-- tabs:end -->
+=== "Linux"
+    ```bash
+    # TBA
+    ```
 
+
+
+## Other tools
+Now that we have pwsh installed, we can use it as a cross platform shell to install the additional required tools. 
+
+
+
+=== "Windows"
+
+    ```powershell
+
+    # Az Copy Install - No Winget Package Available
+    Invoke-WebRequest -Uri https://aka.ms/downloadazcopy-v10-windows -OutFile AzCopy.zip -UseBasicParsing
+    Expand-Archive ./AzCopy.zip ./AzCopy -Force
+    New-Item -ItemType "directory" -Path "$home/AzCopy"  -Force  
+    Get-ChildItem ./AzCopy/*/azcopy.exe | Move-Item -Destination "$home\AzCopy\AzCopy.exe" -Force  
+    $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User") 
+    [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";$home\AzCopy", "User")
+    Remove-Item .\AzCopy\ -Force
+    Remove-Item AzCopy.zip -Force
+
+    ```
+
+=== "MacOS"
+
+    ```bash
+    # TODO 
+    # Add OSX AZ Copy Instructions
+
+    ```
+
+=== "Linux"
+    ```bash
+    # TBA
+    ```
+
+
+## Source Directory & Python Env
 Now lets create and activate our Python environment and install the required packages.
 
-```powershell
-# Create a new source code directory
-mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
-# Navigate to the new directory
-cd dbt-fabricsparknb-test
 
-# Create and activate the Python environment
-python3 -m venv .env
-./.env/bin/Activate.ps1   
-
-# Install dbt-core 
-pip install dbt-core
-
-# Install dbt-fabricspark
-pip install dbt-fabricspark
-
-# Install the dbt-fabricsparknb pre-requisites 
-pip install azure-storage-file-datalake
-pip install nbformat
-
-# Install the dbt-fabricsparknb package from the repository
-pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
-
-```
-
-# Fabric Workspace Setup
-
-Next we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:
-
-- Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
-- Ensure that the workspace is Fabric enabled. If not, enable it.
-- Make sure that there is at least one Datalake in the workspace.
-- Get the connection details for the workspace. This will include the workspace name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
-
-> https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
+!!! tip
+    When doing pip install dbt-fabricspark below it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
 
 
-# Create Dbt Project
-Once you have taken note of the workspace id, lakehouse id, and workspace name, you can create a new dbt project and configure it to use the dbt-fabricsparknb adapter. To do this, run the code shown below:
+=== "Windows"
 
-!> **Important** Note when asked to select the adapter choose `dbt-fabricksparknb`. During this process you will also be asked for the `workspace id`, `lakehouse id`, and `workspace name`. Use the values you gathered from the Power BI Portal. 
+    ```powershell
 
+    # Ensure that you are in the pwsh shell
+    pwsh
 
-```powershell
-# Create your dbt project directories and profiles.yml file
-dbt init my_project # Note that the name of the project is arbitrary... call it whatever you like
-```
+    # Create a new source code directory
+    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
+    # Navigate to the new directory
+    cd dbt-fabricsparknb-test
 
-The command above will create a new directory called `my_project`. Within this directory you will find a `profiles.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
+    # Create and activate the Python environment
+    python -m venv .env
+    ./.env/Scripts/Activate.ps1
 
-```yaml
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: 'my_project'
-version: '1.0.0'
+    # Install the dbt-fabricsparknb package from the repository
+    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'my_project'
-
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
-model-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-
-clean-targets:         # directories to be removed by `dbt clean`
-  - "target"
-  - "dbt_packages"
+    ```
 
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
+=== "MacOS"
 
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
-models:
-  test4:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    ```powershell
 
-```
+    # Ensure that you are in the pwsh shell
+    pwsh
 
-The dbt init command will also update your `profiles.yml` file with a profile matching your dbt project name. Open this file in your favourite text editor using the command below:
+    # Create a new source code directory
+    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
+    # Navigate to the new directory
+    cd dbt-fabricsparknb-test
 
-```powershell
-code  ~/.dbt/profiles.yml
-```
-When run this will display a file similar to the one below. Check that your details are correct. 
+    # Create and activate the Python environment
+    python -m venv .env
+    ./.env/Scripts/Activate.ps1  
 
-```yaml
-test4:
-  outputs:
-    dev:
-      auth: cli #remove
-      client_id: dlkdjl #remove
-      client_scrent: dlkdjl #remove
-      connect_retries: 0 #remove
-      connect_timeout: 0 #remove
-      endpoint: dkld #remove
-      lakehouse: 'lakehouse' #the name of your lakehouse
-      lakehouseid: 'aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9' #the guid of your lakehouse
-      method: livy
-      schema: dbo #the schema you want to use
-      tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' #your power bi tenant id
-      threads: 1 #the number of threads to use
-      type: fabricsparknb #the type of adapter to use.. always use fabricsparknb
-      workspaceid: '4f0cb887-047a-48a1-98c3-ebdb38c784c2' #the guid of your workspace
-  target: dev
-```
+    # Install the dbt-fabricsparknb package from the repository
+    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
 
-```powershell
-# Set the DBT_PROJECT_DIR environment variable
-$env:DBT_PROJECT_DIR = "my_project" #this is the name of the project you created above
+    ```
+
+=== "Linux"
+
+    ```powershell
+
+    # TBA
 
 
-# Build your dbt project 
-dbt build
+    ```
 
-```
+
+!!! info
+    You are now ready to move to the next step in which you will set up your dbt project. Follow the [Dbt Project Setup](./dbt_project_setup.md) guide.
+
+

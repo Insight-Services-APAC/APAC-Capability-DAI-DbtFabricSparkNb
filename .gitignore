@@ -7,6 +7,7 @@ __pycache__
 .Python
 build/
 env*/
+.env*/
 dbt_env/
 dist/
 *.egg-info
@@ -15,7 +16,6 @@ logs/
 
 # Unit test
 .tox/
-.env
 test.env
 
 
@@ -47,4 +47,5 @@ dbt-insightfabric/
 .hive-metastore/
 .spark-warehouse/
 dbt-integration-tests
-ptfproj/target/
+*/target/*
+/site
