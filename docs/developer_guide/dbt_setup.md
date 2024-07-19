@@ -3,7 +3,7 @@
 The following sections are covered in this document:
 
 - Repo clone
-- python evironment setup
+- python environment setup
 - dbt installation
 
 ### Repo Clone

@@ -37,7 +37,7 @@ winget install -e --id Microsoft.VisualStudioCode
 winget install --id Git.Git -e --source winget
 
 # Python Environment Manager
-Python3 -m pip install --user virtualenv
+Python -m pip install --user virtualenv
 
 ```
 
@@ -50,7 +50,7 @@ brew install --cask visual-studio-code
 brew install git
 
 # Python Environment Manager
-Python3 -m pip install --user virtualenv
+Python -m pip install --user virtualenv
 
 ```
 
@@ -70,7 +70,7 @@ mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary..
 cd dbt-fabricsparknb-test
 
 # Create and activate the Python environment
-python3 -m venv .env
+python -m venv .env
 ./.env/bin/Activate.ps1   
 
 # Install dbt-core 
