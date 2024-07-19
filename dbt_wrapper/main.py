@@ -45,8 +45,10 @@ def build(
             help="The option to upload your notebooks directly via the powerbi api."
         ),
     ] = False,
-):
-
+):  
+    """
+    This command will build the dbt project and run the dbt adapter. It will also run the dbt-fabric-sparknb adapter's wrapper functions to allow generation of notebooks based on the dbt project artifacts.
+    """
     if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
         console.print(
             "Warning: :file_folder: The dbt_project_dir provided is nested and not a valid dbt project directory in windows. Copying the dbt_project_dir to the samples_tests directory.",
@@ -65,12 +67,10 @@ def build(
 
 @app.command()
 def docs():
+    """
+    This command will generate the documentation for the dbt project.
+    """
     print(f"Goodbye")
-
-
-@app.command()
-def main():
-    build()
 
 
 if __name__ == "__main__":
