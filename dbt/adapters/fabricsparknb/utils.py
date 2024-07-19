@@ -580,6 +580,19 @@ def APIUpsertNotebooks(dbt_project_dir,workspace_id):
                     print("Notebook updated "+ notebookname) 
     print("Completed uploading notebooks via API")
 
+
+@staticmethod
+def APIRunNotebook(workspace_id,notebook_name):
+    print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric")
+    print("Running notebook via API ...")
+    fc = FabricClientCore()
+    workspace = fc.get_workspace_by_id(id = workspace_id)
+    workspace_id = workspace.id
+    servernotebooks = fc.list_notebooks(workspace_id)
+    for nb_name in servernotebooks:
+            print('')
+    print("Completed uploading notebooks via API")
+
 def PrintFirstTimeRunningMessage():
     print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
     print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
