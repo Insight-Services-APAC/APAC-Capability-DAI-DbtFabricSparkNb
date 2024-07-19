@@ -4,10 +4,17 @@
 
 Here we will create a new dbt project and configure it to use the dbt-fabricsparknb adapter. But, before we do this we need to gather some information from the Power BI / Fabric Portal. To do this, follow the steps below:
 
-- Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
-- Ensure that the workspace is Fabric enabled. If not, enable it.
-- Make sure that there is at least one Datalake in the workspace.
-- Get the connection details for the workspace. This will include the lakehouse name, the workspace id, and the lakehouse id. The easiest way to get this information is to navigate to a file or folder in the lakehouse, click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
+1. Open the Power BI Portal and navigate to the workspace you want to use for development. If necessary, create a new workspace.
+1. Ensure that the workspace is Fabric enabled. If not, enable it.
+1. Make sure that there is at least one Datalake in the workspace.
+1. Get the connection details for the workspace. 
+      1. Get the lakehouse name, the workspace id, and the lakehouse id. 
+      2. The lakehouse name and workspace name are easily viewed from the fabric / power bi portal.
+      3. The easiest way to get this information is to 
+          1. Navigate to a file or folder in the lakehouse, 
+          2. click on the three dots to the right of the file or folder name, and select "Properties". Details will be displayed in the properties window. 
+          3. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. 
+          4. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
 
 > https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 
@@ -69,7 +76,7 @@ The dbt init command will also update your `profiles.yml` file with a profile ma
 When run this will display a file similar to the one below. Check that your details are correct. 
 
 ```yaml
-test4:
+my_project:
   outputs:
     dev:
       auth: cli #remove
@@ -97,60 +104,21 @@ To complete the newly created project you will need to copy some directories fro
 
 ### Create a build python Script
 
-This repo contains a dbt build script created in python. Make a copy of this script from file *ptf_pre_install.py* found in the root. 
+This repo contains a dbt build python script *test_pre_install.py* in the root.
 
 ```python
-import dbt.cli
-import dbt.cli.flags
-import dbt.config.renderer
-import dbt.config.utils
-import dbt.parser
-import dbt.parser.manifest
-import dbt.tests.util
-import dbt.utils
-import dbt
-import dbt.adapters.fabricspark
-import dbt.adapters.fabricsparknb
 from dbt.adapters.fabricsparknb import utils as utils
-import dbt.tests
-from pathlib import Path
-import os
-import shutil
+import os 
+import sys
 
-os.environ['DBT_PROJECT_DIR'] = "ptfproj"
-
-profile_path = Path(os.path.expanduser('~')) / '.dbt/'
-profile = dbt.config.profile.read_profile(profile_path)
-config = dbt.config.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
-profile_info = profile[config['profile']]
-target_info = profile_info['outputs'][profile_info['target']]
-lakehouse = target_info['lakehouse']
-
-
-shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
-utils.GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'])
-
-dbt.tests.util.run_dbt(['build'])
-
-utils.SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], lakehouse)
-utils.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
-utils.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
-utils.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], target_info['workspaceid'], target_info['lakehouseid'], lakehouse)
+utils.RunDbtProjectArg(PreInstall=True,argv = sys.argv)
 ```
 
-Give it the name prefixed by your new project name. Update the DBT_PROJECT_DIR variable with your project name. Save this file.
 
-You can execute this file:
+You can execute this file by passing your project name as the parameter
 ```bash
-python <YourProjectName>_pre_install.py
+python test_pre_install.py my_project
 ```
-
-You may get the error:
-```text
-FileNotFoundError: [WinError 3] The system cannot find the path specified: 'ch_fabric/target'
-```
-
-You will need to add a blank folder to your project called *"target"*.
 
 If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
 
@@ -160,9 +128,21 @@ After successful execution and number of notebooks have been created in your pro
 
 *metadata_extract.ipynb* is used to update the metadata json files in your project. 
 
-These 2 can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder using Onelake explorer. 
+The above two notebooks can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder by running the following script in pwsh. 
+
+```powershell
+#Run upload.ps1
+Invoke-Expression -Command $env:DBT_PROJECT_DIR/target/pwsh/upload.ps1
+```
 
 You then open the *import_notebook.ipynb* in fabric and *Run All* to import the notebooks from the Files/Notebooks directory in fabric. 
+
+Similar to  upload, using the following pwsh script will help you to download the metaextract files to the metaextrcats folder in repo.
+
+```powershell
+#Run upload.ps1
+Invoke-Expression -Command $env:DBT_PROJECT_DIR/target/pwsh/download.ps1
+```
 
 Executing the *master_notebook.ipynb* notebook will execute all notebooks created in your project.
 
