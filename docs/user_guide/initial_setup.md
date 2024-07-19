@@ -40,7 +40,7 @@ Next we will install Python and development tools such as vscode.
     winget install --id Git.Git -e --source winget
 
     # Python Environment Manager
-    Python3 -m pip install --user virtualenv
+    Python -m pip install --user virtualenv
     ```
 
 === "MacOS"
@@ -52,7 +52,7 @@ Next we will install Python and development tools such as vscode.
     brew install git
 
     # Python Environment Manager
-    Python3 -m pip install --user virtualenv
+    Python -m pip install --user virtualenv
 
     # TODO 
     # Add OSX AZ Copy Instructions
@@ -122,7 +122,7 @@ Now lets create and activate our Python environment and install the required pac
     cd dbt-fabricsparknb-test
 
     # Create and activate the Python environment
-    python3 -m venv .env
+    python -m venv .env
     ./.env/Scripts/Activate.ps1
 
     # Install the dbt-fabricsparknb package from the repository
@@ -144,9 +144,8 @@ Now lets create and activate our Python environment and install the required pac
     cd dbt-fabricsparknb-test
 
     # Create and activate the Python environment
-    python3 -m venv .env
-    ./.env/bin/Activate.ps1   
-
+    python -m venv .env
+    ./.env/Scripts/Activate.ps1  
 
     # Install the dbt-fabricsparknb package from the repository
     pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb

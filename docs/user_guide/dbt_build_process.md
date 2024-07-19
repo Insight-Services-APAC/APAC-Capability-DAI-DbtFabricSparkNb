@@ -17,7 +17,7 @@ Run the build script that you created in the previous step using the code below 
     Be sure to replace ==my_project== with the name of your dbt project folder.
 
 ```powershell
-python3.exe post_install.py my_project 
+python post_install.py my_project 
 ```
 
 ## Additional Steps for the First Run
@@ -42,13 +42,13 @@ The first time that you run this script you will get a warning that the metadata
 - [x] A new notebook should appear in the workspace called metadata_==my_project==_extract.ipynb where the text ==my_project== is replaced with the name of your dbt_project. Open this notebook and run all cells. This will generate the metadata extract json files and place them in the metaextracts sub-directory of your lakehouse.
 - [x] Now, back in your powershell terminal. Run the script below. This will download the metadata extract json files to a subfolder in your dbt project directory called metaextracts.
     ```powershell
-    ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1
+    Invoke-Expression -Command $env:DBT_PROJECT_DIR/target/pwsh/download.ps1
     ```
 !!! Important
     Note that the above script runs azcopy to download the metadata extract json files from the lakehouse. Prior to running the script you may need to log in to the appropriate environment. Usually this is done using `azcopy login`. However, if you have access to multiple Microsoft entra domains you may need to specify the tenant id. This can be done by running `azcopy login --tenant-id <tenant_id>`. 
 - [x] Now re-run the dbt build script.
     ```powershell
-    python3.exe post_install.py my_project 
+    python post_install.py my_project 
     ```
 !!! Important
     In the script above be sure to replace ==my_project== with the name of your dbt project folder.
