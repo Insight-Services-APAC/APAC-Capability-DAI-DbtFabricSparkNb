@@ -13,7 +13,7 @@ Documentation for this project is built using [mkdocs-material](https://squidfun
 
 ``` powershell title="Create and activate the Python environment"
 # Create and activate the Python environment
-python3 -m venv .env_mkdocs
+python -m venv .env_mkdocs
 .\.env_mkdocs\Scripts\activate.ps1
 pip install -r ./requirements_mkdocs.txt
 
