@@ -1,3 +1,4 @@
+import time
 import typer
 from typing_extensions import Annotated
 from rich.console import Console
@@ -5,6 +6,7 @@ from rich.theme import Theme
 import os
 import shutil
 from dbt_wrapper.wrapper import Commands
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -127,22 +129,54 @@ def run_all(
     This tba.
     """
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
-    if (clean_target_dir):
-        wrapper_commands.CleanProjectTargetDirectory()
-    if (generate_pre_dbt_scripts):
-        wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install)
-        wrapper_commands.ConvertNotebooksToFabricFormat()
-    if (auto_execute_metadata_extract):
-        wrapper_commands.RunMetadataExtract()
-    if (download_metadata):
-        wrapper_commands.DownloadMetadata()
+    perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
+
+    action_callables = [
+        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs),
+    ]
+    perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
+
+    perform_stage(option=auto_execute_metadata_extract, action_callables=[wrapper_commands.RunMetadataExtract], stage_name="Auto Execute Metadata Extract")
+
+    perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+
     if (build_dbt_project):
         wrapper_commands.BuildDbtProject(PreInstall=pre_install)
-    if (generate_post_dbt_scripts):
-        wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install)
-        wrapper_commands.ConvertNotebooksToFabricFormat()
-    if (upload_notebooks_via_api):
-        wrapper_commands.AutoUploadNotebooksViaApi()
+
+    action_callables = [
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
+    ]
+    perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
+
+    perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
+
 
 if __name__ == "__main__":
     app()
+
+
+def perform_stage(option, action_callables, stage_name):    
+    with Progress(
+            SpinnerColumn(spinner_name="dots", style="progress.spinner", finished_text="✅"),
+            TextColumn("[progress.description]{task.description}"), transient=False,
+            console=console
+    ) as progress:
+        stage_status = "Initiated"
+        ptid = progress.add_task(description=f"Stage: {stage_name} - {stage_status}", total=1)
+        start = time.time()
+        if option:
+            stage_status = "Running"
+            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
+            for action_callable in action_callables:
+                action_callable(progress=progress, task_id=ptid)
+            stage_status = "Completed"
+            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
+        else:
+            stage_status = "Skipped"
+            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
+        runtime = time.time() - start
+        runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
+        time.sleep(1)  # Simulate some delay
+        progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status} - Total Runtime: {runtime_str}", completed=1)

@@ -10,10 +10,11 @@ from dbt.contracts.graph.manifest import Manifest
 import dbt_wrapper.utils as mn
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from dbt.clients.system import load_file_contents
+from rich.progress import Progress
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress:Progress, task_id):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -63,9 +64,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             try:
                 nb_str = nbf.writes(nb)
                 f.write(nb_str)
-                print(f"{target_file_name} created")
+                progress.console.print(f"{target_file_name} created", style="info")
             except Exception as ex:
-                print(f"Error creating: {target_file_name}")
+                progress.console.print(f"Error creating: {target_file_name}", style="danger")
                 raise ex
             
     # Define the directory containing the Jinja templates
@@ -114,7 +115,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -143,7 +144,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -172,7 +173,7 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
+def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Progress, task_id):
     notebook_dir = f'./{project_root}/target/pwsh/'
 
     Path(notebook_dir).mkdir(parents=True, exist_ok=True)
@@ -207,7 +208,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid):
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress, task_id):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]

@@ -9,6 +9,7 @@ import subprocess
 import dbt_wrapper.utils as mn
 import dbt_wrapper.generate_files as gf
 from dbt_wrapper.fabric_api import FabricAPI as fa
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 
 class Commands:
@@ -62,21 +63,22 @@ class Commands:
         print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
         print("7. Re-run this script to generate the model and master notebooks.")
 
-    def GeneratePreDbtScripts(self, PreInstall=False):
-        gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
-        gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
-        gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'])
+    def GeneratePreDbtScripts(self, PreInstall, progress: Progress, task_id):        
+        gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+        gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+        
+        gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], progress=progress, task_id=task_id)
     
-    def GeneratePostDbtScripts(self, PreInstall=False):         
-        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse)
-        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
+    def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None):         
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
     
-    def ConvertNotebooksToFabricFormat(self):
+    def ConvertNotebooksToFabricFormat(self, progress=None, task_id=None):
         curr_dir = os.getcwd()
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
-        self.fa.IPYNBtoFabricPYFile(dbt_project_dir)
+        self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id)
     
-    def CleanProjectTargetDirectory(self):
+    def CleanProjectTargetDirectory(self, progress, task_id):
         if os.path.exists(self.dbt_project_dir + "/target"):
             shutil.rmtree(self.dbt_project_dir + "/target")
         # Generate AzCopy Scripts and Metadata Extract Notebooks

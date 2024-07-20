@@ -38,8 +38,8 @@ class FabricAPI:
             file.writelines(lines[:-1])
 
     # Generate py files for api update
-    def IPYNBtoFabricPYFile(self, dbt_project_dir):
-        self.console.print("Converting notebooks to Fabric PY format", style="info")
+    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id):
+        progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")        
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_dir = str(Path(target_dir) / Path("notebooks"))
         notebooks_fabric_py_dir = str(Path(target_dir) / Path("notebooks_fabric_py"))    
@@ -108,8 +108,8 @@ class FabricAPI:
                         python_file.write("\n\n")
                     
             self.remove_last_line(py_fabric_file)
-            self.console.print("Completed fabric py conversion for " + filenamewithoutext, style="info")
-        self.console.print("Completed all Fabric PY conversions saved to : " + notebooks_fabric_py_dir, style="info")
+            progress.update(task_id=task_id, description=f"Completed fabric py conversion for " + filenamewithoutext)                    
+        progress.update(task_id=task_id, description=f"Completed all Fabric PY conversions saved to : " + notebooks_fabric_py_dir)
 
     def stringToBase64(self, s):
         return base64.b64encode(s.encode('utf-8')).decode('utf-8')
@@ -156,7 +156,7 @@ class FabricAPI:
                 else: 
                     notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
                     self.console.print("Notebook updated " + notebookname, style="info") 
-        print("Completed uploading notebooks via API")
+        self.console.print("Completed uploading notebooks via API", style="info")
 
     def GetNotebookIdByName(self, workspace_id, notebook_name):
         fc = FabricClientCore()
