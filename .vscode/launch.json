@@ -9,7 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "./test_pre_install.py",
-            "args": ["samples\\testproj"],
+            "args": ["build", "samples/testproj", "--pre-install"],
             "console": "integratedTerminal"
         }
     ]

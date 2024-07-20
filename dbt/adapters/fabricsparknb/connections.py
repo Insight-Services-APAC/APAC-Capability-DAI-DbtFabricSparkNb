@@ -222,7 +222,8 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
                 json_object = json.loads(comment)
                 merged_json.update(json_object)
             except json.JSONDecodeError:
-                logger.logger.error('Could not parse comment as JSON')
+                #logger.error('Could not parse comment as JSON')
+                #logger.error(comment)
                 pass
 
         if 'node_id' in merged_json.keys():

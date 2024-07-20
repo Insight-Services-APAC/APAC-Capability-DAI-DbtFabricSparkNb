@@ -510,7 +510,6 @@ class SparkAdapter(SQLAdapter):
 
         return [row[0] for row in results]
 
-
     def check_schema_exists(self, database: str, schema: str) -> bool:
         #logger.debug("Datalake name is ", schema)
         results = catalog.ListSchema(profile=self.config, schema=schema)

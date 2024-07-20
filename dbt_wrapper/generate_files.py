@@ -8,6 +8,7 @@ import dbt_wrapper.catalog as Catalog
 from pathlib import Path
 from dbt.contracts.graph.manifest import Manifest
 import dbt_wrapper.utils as mn
+from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from dbt.clients.system import load_file_contents
 
 

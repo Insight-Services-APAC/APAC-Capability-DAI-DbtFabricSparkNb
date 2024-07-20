@@ -1,9 +1,11 @@
+import time
 import uuid
 from msfabricpysdkcore import FabricClientCore
 import base64
 import os
 import json
-
+import typer
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 @staticmethod
 def GetFabricPlatformContent(displayName):
@@ -162,16 +164,34 @@ def APIUpsertNotebooks(dbt_project_dir, workspace_id):
 
 @staticmethod
 def APIRunNotebook(workspace_id, notebook_name):
-    print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric")
-    print("Running notebook via API ...")
     fc = FabricClientCore()
-    workspace = fc.get_workspace_by_id(id = workspace_id)
+    workspace = fc.get_workspace_by_id(id=workspace_id)
     workspace_id = workspace.id
-    servernotebooks = fc.list_notebooks(workspace_id)
-    for nb_name in servernotebooks:
-            print('')
-    print("Completed uploading notebooks via API")
+    ws_items = fc.list_items(workspace_id)
+    for item in ws_items:
+        if item.type == 'Notebook' and item.display_name == notebook_name:
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                transient=True,
+            ) as progress:
+                ptid = progress.add_task(description=f"Running {item.display_name}", total=None)
+                start = time.time()
+                ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
+                progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status}")
+                while ji.status == "InProgress" or ji.status == "NotStarted":                    
+                    ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
+                    # update progress with total runtime
+                    runtime = time.time() - start
+                    runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
+                    progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
+                    # wait for 10 seconds
+                    time.sleep(10)
+                print(f"Notebook execution of {item.display_name} completed with status {ji.status}")
 
+            break
+            
+   
 
 
 
