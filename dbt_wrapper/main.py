@@ -2,11 +2,9 @@ import typer
 from typing_extensions import Annotated
 from rich.console import Console
 from rich.theme import Theme
-import dbt.adapters.fabricsparknb.utils as utils
 import os
-import sys
 import shutil
-import dbt.adapters
+from dbt.adapters.fabricsparknb.wrapper import RunDbtProject
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -62,7 +60,7 @@ def build(
     os.environ["DBT_PROJECT_DIR"] = dbt_project_dir
     if (dbt_profiles_dir is not None):
         os.environ["DBT_PROFILES_DIR"] = dbt_profiles_dir
-    utils.RunDbtProject(PreInstall=pre_install, Upload=upload_notebooks_via_api)
+    RunDbtProject(PreInstall=pre_install, Upload=upload_notebooks_via_api)
 
 
 @app.command()

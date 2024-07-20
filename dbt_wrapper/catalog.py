@@ -64,6 +64,16 @@ def GetColumnsInRelation(profile, schema, identifier):
 
 
 @staticmethod
+def GetMetaHashes(project_root):
+    # Open the file
+    with io.open(project_root + '/metaextracts/MetaHashes.json', 'r') as file:
+        # Load JSON data from file
+        data = json.load(file)
+   
+    return data
+
+
+@staticmethod
 def ListSchemas(profile):
     # Open the file
     with io.open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:

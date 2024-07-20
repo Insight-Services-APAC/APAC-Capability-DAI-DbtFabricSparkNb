@@ -21,7 +21,6 @@ from pathlib import Path
 import dbt.adapters
 import dbt.adapters.fabricsparknb
 import dbt.adapters.fabricsparknb.notebook
-import dbt.adapters.fabricsparknb.utils
 
 logger = AdapterLogger("fabricsparknb")
 NUMBERS = DECIMALS + (int, float)
