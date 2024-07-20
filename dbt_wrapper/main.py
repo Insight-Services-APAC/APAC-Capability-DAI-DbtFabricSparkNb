@@ -8,7 +8,7 @@ from dbt_wrapper.wrapper import Commands
 
 app = typer.Typer(no_args_is_help=True)
 
-custom_theme = Theme({"info": "dim cyan", "warning": "magenta", "danger": "bold red"})
+custom_theme = Theme({"info": "dim cyan", "warning": "magenta", "danger": "bold red", "debug": "grey82"})
 
 console = Console(theme=custom_theme)
 
@@ -121,7 +121,7 @@ def run_all(
         typer.Option(
             help="The option to upload your notebooks directly via the powerbi api."
         ),
-    ] = True,
+    ] = True
 ):
     """
     This tba.
@@ -133,7 +133,7 @@ def run_all(
         wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install)
         wrapper_commands.ConvertNotebooksToFabricFormat()
     if (auto_execute_metadata_extract):
-        wrapper_commands.RunMetadataExtract()        
+        wrapper_commands.RunMetadataExtract()
     if (download_metadata):
         wrapper_commands.DownloadMetadata()
     if (build_dbt_project):

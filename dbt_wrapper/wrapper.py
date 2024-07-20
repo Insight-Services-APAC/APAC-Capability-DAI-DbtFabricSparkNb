@@ -8,7 +8,7 @@ import sys
 import subprocess
 import dbt_wrapper.utils as mn
 import dbt_wrapper.generate_files as gf
-import dbt_wrapper.fabric_api as fa
+from dbt_wrapper.fabric_api import FabricAPI as fa
 
 
 class Commands:
@@ -20,6 +20,7 @@ class Commands:
         self.target_info = None
         self.lakehouse = None
         self.project_root = None
+        self.fa = fa(console=self.console)
     
     def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None):
         if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
@@ -33,22 +34,23 @@ class Commands:
                 shutil.rmtree(dbt_project_dir)
             shutil.copytree(old_dbt_project_dir, dbt_project_dir)
         os.environ["DBT_PROJECT_DIR"] = dbt_project_dir
+        self.dbt_project_dir = dbt_project_dir
         if (dbt_profiles_dir is not None):
             os.environ["DBT_PROFILES_DIR"] = dbt_profiles_dir
             
         if (os.environ.get('DBT_PROFILES_DIR') is not None):
             profile_path = Path(os.environ['DBT_PROFILES_DIR'])
-            print(profile_path)
+            self.console.print(profile_path, style="debug")
         else:
             profile_path = Path(os.path.expanduser('~')) / '.dbt/'
         
         self.profile = dbtconfig.profile.read_profile(profile_path)
-        self.config = dbtconfig.project.load_raw_project(os.environ['DBT_PROJECT_DIR'])
+        self.config = dbtconfig.project.load_raw_project(self.dbt_project_dir)
         self.profile_info = self.profile[self.config['profile']]
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
         self.project_name = self.config['name']
-        self.dbt_project_dir = dbt_project_dir
+        
         
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
@@ -61,31 +63,31 @@ class Commands:
         print("7. Re-run this script to generate the model and master notebooks.")
 
     def GeneratePreDbtScripts(self, PreInstall=False):
-        gf.GenerateMetadataExtract(os.environ['DBT_PROJECT_DIR'], self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
-        gf.GenerateNotebookUpload(os.environ['DBT_PROJECT_DIR'], self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
-        gf.GenerateAzCopyScripts(os.environ['DBT_PROJECT_DIR'], self.target_info['workspaceid'], self.target_info['lakehouseid'])
+        gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
+        gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
+        gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'])
     
     def GeneratePostDbtScripts(self, PreInstall=False):         
-        gf.SetSqlVariableForAllNotebooks(os.environ['DBT_PROJECT_DIR'], self.lakehouse)
-        gf.GenerateMasterNotebook(os.environ['DBT_PROJECT_DIR'], self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'])
     
     def ConvertNotebooksToFabricFormat(self):
         curr_dir = os.getcwd()
-        dbt_project_dir = os.path.join(curr_dir, os.environ['DBT_PROJECT_DIR'])
-        fa.IPYNBtoFabricPYFile(dbt_project_dir)
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        self.fa.IPYNBtoFabricPYFile(dbt_project_dir)
     
     def CleanProjectTargetDirectory(self):
-        if os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target"):
-            shutil.rmtree(os.environ['DBT_PROJECT_DIR'] + "/target")
+        if os.path.exists(self.dbt_project_dir + "/target"):
+            shutil.rmtree(self.dbt_project_dir + "/target")
         # Generate AzCopy Scripts and Metadata Extract Notebooks
         
-        if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks"):
-            os.makedirs(os.environ['DBT_PROJECT_DIR'] + "/target/notebooks")
+        if not os.path.exists(self.dbt_project_dir + "/target/notebooks"):
+            os.makedirs(self.dbt_project_dir + "/target/notebooks")
 
     def AutoUploadNotebooksViaApi(self):
         curr_dir = os.getcwd()
-        dbt_project_dir = os.path.join(curr_dir, os.environ['DBT_PROJECT_DIR'])
-        fa.APIUpsertNotebooks(dbt_project_dir, self.target_info['workspaceid'])
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        self.fa.APIUpsertNotebooks(dbt_project_dir, self.target_info['workspaceid'])
 
     def BuildDbtProject(self, PreInstall=False):    
         # Check if PreInstall is True
@@ -94,9 +96,9 @@ class Commands:
                 raise Exception('When running pre-install development version please uninstall the pip installation by running : `pip uninstall dbt-fabricsparknb` before continuing')
 
         # count files in metaextracts directory
-        if not os.path.exists(os.environ['DBT_PROJECT_DIR'] + "/metaextracts"):
+        if not os.path.exists(self.dbt_project_dir + "/metaextracts"):
             self.PrintFirstTimeRunningMessage()
-        elif len(os.listdir(os.environ['DBT_PROJECT_DIR'] + "/metaextracts")) == 0:
+        elif len(os.listdir(self.dbt_project_dir + "/metaextracts")) == 0:
             self.PrintFirstTimeRunningMessage()
         else:
             if (PreInstall is True):
@@ -117,5 +119,12 @@ class Commands:
         subprocess.run(["pwsh", f"./{self.dbt_project_dir}/target/pwsh/download.ps1"], check=True)
 
     def RunMetadataExtract(self):
+        nb_name = f"metadata_{self.project_name}_extract"        
+        nb_id = self.fa.GetNotebookIdByName(workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+        if (1==1):
+            print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now")               
+            self.fa.APIUpsertNotebooks(self.dbt_project_dir, self.target_info['workspaceid'], notebook_name=nb_name)
+        else: 
+            print("Metadata Extract Notebook Found in Workspace.")
         print("Running Metadata Extract")
-        fa.APIRunNotebook(self.target_info['workspaceid'], f"metadata_{self.project_name}_extract")
+        self.fa.APIRunNotebook(self.target_info['workspaceid'], f"metadata_{self.project_name}_extract")

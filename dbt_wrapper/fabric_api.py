@@ -1,3 +1,4 @@
+from pathlib import Path
 import time
 import uuid
 from msfabricpysdkcore import FabricClientCore
@@ -7,195 +8,196 @@ import json
 import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-@staticmethod
-def GetFabricPlatformContent(displayName):
-    logicalId = str(uuid.uuid4())
 
-    platformcontent = """{
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
-  "metadata": {
-    "type": "Notebook",
-    "displayName": \"""" + displayName + """\",
-    "description": "New notebook"
-   },
-   "config": {
-     "version": "2.0",
-     "logicalId": \"""" + logicalId + """\"
-   }
-}"""
-    return platformcontent
+class FabricAPI:
+    def __init__(self, console):
+        self.console = console
 
+    def GetFabricPlatformContent(self, displayName):
+        logicalId = str(uuid.uuid4())
 
-@staticmethod
-def remove_last_line(py_fabric_file: str):
-    with open(py_fabric_file, "r+", encoding="utf-8") as file:
-        lines = file.readlines()
-        file.seek(0)
-        file.truncate()
-        file.writelines(lines[:-1])
+        platformcontent = """{
+    "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+    "metadata": {
+        "type": "Notebook",
+        "displayName": \"""" + displayName + """\",
+        "description": "New notebook"
+    },
+    "config": {
+        "version": "2.0",
+        "logicalId": \"""" + logicalId + """\"
+    }
+    }"""
+        return platformcontent
 
+    def remove_last_line(self, py_fabric_file: str):
+        with open(py_fabric_file, "r+", encoding="utf-8") as file:
+            lines = file.readlines()
+            file.seek(0)
+            file.truncate()
+            file.writelines(lines[:-1])
 
-@staticmethod
-# Generate py files for api update
-def IPYNBtoFabricPYFile(dbt_project_dir):
-    print("Converting notebooks to Fabric PY format")
-    target_dir = os.path.join(dbt_project_dir, "target")
-    notebooks_dir = os.path.join(target_dir, "notebooks")
-    notebooks_fabric_py_dir = os.path.join(target_dir, "notebooks_fabric_py")
-    os.chdir(notebooks_dir)
-    os.makedirs(notebooks_fabric_py_dir, exist_ok=True)
-    list_of_notebooks = os.listdir(notebooks_dir)
-    for filename in list_of_notebooks:
-        filenamewithoutext = filename[:-6]  # # remove .ipynb
-        py_fabric_file = os.path.join(notebooks_fabric_py_dir, filenamewithoutext + ".py")
-        # path = dbt_project_dir
-        FabricPlatformContent = GetFabricPlatformContent(filenamewithoutext)          
-        with open(py_fabric_file, "w", encoding="utf-8") as python_file:
-            python_file.write("# Fabric notebook source\n\n")
-            python_file.write("# METADATA ********************\n\n")
-            python_file.write("# META {\n")
-            python_file.write("# META   \"kernel_info\": {\n")
-            python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
-            python_file.write("# META   }\n")
-            python_file.write("# META }\n\n")
-            f = open(filename, "r", encoding="utf-8")
-            data = json.loads(f.read())
-            for cell in data['cells']:
-                if (cell["cell_type"] == "code"):
-                    if (cell["source"][0][:5] == "%%sql"):
-                        python_file.write("# CELL ********************\n\n")
+    # Generate py files for api update
+    def IPYNBtoFabricPYFile(self, dbt_project_dir):
+        self.console.print("Converting notebooks to Fabric PY format", style="info")
+        target_dir = str(Path(dbt_project_dir) / Path("target"))
+        notebooks_dir = str(Path(target_dir) / Path("notebooks"))
+        notebooks_fabric_py_dir = str(Path(target_dir) / Path("notebooks_fabric_py"))    
+        os.makedirs(notebooks_fabric_py_dir, exist_ok=True)
+        list_of_notebooks = os.listdir(notebooks_dir)
+        for filename in list_of_notebooks:
+            filenamewithoutext = filename[:-6]  # # remove .ipynb
+            py_fabric_file = str(Path(notebooks_fabric_py_dir) / Path(filenamewithoutext + ".py"))
+            # path = dbt_project_dir
+            FabricPlatformContent = self.GetFabricPlatformContent(filenamewithoutext)          
+            with open(py_fabric_file, "w", encoding="utf-8") as python_file:
+                python_file.write("# Fabric notebook source\n\n")
+                python_file.write("# METADATA ********************\n\n")
+                python_file.write("# META {\n")
+                python_file.write("# META   \"kernel_info\": {\n")
+                python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
+                python_file.write("# META   }\n")
+                python_file.write("# META }\n\n")
+                f = open(Path(notebooks_dir) / Path(filename), "r", encoding="utf-8")
+                data = json.loads(f.read())
+                for cell in data['cells']:
+                    if (cell["cell_type"] == "code"):
+                        if (cell["source"][0][:5] == "%%sql"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC "+ sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"sparksql\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")                   
+                        elif (cell["source"][0][:11] == "%%configure"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC " + sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"python\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")
+                        elif (cell["source"][0][:2] == "%%"):
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                line = "# MAGIC "+ sourceline
+                                python_file.write(line)
+                            python_file.write("\n\n")
+                        else:
+                            python_file.write("# CELL ********************\n\n")
+                            for sourceline in cell['source']:
+                                python_file.write(sourceline)
+                            python_file.write("\n\n")
+                            python_file.write("# METADATA ********************\n\n")
+                            python_file.write("# META {\n")
+                            python_file.write("# META   \"language\": \"python\",\n")
+                            python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
+                            python_file.write("# META }\n\n")
+                    elif (cell["cell_type"] == "markdown"):
+                        python_file.write("# MARKDOWN ********************\n\n")
                         for sourceline in cell['source']:
-                            line = "# MAGIC "+ sourceline
+                            line = "# "+ sourceline
                             python_file.write(line)
                         python_file.write("\n\n")
-                        python_file.write("# METADATA ********************\n\n")
-                        python_file.write("# META {\n")
-                        python_file.write("# META   \"language\": \"sparksql\",\n")
-                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                        python_file.write("# META }\n\n")                   
-                    elif (cell["source"][0][:11] == "%%configure"):
-                        python_file.write("# CELL ********************\n\n")
-                        for sourceline in cell['source']:
-                            line = "# MAGIC " + sourceline
-                            python_file.write(line)
-                        python_file.write("\n\n")
-                        python_file.write("# METADATA ********************\n\n")
-                        python_file.write("# META {\n")
-                        python_file.write("# META   \"language\": \"python\",\n")
-                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                        python_file.write("# META }\n\n")
-                    elif (cell["source"][0][:2] == "%%"):
-                        python_file.write("# CELL ********************\n\n")
-                        for sourceline in cell['source']:
-                            line = "# MAGIC "+ sourceline
-                            python_file.write(line)
-                        python_file.write("\n\n")
-                    else:
-                        python_file.write("# CELL ********************\n\n")
-                        for sourceline in cell['source']:
-                            python_file.write(sourceline)
-                        python_file.write("\n\n")
-                        python_file.write("# METADATA ********************\n\n")
-                        python_file.write("# META {\n")
-                        python_file.write("# META   \"language\": \"python\",\n")
-                        python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
-                        python_file.write("# META }\n\n")
-                elif (cell["cell_type"] == "markdown"):
-                    python_file.write("# MARKDOWN ********************\n\n")
-                    for sourceline in cell['source']:
-                        line = "# "+ sourceline
-                        python_file.write(line)
-                    python_file.write("\n\n")
-                
-        remove_last_line(py_fabric_file)
-        print("Completed fabric py conversion for " + filenamewithoutext)
-    print("Completed all Fabric PY conversions saved to : " + notebooks_fabric_py_dir)
+                    
+            self.remove_last_line(py_fabric_file)
+            self.console.print("Completed fabric py conversion for " + filenamewithoutext, style="info")
+        self.console.print("Completed all Fabric PY conversions saved to : " + notebooks_fabric_py_dir, style="info")
+
+    def stringToBase64(self, s):
+        return base64.b64encode(s.encode('utf-8')).decode('utf-8')
+
+    def base64ToString(self, b):
+        return base64.b64decode(b).decode('utf-8')
+
+    def GenerateNotebookContent(self, notebookcontentBase64):
+        notebook_w_content = {'parts': [{'path': 'notebook-content.py', 'payload': notebookcontentBase64, 'payloadType': 'InlineBase64'}]}
+        return notebook_w_content
+
+    def findnotebookid(self, notebooks, displayname):
+        for notebook in notebooks:
+            if notebook.display_name == displayname:
+                return notebook.id
+        return -1
+    
+    def APIUpsertNotebooks(self, dbt_project_dir, workspace_id, notebook_name=None):
+        self.console.print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric", style="warning")
+        self.console.print("Uploading notebooks via API ...", style="info")
+        target_dir = str(Path(dbt_project_dir) / Path("target"))    
+        notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")
+        os.chdir(notebooks_fabric_py_dir)
+        fc = FabricClientCore()
+        workspace = fc.get_workspace_by_id(id=workspace_id)
+        workspace_id = workspace.id
+        servernotebooks = fc.list_notebooks(workspace_id)
+        list_of_notebooks = os.listdir(notebooks_fabric_py_dir)
+        if (notebook_name is not None):
+            list_of_notebooks = [notebook for notebook in list_of_notebooks if notebook[:-3] == notebook_name]
+
+        for filename in list_of_notebooks:
+            with open(filename, 'r', encoding="utf8") as file:
+                notebookcontent = file.read()
+                notebookname = filename[:-3]  # # remove .py
+                notebookcontentBase64 = self.stringToBase64(notebookcontent)
+                notebook_w_content_new = self.GenerateNotebookContent(notebookcontentBase64)  
+
+                # notebook_w_content = fc.get_notebook(workspace_id, notebook_name=notebookname)
+                notebookid = self.findnotebookid(servernotebooks, notebookname)
+                if notebookid == -1:
+                    notebook = fc.create_notebook(workspace_id, definition=notebook_w_content_new, display_name=notebookname)
+                    self.console.print("Notebook created " + notebookname, style="info")
+                else: 
+                    notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
+                    self.console.print("Notebook updated " + notebookname, style="info") 
+        print("Completed uploading notebooks via API")
+
+    def GetNotebookIdByName(self, workspace_id, notebook_name):
+        fc = FabricClientCore()
+        workspace = fc.get_workspace_by_id(id=workspace_id)
+        workspace_id = workspace.id
+        ws_items = fc.list_items(workspace_id)
+        for item in ws_items:
+            if item.type == 'Notebook' and item.display_name == notebook_name:
+                return item.id
+        return None
+
+    def APIRunNotebook(self, workspace_id, notebook_name):
+        fc = FabricClientCore()
+        workspace = fc.get_workspace_by_id(id=workspace_id)
+        workspace_id = workspace.id
+        ws_items = fc.list_items(workspace_id)
+        for item in ws_items:
+            if item.type == 'Notebook' and item.display_name == notebook_name:
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    transient=True,
+                ) as progress:
+                    ptid = progress.add_task(description=f"Running {item.display_name}", total=None)
+                    start = time.time()
+                    ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
+                    progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status}")
+                    while ji.status == "InProgress" or ji.status == "NotStarted":                    
+                        ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
+                        # update progress with total runtime
+                        runtime = time.time() - start
+                        runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
+                        progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
+                        # wait for 10 seconds
+                        time.sleep(10)
+                    print(f"Notebook execution of {item.display_name} completed with status {ji.status}")
+
+                break
 
 
-def stringToBase64(s):
-    return base64.b64encode(s.encode('utf-8')).decode('utf-8')
-
-
-def base64ToString(b):
-    return base64.b64decode(b).decode('utf-8')
-
-
-def GenerateNotebookContent(notebookcontentBase64):
-    notebook_w_content = {'parts': [{'path': 'notebook-content.py', 'payload': notebookcontentBase64, 'payloadType': 'InlineBase64'}]}
-    return notebook_w_content
-
-
-def findnotebookid(notebooks, displayname):
-    for notebook in notebooks:
-        if notebook.display_name == displayname:
-            return notebook.id
-    return -1
-
-
-@staticmethod
-def APIUpsertNotebooks(dbt_project_dir, workspace_id):
-    print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric")
-    print("Uploading notebooks via API ...")
-    target_dir = os.path.join(dbt_project_dir, "target")
-    notebooks_fabric_py_dir = os.path.join(target_dir, "notebooks_fabric_py")
-    os.chdir(notebooks_fabric_py_dir)
-    fc = FabricClientCore()
-    workspace = fc.get_workspace_by_id(id=workspace_id)
-    workspace_id = workspace.id
-    servernotebooks = fc.list_notebooks(workspace_id)
-    list_of_notebooks = os.listdir(notebooks_fabric_py_dir)
-    for filename in list_of_notebooks:
-        with open(filename, 'r', encoding="utf8") as file:
-            notebookcontent = file.read()
-            notebookname = filename[:-3]  # # remove .py
-            notebookcontentBase64 = stringToBase64(notebookcontent)
-            notebook_w_content_new = GenerateNotebookContent(notebookcontentBase64)  
-
-            # notebook_w_content = fc.get_notebook(workspace_id, notebook_name=notebookname)
-            notebookid = findnotebookid(servernotebooks, notebookname)
-            if notebookid == -1:
-                notebook = fc.create_notebook(workspace_id, definition=notebook_w_content_new, display_name=notebookname)
-                print("Notebook created " + notebookname)
-            else: 
-                notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
-                print("Notebook updated " + notebookname) 
-    print("Completed uploading notebooks via API")
-
-
-@staticmethod
-def APIRunNotebook(workspace_id, notebook_name):
-    fc = FabricClientCore()
-    workspace = fc.get_workspace_by_id(id=workspace_id)
-    workspace_id = workspace.id
-    ws_items = fc.list_items(workspace_id)
-    for item in ws_items:
-        if item.type == 'Notebook' and item.display_name == notebook_name:
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
-                transient=True,
-            ) as progress:
-                ptid = progress.add_task(description=f"Running {item.display_name}", total=None)
-                start = time.time()
-                ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
-                progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status}")
-                while ji.status == "InProgress" or ji.status == "NotStarted":                    
-                    ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
-                    # update progress with total runtime
-                    runtime = time.time() - start
-                    runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
-                    progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
-                    # wait for 10 seconds
-                    time.sleep(10)
-                print(f"Notebook execution of {item.display_name} completed with status {ji.status}")
-
-            break
-            
-   
-
-
-
-#@staticmethod
+# @staticmethod
 
 ### Generate py files and.platform files for git direct deployment
 #def IPYNBtoFabricPYFileAndGitStructure(dbt_project_dir):
