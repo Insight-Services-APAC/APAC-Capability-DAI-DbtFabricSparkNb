@@ -29,38 +29,6 @@ def docs_options():
 def log_levels():
     return ["DEBUG", "INFO", "WARNING", "ERROR"]
 
-@app.command()
-def build(
-    dbt_project_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_project directory. If left blank it will use the current directory"
-        ),
-    ],
-    dbt_profiles_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
-        ),
-    ] = None,
-    pre_install: Annotated[
-        bool,
-        typer.Option(
-            help="The option to run the dbt adapter using source code and not the installed package."
-        ),
-    ] = False,
-    upload_notebooks_via_api: Annotated[
-        bool,
-        typer.Option(
-            help="The option to upload your notebooks directly via the powerbi api."
-        ),
-    ] = False,
-):
-    """
-    This command will build the dbt project and run the dbt adapter. It will also run the dbt-fabric-sparknb adapter's wrapper functions to allow generation of notebooks based on the dbt project artifacts.
-    """
-    wrapper_commands.BuildDbtProject(PreInstall=pre_install)
-
 
 @app.command()
 def docs():
@@ -132,6 +100,12 @@ def run_all(
             help="The option to upload your notebooks directly via the powerbi api."
         ),
     ] = True,
+    auto_run_master_notebook: Annotated[
+        bool,
+        typer.Option(
+            help="The option to automatically execute your transformation pipeline by executing the master orchestration notebook after the build and publish stages."
+        ),
+    ] = True,
     log_level: Annotated[
         Optional[str],
         typer.Option(
@@ -168,6 +142,88 @@ def run_all(
 
     se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
 
+    se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.RunMasterNotebook], stage_name="Run Master Notebook")
+
+
+@app.command()
+def execute_master_notebook(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None,
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
+):
+    """
+    This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
+    """    
+    run_all(
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        clean_target_dir=False,
+        generate_pre_dbt_scripts=False,
+        generate_post_dbt_scripts=False,
+        auto_execute_metadata_extract=False,
+        download_metadata=False,
+        build_dbt_project=False,
+        pre_install=False,
+        upload_notebooks_via_api=False,
+        auto_run_master_notebook=True,
+        log_level=log_level
+    )
+
+
+
+@app.command()
+def build_dbt_project(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None,
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
+):
+    """
+    This command will just build the dbt project. It assumes all other stages have been completed.
+    """    
+    run_all(
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        clean_target_dir=True,
+        generate_pre_dbt_scripts=False,
+        generate_post_dbt_scripts=False,
+        auto_execute_metadata_extract=False,
+        download_metadata=False,
+        build_dbt_project=True,
+        pre_install=False,
+        upload_notebooks_via_api=False,
+        auto_run_master_notebook=False,
+        log_level=log_level
+    )
 
 if __name__ == "__main__":
     app()

@@ -79,7 +79,8 @@ setup(
         "azure-identity>=1.13.0",
         "azure-core>=1.26.4",
         "requests==2.31.0",
-        "typer>=0.12.3"
+        "typer>=0.12.3",
+        "setuptools>=71.0.4"
        
    ],
     zip_safe=False,

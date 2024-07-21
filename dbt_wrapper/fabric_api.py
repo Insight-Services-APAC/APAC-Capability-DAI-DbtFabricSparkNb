@@ -129,7 +129,7 @@ class FabricAPI:
         return -1
     
     def APIUpsertNotebooks(self, progress: ProgressConsoleWrapper, task_id, dbt_project_dir, workspace_id, notebook_name=None):
-        progress.print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric", level=LogLevel.WARNING)
+        progress.progress.update(task_id=task_id, description="Logging in... Make sure you use `az login` to authenticate before running for the first time")
         progress.print("Uploading notebooks via API ...", level=LogLevel.INFO)
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")        
@@ -182,7 +182,8 @@ class FabricAPI:
                     start = time.time()                
                     ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
                     progress.progress.update(task_id=task_id, description=f"Running {item.display_name} - {ji.status}")
-                    while ji.status == "InProgress" or ji.status == "NotStarted":                    
+                    time.sleep(10)
+                    while ji.status == "InProgress" or ji.status == "NotStarted":
                         ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
                         # update progress with total runtime
                         runtime = time.time() - start

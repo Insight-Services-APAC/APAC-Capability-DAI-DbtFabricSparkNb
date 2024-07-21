@@ -11,6 +11,8 @@ import dbt_wrapper.generate_files as gf
 from dbt_wrapper.fabric_api import FabricAPI as fa
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
+from rich import print
+from rich.panel import Panel
 
 class Commands:
     def __init__(self, console):
@@ -92,6 +94,7 @@ class Commands:
         self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'])
 
     def BuildDbtProject(self, PreInstall=False):
+        print(Panel.fit("[blue]<<<<<<<<<<<<<<<<<<<<<<< Start of dbt build[/blue]"))
         # Check if PreInstall is True
         if (PreInstall is True):
             if mn.PureLibIncludeDirExists():
@@ -111,10 +114,18 @@ class Commands:
                 sys.modules["module.name"] = foo
                 spec.loader.exec_module(foo)
                 foo.run_dbt(['build'])
+                
             else:
-                # Call dbt build
-                subprocess.run(["dbt", "build"], check=True)
-                # Generate Model Notebooks and Master Notebooks
+                # Call dbt build                
+                result = subprocess.run(["dbt", "build"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # Access the output and error
+                output = result.stdout.decode('utf-8')
+                error = result.stderr.decode('utf-8')
+
+                self.console.print(f"Output: {output}", style="info")
+                if error:
+                    self.console.print(f"Error: {error}", style="error")
+        print(Panel.fit("[blue]End of dbt build >>>>>>>>>>>>>>>>>>>>>>>[/blue]"))
 
     def DownloadMetadata(self, progress: ProgressConsoleWrapper, task_id):
         progress.print("Downloading Metadata via Azcopy", level=LogLevel.INFO)
@@ -130,10 +141,9 @@ class Commands:
         progress.print(f"Output: {output}", level=LogLevel.INFO)
         if error:
             progress.print(f"Error: {error}", level=LogLevel.ERROR)
-        
 
     def RunMetadataExtract(self, progress: ProgressConsoleWrapper, task_id):
-        nb_name = f"metadata_{self.project_name}_extract"        
+        nb_name = f"metadata_{self.project_name}_extract"
         nb_id = self.fa.GetNotebookIdByName(workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
         if (1==1):
             progress.print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now", level=LogLevel.INFO)
@@ -142,3 +152,7 @@ class Commands:
             progress.print("Metadata Extract Notebook Found in Workspace.", level=LogLevel.INFO)            
         progress.print("Running Metadata Extract", LogLevel.INFO)
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=f"metadata_{self.project_name}_extract")
+
+    def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id):
+        nb_name = f"master_{self.project_name}_notebook"
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
