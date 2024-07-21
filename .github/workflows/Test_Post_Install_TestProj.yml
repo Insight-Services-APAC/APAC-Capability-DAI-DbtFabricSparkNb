@@ -27,7 +27,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install . 
-        python test_post_install.py samples/testproj 0 samples/testproj
+         dbt_wrapper run-all-local samples/testproj
     - name: Archive testproj artifacts
       uses: actions/upload-artifact@v4
       with:

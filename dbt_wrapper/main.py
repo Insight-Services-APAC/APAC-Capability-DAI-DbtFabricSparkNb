@@ -185,6 +185,45 @@ def execute_master_notebook(
     )
 
 
+@app.command()
+def run_all_local(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None,
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
+):
+    """
+    This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
+    """    
+    run_all(
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        clean_target_dir=True,
+        generate_pre_dbt_scripts=True,
+        generate_post_dbt_scripts=True,
+        auto_execute_metadata_extract=False,
+        download_metadata=False,
+        build_dbt_project=True,
+        pre_install=False,
+        upload_notebooks_via_api=False,
+        auto_run_master_notebook=True,
+        log_level=log_level
+    )
+
 
 @app.command()
 def build_dbt_project(
