@@ -9,7 +9,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "./test_pre_install.py",
-            "args": ["run-all",  "--pre-install", "--no-build-dbt-project", "--no-download-metadata", "--no-upload-notebooks-via-api", "--no-generate-post-dbt-scripts", "samples/testproj2"],
+            "args": ["run-all",  "--pre-install", "--no-build-dbt-project",  "--no-upload-notebooks-via-api", "--no-generate-post-dbt-scripts", "--log-level", "warning",  "samples/testproj2"],
             "console": "integratedTerminal"
         }
     ]

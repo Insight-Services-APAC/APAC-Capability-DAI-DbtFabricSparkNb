@@ -1,25 +1,33 @@
-import time
+from typing import Optional
 import typer
 from typing_extensions import Annotated
 from rich.console import Console
 from rich.theme import Theme
-import os
-import shutil
 from dbt_wrapper.wrapper import Commands
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich import print
+from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.stage_executor import stage_executor
 
 app = typer.Typer(no_args_is_help=True)
 
-custom_theme = Theme({"info": "dim cyan", "warning": "magenta", "danger": "bold red", "debug": "grey82"})
+custom_theme = Theme({"info": "dim cyan", "warning": "dark_orange", "danger": "bold red", "error": "bold red", "debug": "khaki1"})
 
 console = Console(theme=custom_theme)
 
 wrapper_commands = Commands(console=console)
 
+_log_level: LogLevel = None
+
+if (_log_level is None):
+    _log_level = LogLevel.WARNING
+
 
 def docs_options():
     return ["generate", "serve"]
 
+
+def log_levels():
+    return ["DEBUG", "INFO", "WARNING", "ERROR"]
 
 @app.command()
 def build(
@@ -123,23 +131,31 @@ def run_all(
         typer.Option(
             help="The option to upload your notebooks directly via the powerbi api."
         ),
-    ] = True
+    ] = True,
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
 ):
     """
-    This tba.
-    """
+    This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
+    """    
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
-    perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+    se.perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
 
     action_callables = [
         lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs),
     ]
-    perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
+    se.perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
 
-    perform_stage(option=auto_execute_metadata_extract, action_callables=[wrapper_commands.RunMetadataExtract], stage_name="Auto Execute Metadata Extract")
+    se.perform_stage(option=auto_execute_metadata_extract, action_callables=[wrapper_commands.RunMetadataExtract], stage_name="Auto Execute Metadata Extract")
 
-    perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+    se.perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
 
     if (build_dbt_project):
         wrapper_commands.BuildDbtProject(PreInstall=pre_install)
@@ -148,35 +164,10 @@ def run_all(
         lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
     ]
-    perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
+    se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 
-    perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
+    se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
 
 
 if __name__ == "__main__":
     app()
-
-
-def perform_stage(option, action_callables, stage_name):    
-    with Progress(
-            SpinnerColumn(spinner_name="dots", style="progress.spinner", finished_text="✅"),
-            TextColumn("[progress.description]{task.description}"), transient=False,
-            console=console
-    ) as progress:
-        stage_status = "Initiated"
-        ptid = progress.add_task(description=f"Stage: {stage_name} - {stage_status}", total=1)
-        start = time.time()
-        if option:
-            stage_status = "Running"
-            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
-            for action_callable in action_callables:
-                action_callable(progress=progress, task_id=ptid)
-            stage_status = "Completed"
-            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
-        else:
-            stage_status = "Skipped"
-            progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status}")
-        runtime = time.time() - start
-        runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
-        time.sleep(1)  # Simulate some delay
-        progress.update(task_id=ptid, description=f"Stage: {stage_name} - {stage_status} - Total Runtime: {runtime_str}", completed=1)

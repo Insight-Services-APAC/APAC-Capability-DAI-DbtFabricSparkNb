@@ -7,7 +7,8 @@ import os
 import json
 import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
-
+from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 class FabricAPI:
     def __init__(self, console):
@@ -127,13 +128,12 @@ class FabricAPI:
                 return notebook.id
         return -1
     
-    def APIUpsertNotebooks(self, dbt_project_dir, workspace_id, notebook_name=None):
-        self.console.print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric", style="warning")
-        self.console.print("Uploading notebooks via API ...", style="info")
-        target_dir = str(Path(dbt_project_dir) / Path("target"))    
-        notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")
-        os.chdir(notebooks_fabric_py_dir)
-        fc = FabricClientCore()
+    def APIUpsertNotebooks(self, progress: ProgressConsoleWrapper, task_id, dbt_project_dir, workspace_id, notebook_name=None):
+        progress.print("Please ensure your terminal is authenticated with az login as the following process will attempt to upload to fabric", level=LogLevel.WARNING)
+        progress.print("Uploading notebooks via API ...", level=LogLevel.INFO)
+        target_dir = str(Path(dbt_project_dir) / Path("target"))
+        notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")        
+        fc = FabricClientCore(silent=True)
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         servernotebooks = fc.list_notebooks(workspace_id)
@@ -142,7 +142,7 @@ class FabricAPI:
             list_of_notebooks = [notebook for notebook in list_of_notebooks if notebook[:-3] == notebook_name]
 
         for filename in list_of_notebooks:
-            with open(filename, 'r', encoding="utf8") as file:
+            with open(Path(notebooks_fabric_py_dir) / Path(filename), 'r', encoding="utf8") as file:
                 notebookcontent = file.read()
                 notebookname = filename[:-3]  # # remove .py
                 notebookcontentBase64 = self.stringToBase64(notebookcontent)
@@ -152,14 +152,14 @@ class FabricAPI:
                 notebookid = self.findnotebookid(servernotebooks, notebookname)
                 if notebookid == -1:
                     notebook = fc.create_notebook(workspace_id, definition=notebook_w_content_new, display_name=notebookname)
-                    self.console.print("Notebook created " + notebookname, style="info")
+                    progress.progress.update(task_id=task_id, description="Notebook created " + notebookname)
                 else: 
                     notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
-                    self.console.print("Notebook updated " + notebookname, style="info") 
-        self.console.print("Completed uploading notebooks via API", style="info")
+                    progress.progress.update(task_id=task_id, description="Notebook updated " + notebookname)                    
+        progress.progress.update(task_id=task_id, description="Completed uploading notebooks via API")
 
     def GetNotebookIdByName(self, workspace_id, notebook_name):
-        fc = FabricClientCore()
+        fc = FabricClientCore(silent=True)
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         ws_items = fc.list_items(workspace_id)
@@ -168,33 +168,34 @@ class FabricAPI:
                 return item.id
         return None
 
-    def APIRunNotebook(self, workspace_id, notebook_name):
-        fc = FabricClientCore()
+    def APIRunNotebook(self, progress: ProgressConsoleWrapper, task_id, workspace_id, notebook_name):
+        fc = FabricClientCore(silent=True)
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         ws_items = fc.list_items(workspace_id)
-        for item in ws_items:
+        item_found = False
+        for item in ws_items:         
             if item.type == 'Notebook' and item.display_name == notebook_name:
-                with Progress(
-                    SpinnerColumn(),
-                    TextColumn("[progress.description]{task.description}"),
-                    transient=True,
-                ) as progress:
-                    ptid = progress.add_task(description=f"Running {item.display_name}", total=None)
-                    start = time.time()
+                item_found = True
+                try: 
+                    progress.progress.update(task_id=task_id, description=f"Running {item.display_name}")
+                    start = time.time()                
                     ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
-                    progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status}")
+                    progress.progress.update(task_id=task_id, description=f"Running {item.display_name} - {ji.status}")
                     while ji.status == "InProgress" or ji.status == "NotStarted":                    
                         ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
                         # update progress with total runtime
                         runtime = time.time() - start
                         runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
-                        progress.update(task_id=ptid, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
+                        progress.progress.update(task_id=task_id, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
                         # wait for 10 seconds
                         time.sleep(10)
-                    print(f"Notebook execution of {item.display_name} completed with status {ji.status}")
-
+                    progress.print(f"Notebook execution of {item.display_name} completed with status {ji.status}", level=LogLevel.INFO)
+                except Exception as e:
+                    progress.print(f"Error running notebook {item.display_name} - {e}", level=LogLevel.ERROR)
                 break
+        if not item_found:
+            progress.print(f"Notebook {notebook_name} not found in workspace {workspace_id}", level=LogLevel.ERROR)
 
 
 # @staticmethod
@@ -204,7 +205,6 @@ class FabricAPI:
 #    print("Converting notebooks to Fabric PY format")
 #    target_dir = os.path.join(dbt_project_dir,"target")
 #    notebooks_dir = os.path.join(target_dir,"notebooks")
-#    os.chdir(notebooks_dir)
 #    list_of_notebooks = os.listdir(notebooks_dir)
 #    for filename in list_of_notebooks:
 #        filenamewithoutext = filename[:-6]  ## remove .ipynb

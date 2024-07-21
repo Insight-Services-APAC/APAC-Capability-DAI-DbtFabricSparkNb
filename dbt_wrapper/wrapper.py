@@ -9,8 +9,8 @@ import subprocess
 import dbt_wrapper.utils as mn
 import dbt_wrapper.generate_files as gf
 from dbt_wrapper.fabric_api import FabricAPI as fa
-from rich.progress import Progress, SpinnerColumn, TextColumn
-
+from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 class Commands:
     def __init__(self, console):
@@ -63,7 +63,7 @@ class Commands:
         print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
         print("7. Re-run this script to generate the model and master notebooks.")
 
-    def GeneratePreDbtScripts(self, PreInstall, progress: Progress, task_id):        
+    def GeneratePreDbtScripts(self, PreInstall, progress: ProgressConsoleWrapper, task_id):        
         gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
         gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
         
@@ -73,12 +73,12 @@ class Commands:
         gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id)
         gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
     
-    def ConvertNotebooksToFabricFormat(self, progress=None, task_id=None):
+    def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None):
         curr_dir = os.getcwd()
-        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir) 
         self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id)
     
-    def CleanProjectTargetDirectory(self, progress, task_id):
+    def CleanProjectTargetDirectory(self, progress: ProgressConsoleWrapper, task_id):
         if os.path.exists(self.dbt_project_dir + "/target"):
             shutil.rmtree(self.dbt_project_dir + "/target")
         # Generate AzCopy Scripts and Metadata Extract Notebooks
@@ -86,12 +86,12 @@ class Commands:
         if not os.path.exists(self.dbt_project_dir + "/target/notebooks"):
             os.makedirs(self.dbt_project_dir + "/target/notebooks")
 
-    def AutoUploadNotebooksViaApi(self):
+    def AutoUploadNotebooksViaApi(self, progress: ProgressConsoleWrapper, task_id):
         curr_dir = os.getcwd()
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
-        self.fa.APIUpsertNotebooks(dbt_project_dir, self.target_info['workspaceid'])
+        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'])
 
-    def BuildDbtProject(self, PreInstall=False):    
+    def BuildDbtProject(self, PreInstall=False):
         # Check if PreInstall is True
         if (PreInstall is True):
             if mn.PureLibIncludeDirExists():
@@ -116,17 +116,29 @@ class Commands:
                 subprocess.run(["dbt", "build"], check=True)
                 # Generate Model Notebooks and Master Notebooks
 
-    def DownloadMetadata(self):
-        print("Downloading Metadata via Azcopy")
-        subprocess.run(["pwsh", f"./{self.dbt_project_dir}/target/pwsh/download.ps1"], check=True)
+    def DownloadMetadata(self, progress: ProgressConsoleWrapper, task_id):
+        progress.print("Downloading Metadata via Azcopy", level=LogLevel.INFO)
+        # Get Current Directory
+        curr_dir = os.getcwd()
+        target = Path(curr_dir) / self.dbt_project_dir / "target" / "pwsh" / "download.ps1"
+        result = subprocess.run(["pwsh", "–noprofile", str(target)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    def RunMetadataExtract(self):
+        # Access the output and error
+        output = result.stdout.decode('utf-8')
+        error = result.stderr.decode('utf-8')
+
+        progress.print(f"Output: {output}", level=LogLevel.INFO)
+        if error:
+            progress.print(f"Error: {error}", level=LogLevel.ERROR)
+        
+
+    def RunMetadataExtract(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"metadata_{self.project_name}_extract"        
         nb_id = self.fa.GetNotebookIdByName(workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
         if (1==1):
-            print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now")               
-            self.fa.APIUpsertNotebooks(self.dbt_project_dir, self.target_info['workspaceid'], notebook_name=nb_name)
+            progress.print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now", level=LogLevel.INFO)
+            self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=self.dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
         else: 
-            print("Metadata Extract Notebook Found in Workspace.")
-        print("Running Metadata Extract")
-        self.fa.APIRunNotebook(self.target_info['workspaceid'], f"metadata_{self.project_name}_extract")
+            progress.print("Metadata Extract Notebook Found in Workspace.", level=LogLevel.INFO)            
+        progress.print("Running Metadata Extract", LogLevel.INFO)
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=f"metadata_{self.project_name}_extract")

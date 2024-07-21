@@ -10,17 +10,18 @@ from dbt.contracts.graph.manifest import Manifest
 import dbt_wrapper.utils as mn
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from dbt.clients.system import load_file_contents
-from rich.progress import Progress
+from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress:Progress, task_id):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
-    manifest = GetManifest()
-    nodes_copy = SortManifest(manifest.nodes)
+    manifest = GetManifest(progress)
+    nodes_copy = SortManifest(nodes_orig=manifest.nodes, progress=progress)
 
     notebook_files = []
     # Add sort_order attribute to each file object
@@ -64,9 +65,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             try:
                 nb_str = nbf.writes(nb)
                 f.write(nb_str)
-                progress.console.print(f"{target_file_name} created", style="info")
+                progress.print(f"{target_file_name} created", level=LogLevel.INFO)
             except Exception as ex:
-                progress.console.print(f"Error creating: {target_file_name}", style="danger")
+                progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
                 raise ex
             
     # Define the directory containing the Jinja templates
@@ -109,13 +110,13 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         try:
             nb_str = nbf.writes(nb)
             f.write(nb_str)
-            print(f"{target_file_name} created")
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)
         except Exception as ex:
-            print(f"Error creating: {target_file_name}")
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress, task_id):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -138,13 +139,13 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
         try:
             nb_str = nbf.writes(nb)
             f.write(nb_str)
-            print(f"{target_file_name} created")
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)            
         except Exception as ex:
-            print(f"Error creating: {target_file_name}")
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress, task_id):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -167,13 +168,13 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
         try:
             nb_str = nbf.writes(nb)
             f.write(nb_str)
-            print(f"{target_file_name} created")
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)
         except Exception as ex:
-            print(f"Error creating: {target_file_name}")
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)            
             raise ex
 
 
-def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Progress, task_id):
+def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/pwsh/'
 
     Path(notebook_dir).mkdir(parents=True, exist_ok=True)
@@ -193,7 +194,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Prog
     # Write the notebook to a file
     with io.open(notebook_dir + 'upload.ps1', 'w') as f:
         f.write(rendered_template)
-        print("upload.ps1 created")
+        progress.print("upload.ps1 created", level=LogLevel.INFO)        
 
         # Load the template
     template = env.get_template('download.ps1')
@@ -204,11 +205,11 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Prog
     # Write the notebook to a file
     with io.open(notebook_dir + 'download.ps1', 'w') as f:
         f.write(rendered_template)
-        print("download.ps1 created")
+        progress.print("download.ps1 created", level=LogLevel.INFO)        
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress, task_id):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
@@ -237,14 +238,14 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress, task_i
             try:
                 nb_str = nbf.writes(nb)
                 f.write(nb_str)
-                print(f"{target_file_name} updated")
+                progress.print(f"{target_file_name} updated", level=LogLevel.INFO)                
             except Exception as ex:
-                print(f"Error updating: {target_file_name}")
+                progress.print(f"Error updating: {target_file_name}", level=LogLevel.ERROR)                
                 raise ex
 
 
 @staticmethod
-def GetManifest():
+def GetManifest(progress: ProgressConsoleWrapper):
     # Specify the path to your manifest file
     manifest_path = os.environ['DBT_PROJECT_DIR'] + '/target/manifest.json'
 
@@ -260,7 +261,7 @@ def GetManifest():
 
 
 @staticmethod
-def SortManifest(nodes_orig):
+def SortManifest(nodes_orig, progress: ProgressConsoleWrapper):
     nodes = copy.deepcopy(nodes_orig)
     sort_order = 0
     while nodes:
@@ -288,17 +289,18 @@ def SortManifest(nodes_orig):
                 else :
                     # If the node has no depends_on attribute, it has no dependencies
                     has_dependency = False
-                    print(f"Node {node_id} has no nodes attribute")
+                    progress.print(f"Node {node_id} has no nodes attribute", level=LogLevel.WARNING)                    
             else :
                 # If the node has no depends_on attribute, it has no dependencies
                 has_dependency = False
-                print(f"Node {node_id} has no depends_on attribute")
+                progress.print(f"Node {node_id} has no depends_on attribute", level=LogLevel.WARNING)                
 
             # If no dependency was found, add the node_id to the list
             if not has_dependency:
                 nodes_without_deps.append(node_id)
 
         if not nodes_without_deps:
+            progress.print(f"Nodes: {nodes}", level=LogLevel.ERROR)
             raise Exception('Circular dependency detected')
         # Assign the current sort order to the nodes without dependencies
         for node_id in nodes_without_deps:
