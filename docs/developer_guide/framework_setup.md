@@ -102,9 +102,9 @@ To complete the newly created project you will need to copy some directories fro
 [{"namespace":"lh_raw"},{"namespace":"lh_conformed"},{"namespace":"lh_consolidated"}]
 ```
 
-### Create a build python Script
+### Review the build python Script
 
-This repo contains a dbt build python script *test_pre_install.py* in the root.
+To ensure a successful dbt build process, please verify that the Python script *test_pre_install.py* exists in the root directory of your repository
 
 ```python
 from dbt.adapters.fabricsparknb import utils as utils
@@ -114,7 +114,7 @@ import sys
 utils.RunDbtProjectArg(PreInstall=True,argv = sys.argv)
 ```
 
-
+### Execute the build python Script
 You can execute this file by passing your project name as the parameter
 ```bash
 python test_pre_install.py my_project
