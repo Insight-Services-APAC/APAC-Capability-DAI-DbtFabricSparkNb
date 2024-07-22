@@ -510,21 +510,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Create Dbt Project">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#review-the-build-script-that-will-wrap-our-dbt-process" class="md-nav__link">
-    <span class="md-ellipsis">
-      Review the build script that will wrap our dbt process
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -1091,15 +1076,7 @@
 <a id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fabricsparknb</span>
 <a id="__codelineno-6-18" name="__codelineno-6-18"></a><span class="w">      </span><span class="nt">retry_all</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div></td></tr></table></div>
-<p>Now we are ready to run our dbt project for the first time. But first we need to review the build script.</p>
-<h3 id="review-the-build-script-that-will-wrap-our-dbt-process">Review the build script that will wrap our dbt process<a class="headerlink" href="#review-the-build-script-that-will-wrap-our-dbt-process" title="Permanent link">&para;</a></h3>
-<p>To ensure a successful dbt build process, please verify that the Python script <em>test_post_install.py</em> exists in the root directory of your repository</p>
-<div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span> <span class="nn">sys</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProjectArg</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
-</code></pre></div>
+<p>Now we are ready to run our dbt project for the first time.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>You are now ready to move to the next step in which you will build your dbt project. Follow the <a href="../dbt_build_process/">Dbt Build Process</a> guide.</p>

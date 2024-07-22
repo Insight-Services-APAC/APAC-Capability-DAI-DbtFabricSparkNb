@@ -1064,6 +1064,7 @@
 <h3 id="logging-to-delta">Logging to Delta<a class="headerlink" href="#logging-to-delta" title="Permanent link">&para;</a></h3>
 <p>Logging was previously done to a log file saved in the lakehouse and in json format. This has been changed to now log to a delta table in the lakehouse.</p>
 <p>It works using 2 tables <em>"batch"</em> and <em>"execution_log"</em>. At the start of the ETL the Prepare step will check if the tables exist and if they don't they will be created. This is followed by a check for an <em>"open"</em> batch and where the batch is still open it will fail. </p>
+<p>If you need to close the batch manually, this code is available at the end of the master notebook. </p>
 <p>If this check passes, a batch will be opened. There are steps in each master numbered notebook to check for failures in previousn notebook runs and this is done using the open batch so previous ETL executions with failures are not picked up and return false stops on the current execution.</p>
 
 

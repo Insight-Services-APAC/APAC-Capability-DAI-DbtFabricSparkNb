@@ -522,16 +522,7 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#additional-steps-for-the-first-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      Additional Steps for the First Run
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Additional Steps for the First Run">
+    <nav class="md-nav" aria-label="Run the build script">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -544,9 +535,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#post-build-steps-checks" class="md-nav__link">
+  <a href="#other-useful-dbt_wrapper-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Post Build Steps &amp; Checks
+      Other useful dbt_wrapper options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-useful-dbt_wrapper-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other useful dbt_wrapper commands
     </span>
   </a>
   
@@ -962,52 +962,21 @@
 
 <h1 id="dbt-build-process">Dbt Build Process<a class="headerlink" href="#dbt-build-process" title="Permanent link">&para;</a></h1>
 <h2 id="run-the-build-script">Run the build script<a class="headerlink" href="#run-the-build-script" title="Permanent link">&para;</a></h2>
-<p>Run the build script that you created in the previous step using the code below in the terminal.</p>
+<p>Run the build script using the code below in the terminal.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder.</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span> <span class="n">my_project</span> 
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> 
 </code></pre></div>
-<h2 id="additional-steps-for-the-first-run">Additional Steps for the First Run<a class="headerlink" href="#additional-steps-for-the-first-run" title="Permanent link">&para;</a></h2>
-<p>The first time that you run this script you will get a warning that the metadata json files are not present. You will need to follow the steps in the warning message to download the metadata json files from your Fabric Lakehouse. These steps are as follows: </p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> In a pwsh terminal run the script below. This will set an environment variable that will be used by steps later on. Be sure to replace <mark>my_project</mark> with the name of your dbt project folder.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">$env:DBT_PROJECT_DIR</span> <span class="p">=</span> <span class="s2">&quot;my_project&quot;</span>
-</code></pre></div></li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> In the same terminal now run the script below. This will upload a series of notebooks to a folder in your Fabric workspace
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">Invoke-Expression</span> <span class="n">-Command</span> <span class="nv">$env:DBT_PROJECT_DIR</span><span class="p">/</span><span class="n">target</span><span class="p">/</span><span class="n">pwsh</span><span class="p">/</span><span class="n">upload</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div></li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now run the following code to output the path to the import notebook. This will be used to import the notebooks into your workspace:
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">Get-Childitem</span> <span class="s2">&quot;$env:DBT_PROJECT_DIR/target/notebooks/import_*&quot;</span> <span class="p">|</span> <span class="p">%</span> <span class="p">{</span><span class="nb">Write-Host</span> <span class="nv">$_</span><span class="p">.</span><span class="n">FullName</span><span class="p">}</span>
-</code></pre></div></li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now login to the Fabric Portal and navigate to the workspace and lakehouse you are using and import the notebook using the path from the previous step.</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">How to manually upload a notebook</p>
-<p>See <a href="https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks">https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks</a></p>
-</div>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> A new notebook should appear in the workspace called metadata_<mark>my_project</mark>_extract.ipynb where the text <mark>my_project</mark> is replaced with the name of your dbt_project. Open this notebook and run all cells. This will generate the metadata extract json files and place them in the metaextracts sub-directory of your lakehouse.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now, back in your powershell terminal. Run the script below. This will download the metadata extract json files to a subfolder in your dbt project directory called metaextracts.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">Invoke-Expression</span> <span class="n">-Command</span> <span class="nv">$env:DBT_PROJECT_DIR</span><span class="p">/</span><span class="n">target</span><span class="p">/</span><span class="n">pwsh</span><span class="p">/</span><span class="n">download</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div></li>
-</ul>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Note that the above script runs azcopy to download the metadata extract json files from the lakehouse. Prior to running the script you may need to log in to the appropriate environment. Usually this is done using <code>azcopy login</code>. However, if you have access to multiple Microsoft entra domains you may need to specify the tenant id. This can be done by running <code>azcopy login --tenant-id &lt;tenant_id&gt;</code>. </p>
+<p>Make sure you're logged into your tenant in the PowerShell terminal using the command <code>az login</code> and your fabric tentant id.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
+</code></pre></div></p>
 </div>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now re-run the dbt build script.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span> <span class="n">my_project</span> 
-</code></pre></div></li>
-</ul>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>In the script above be sure to replace <mark>my_project</mark> with the name of your dbt project folder.</p>
-</div>
-<p>When you run this build script successfully, you will see a series of notebooks generated in your <mark>my_project</mark>/target/notebooks directory. This is the <code>"special sauce"</code> of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. </p>
+<p>When you run this build script successfully, you will see a series of notebooks generated in your <mark>my_project</mark>/target/notebooks directory. 
+After a successful execution you can now see your notebooks to your Fabric Workspace.  In order to organise your workspace efficiently I suggest that you move them all into a folder called the matches the name of your dbt project. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. </p>
 <h4 id="sample-listing-of-generated-notebooks">Sample listing of Generated Notebooks<a class="headerlink" href="#sample-listing-of-generated-notebooks" title="Permanent link">&para;</a></h4>
 <p><img alt="notebooks" src="/assets/images/notebooks.png" /></p>
 <p>If you study the files shown above you will notice that there is a naming convention and that the notebooks are prefixed with a specific string. The following table explains at a high level the naming convention and the purpose of each type of notebook.</p>
@@ -1075,17 +1044,60 @@
 <summary>Notebooks with the Prefix <code>"metadata_"</code></summary>
 <p>This is a helper notebook to facilitates the generation of workspace metadata json files.</p>
 </details>
-<h3 id="post-build-steps-checks">Post Build Steps &amp; Checks<a class="headerlink" href="#post-build-steps-checks" title="Permanent link">&para;</a></h3>
-<p>After a successful execution you can now upload your notebooks to your Fabric Workspace and run your dbt transformations against your lakehouse/s. To do this follow the steps below: </p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> In a pwsh terminal run the script below. This will set an environment variable that will be used by steps later on. Be sure to replace <mark>my_project</mark> with the name of your dbt project folder.
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$env:DBT_PROJECT_DIR</span> <span class="p">=</span> <span class="s2">&quot;my_project&quot;</span>
-</code></pre></div></li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> In the same terminal now run the script below. This will upload a the generated notebooks to a folder in your Fabric workspace
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">Invoke-Expression</span> <span class="n">-Command</span> <span class="nv">$env:DBT_PROJECT_DIR</span><span class="p">/</span><span class="n">target</span><span class="p">/</span><span class="n">pwsh</span><span class="p">/</span><span class="n">upload</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div></li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> In your Fabric workspace open the import_<mark>my_project</mark>_notebook and run all cells. This will upload the generated notebooks to your workspace. If they already exist they will be updated. In order to organise your workspace efficiently I suggest that you move them all into a folder called the matches the name of your dbt project. Don't worry, even if you upload a new version of the notebooks the folder structure will be mantained.</li>
-</ul>
+<h3 id="other-useful-dbt_wrapper-options">Other useful dbt_wrapper options<a class="headerlink" href="#other-useful-dbt_wrapper-options" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Options</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dbt_wrapper --help</td>
+<td>Displays all the userful commands</td>
+</tr>
+<tr>
+<td>--install-completion</td>
+<td>Install completion for the current shell.</td>
+</tr>
+<tr>
+<td>--show-completion</td>
+<td>how completion for the current shell, to copy it or customize the installation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="other-useful-dbt_wrapper-commands">Other useful dbt_wrapper commands<a class="headerlink" href="#other-useful-dbt_wrapper-commands" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Commands</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build-dbt-project</td>
+<td>This command will just build the dbt project. It assumes all other stages have been completed.</td>
+</tr>
+<tr>
+<td>docs</td>
+<td>This command will generate the documentation for the dbt project.</td>
+</tr>
+<tr>
+<td>execute-master-notebook</td>
+<td>This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.</td>
+</tr>
+<tr>
+<td>run-all</td>
+<td>This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.</td>
+</tr>
+<tr>
+<td>run-all-local</td>
+<td>This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.</td>
+</tr>
+</tbody>
+</table>
 
 
 
