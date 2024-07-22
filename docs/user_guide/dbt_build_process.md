@@ -14,17 +14,16 @@
 Run the build script using the code below in the terminal.
 
 !!! Important
-    Be sure to replace ==my_project== with the name of your dbt project folder.
+    
+    Prerequisites: Make sure you're logged into your tenant in the PowerShell terminal using the command `az login` and your fabric tentant id.
+    ```powershell
+    az login --tenant 73738727-cfc1-4875-90c2-2a7a1149ed3d 
+    ```
+    Be sure to replace ==my_project== with the name of your dbt project folder. 
 
 ```powershell
 dbt_wrapper run-all my_project 
 ```
-
-!!! Important
-    Make sure you're logged into your tenant in the PowerShell terminal using the command `az login` and your fabric tentant id.
-    ```powershell
-    az login --tenant 73738727-cfc1-4875-90c2-2a7a1149ed3d 
-    ```
 
 When you run this build script successfully, you will see a series of notebooks generated in your ==my_project==/target/notebooks directory. 
 After a successful execution you can now see your notebooks to your Fabric Workspace.  In order to organise your workspace efficiently I suggest that you move them all into a folder called the matches the name of your dbt project. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. 
