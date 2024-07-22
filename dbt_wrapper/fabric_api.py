@@ -63,8 +63,20 @@ class FabricAPI:
                 data = json.loads(f.read())
                 for cell in data['cells']:
                     if (cell["cell_type"] == "code"):
+                        ParamCell = False
+                        try:
+                            for tag in cell["metadata"]["tags"]:
+                                if (tag == "parameters"):
+                                    ParamCell = True
+                                    break
+                        except:
+                            pass
+                        
                         if (cell["source"][0][:5] == "%%sql"):
-                            python_file.write("# CELL ********************\n\n")
+                            if (ParamCell == False):
+                                python_file.write("# CELL ********************\n\n")
+                            else: 
+                                python_file.write("# PARAMETERS CELL ********************\n\n")
                             for sourceline in cell['source']:
                                 line = "# MAGIC "+ sourceline
                                 python_file.write(line)
@@ -75,7 +87,10 @@ class FabricAPI:
                             python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
                             python_file.write("# META }\n\n")                   
                         elif (cell["source"][0][:11] == "%%configure"):
-                            python_file.write("# CELL ********************\n\n")
+                            if (ParamCell == False):
+                                python_file.write("# CELL ********************\n\n")
+                            else:
+                                python_file.write("# PARAMETERS CELL ********************\n\n")
                             for sourceline in cell['source']:
                                 line = "# MAGIC " + sourceline
                                 python_file.write(line)
@@ -86,13 +101,19 @@ class FabricAPI:
                             python_file.write("# META   \"language_group\": \"synapse_pyspark\"\n")
                             python_file.write("# META }\n\n")
                         elif (cell["source"][0][:2] == "%%"):
-                            python_file.write("# CELL ********************\n\n")
+                            if (ParamCell == False):
+                                python_file.write("# CELL ********************\n\n")
+                            else: 
+                                python_file.write("# PARAMETERS CELL ********************\n\n")
                             for sourceline in cell['source']:
                                 line = "# MAGIC "+ sourceline
                                 python_file.write(line)
                             python_file.write("\n\n")
                         else:
-                            python_file.write("# CELL ********************\n\n")
+                            if (ParamCell == False):
+                                python_file.write("# CELL ********************\n\n")
+                            else: 
+                                python_file.write("# PARAMETERS CELL ********************\n\n")
                             for sourceline in cell['source']:
                                 python_file.write(sourceline)
                             python_file.write("\n\n")
@@ -104,7 +125,7 @@ class FabricAPI:
                     elif (cell["cell_type"] == "markdown"):
                         python_file.write("# MARKDOWN ********************\n\n")
                         for sourceline in cell['source']:
-                            line = "# "+ sourceline
+                            line = "# " + sourceline
                             python_file.write(line)
                         python_file.write("\n\n")
                     

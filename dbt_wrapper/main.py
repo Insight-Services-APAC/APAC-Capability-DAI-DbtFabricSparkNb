@@ -159,6 +159,12 @@ def execute_master_notebook(
             help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
         ),
     ] = None,
+    pre_install: Annotated[
+        bool,
+        typer.Option(
+            help="The option to run the dbt adapter using source code and not the installed package."
+        ),
+    ] = False,
     log_level: Annotated[
         Optional[str],
         typer.Option(
@@ -178,7 +184,7 @@ def execute_master_notebook(
         auto_execute_metadata_extract=False,
         download_metadata=False,
         build_dbt_project=False,
-        pre_install=False,
+        pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=True,
         log_level=log_level
@@ -199,6 +205,12 @@ def run_all_local(
             help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
         ),
     ] = None,
+    pre_install: Annotated[
+        bool,
+        typer.Option(
+            help="The option to run the dbt adapter using source code and not the installed package."
+        ),
+    ] = False,
     log_level: Annotated[
         Optional[str],
         typer.Option(
@@ -218,7 +230,7 @@ def run_all_local(
         auto_execute_metadata_extract=False,
         download_metadata=False,
         build_dbt_project=True,
-        pre_install=False,
+        pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
         log_level=log_level
@@ -239,6 +251,12 @@ def build_dbt_project(
             help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
         ),
     ] = None,
+    pre_install: Annotated[
+        bool,
+        typer.Option(
+            help="The option to run the dbt adapter using source code and not the installed package."
+        ),
+    ] = False,
     log_level: Annotated[
         Optional[str],
         typer.Option(
@@ -258,7 +276,7 @@ def build_dbt_project(
         auto_execute_metadata_extract=False,
         download_metadata=False,
         build_dbt_project=True,
-        pre_install=False,
+        pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
         log_level=log_level

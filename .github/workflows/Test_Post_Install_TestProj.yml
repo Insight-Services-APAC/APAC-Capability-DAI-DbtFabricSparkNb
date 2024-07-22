@@ -33,4 +33,4 @@ jobs:
       with:
         name: dist-without-markdown
         path: |
-            samples/testproj/target/            
+            samples_tests/target/
