@@ -1093,7 +1093,7 @@
 </code></pre></div></td></tr></table></div>
 <p>Now we are ready to run our dbt project for the first time. But first we need to review the build script.</p>
 <h3 id="review-the-build-script-that-will-wrap-our-dbt-process">Review the build script that will wrap our dbt process<a class="headerlink" href="#review-the-build-script-that-will-wrap-our-dbt-process" title="Permanent link">&para;</a></h3>
-<p>To ensure a successful dbt build process, please verify that the Python script “test_post_install.py” exists in the root directory of your repository</p>
+<p>To ensure a successful dbt build process, please verify that the Python script <em>test_post_install.py</em> exists in the root directory of your repository</p>
 <div class="highlight"><span class="filename">Python Build script template</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">import</span> <span class="nn">os</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">import</span> <span class="nn">sys</span>

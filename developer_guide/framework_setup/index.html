@@ -710,9 +710,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-build-python-script" class="md-nav__link">
+  <a href="#review-the-build-python-script" class="md-nav__link">
     <span class="md-ellipsis">
-      Create a build python Script
+      Review the build python Script
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execute-the-build-python-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Execute the build python Script
     </span>
   </a>
   
@@ -1035,14 +1044,15 @@
 <p>To complete the newly created project you will need to copy some directories from the project called <em>"ptfproj"</em> dbt project. Copy <em>ptfproj/macros/</em> and <em>ptfproj/metaextracts/</em> directories with their files into your new dbt project. Overwrite any directories or files if they exist. Now in metaextracts the file ListSchemas.json contains the lakehouses in your workspace. You can manually update this file.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">[{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_raw&quot;</span><span class="p">},{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_conformed&quot;</span><span class="p">},{</span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="s2">&quot;lh_consolidated&quot;</span><span class="p">}]</span>
 </code></pre></div>
-<h3 id="create-a-build-python-script">Create a build python Script<a class="headerlink" href="#create-a-build-python-script" title="Permanent link">&para;</a></h3>
-<p>This repo contains a dbt build python script <em>test_pre_install.py</em> in the root.</p>
+<h3 id="review-the-build-python-script">Review the build python Script<a class="headerlink" href="#review-the-build-python-script" title="Permanent link">&para;</a></h3>
+<p>To ensure a successful dbt build process, please verify that the Python script <em>test_pre_install.py</em> exists in the root directory of your repository</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">dbt.adapters.fabricsparknb</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span> <span class="nn">os</span> 
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">import</span> <span class="nn">sys</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">utils</span><span class="o">.</span><span class="n">RunDbtProjectArg</span><span class="p">(</span><span class="n">PreInstall</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </code></pre></div>
+<h3 id="execute-the-build-python-script">Execute the build python Script<a class="headerlink" href="#execute-the-build-python-script" title="Permanent link">&para;</a></h3>
 <p>You can execute this file by passing your project name as the parameter
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>test_pre_install.py<span class="w"> </span>my_project
 </code></pre></div></p>
