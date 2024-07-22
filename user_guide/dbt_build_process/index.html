@@ -965,16 +965,13 @@
 <p>Run the build script using the code below in the terminal.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder.</p>
-</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> 
+<p>Prerequisites: Make sure you're logged into your tenant in the PowerShell terminal using the command <code>az login</code> and your fabric tentant id.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
 </code></pre></div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Make sure you're logged into your tenant in the PowerShell terminal using the command <code>az login</code> and your fabric tentant id.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
-</code></pre></div></p>
+Be sure to replace <mark>my_project</mark> with the name of your dbt project folder. </p>
 </div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> 
+</code></pre></div>
 <p>When you run this build script successfully, you will see a series of notebooks generated in your <mark>my_project</mark>/target/notebooks directory. 
 After a successful execution you can now see your notebooks to your Fabric Workspace.  In order to organise your workspace efficiently I suggest that you move them all into a folder called the matches the name of your dbt project. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. </p>
 <h4 id="sample-listing-of-generated-notebooks">Sample listing of Generated Notebooks<a class="headerlink" href="#sample-listing-of-generated-notebooks" title="Permanent link">&para;</a></h4>
