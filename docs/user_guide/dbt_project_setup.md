@@ -136,19 +136,7 @@ my_project:
       retry_all: true
 ```
 
-Now we are ready to run our dbt project for the first time. But first we need to review the build script.
-
-### Review the build script that will wrap our dbt process 
-
-To ensure a successful dbt build process, please verify that the Python script *test_post_install.py* exists in the root directory of your repository
-
-```python title="Python Build script template"
-from dbt.adapters.fabricsparknb import utils as utils
-import os
-import sys
- 
-utils.RunDbtProjectArg(PreInstall=False,argv = sys.argv)
-```
+Now we are ready to run our dbt project for the first time.
 
 !!! info
     You are now ready to move to the next step in which you will build your dbt project. Follow the [Dbt Build Process](./dbt_build_process.md) guide.
