@@ -993,13 +993,19 @@
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now, back in your powershell terminal. Run the script below. This will download the metadata extract json files to a subfolder in your dbt project directory called metaextracts.
     <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">Invoke-Expression</span> <span class="n">-Command</span> <span class="nv">$env:DBT_PROJECT_DIR</span><span class="p">/</span><span class="n">target</span><span class="p">/</span><span class="n">pwsh</span><span class="p">/</span><span class="n">download</span><span class="p">.</span><span class="n">ps1</span>
 </code></pre></div></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Note that the above script runs azcopy to download the metadata extract json files from the lakehouse. Prior to running the script you may need to log in to the appropriate environment. Usually this is done using <code>azcopy login</code>. However, if you have access to multiple Microsoft entra domains you may need to specify the tenant id. This can be done by running <code>azcopy login --tenant-id &lt;tenant_id&gt;</code>. </p>
+</div>
+<ul class="task-list">
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Now re-run the dbt build script.
     <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">python</span> <span class="n">post_install</span><span class="p">.</span><span class="n">py</span> <span class="n">my_project</span> 
 </code></pre></div></li>
 </ul>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder.</p>
+<p>In the script above be sure to replace <mark>my_project</mark> with the name of your dbt project folder.</p>
 </div>
 <p>When you run this build script successfully, you will see a series of notebooks generated in your <mark>my_project</mark>/target/notebooks directory. This is the <code>"special sauce"</code> of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. </p>
 <h4 id="sample-listing-of-generated-notebooks">Sample listing of Generated Notebooks<a class="headerlink" href="#sample-listing-of-generated-notebooks" title="Permanent link">&para;</a></h4>
