@@ -220,7 +220,7 @@ def run_all_local(
         build_dbt_project=True,
         pre_install=False,
         upload_notebooks_via_api=False,
-        auto_run_master_notebook=True,
+        auto_run_master_notebook=False,
         log_level=log_level
     )
 
