@@ -15,3 +15,5 @@ This is the adaptor that the Insight version is based on and references in code.
 ### Reporting bugs and contributing code
 
 -   Want to report a bug or request a feature? Open [an issue](https://github.com/microsoft/dbt-fabricspark/issues/new).
+
+- Test change1
