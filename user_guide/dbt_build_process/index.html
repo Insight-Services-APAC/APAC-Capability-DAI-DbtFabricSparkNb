@@ -972,8 +972,9 @@
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using the command <code>az login</code> and your fabric tentant id.
+<p>Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using both <code>az login</code> and <code>azcopy login</code>. See the examples below and replace the tenant id with your own.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">azcopy</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant-id</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
 </code></pre></div></p>
 </div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span>
