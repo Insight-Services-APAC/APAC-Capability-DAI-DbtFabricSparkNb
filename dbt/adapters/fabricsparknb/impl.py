@@ -496,7 +496,7 @@ class SparkAdapter(SQLAdapter):
         :rtype: Tuple[AdapterResponse, agate.Table]
         """
         # Convert self.config to a JSON string
-        project_root = self.config.project_root
+        project_root = (self.config.project_root).replace('\\', '/')
 
         # Inject the JSON into the SQL as a comment
         sql = '/*{"project_root": "'+ project_root + '"}*/' + f'\n{sql}'
@@ -509,7 +509,6 @@ class SparkAdapter(SQLAdapter):
         results = catalog.ListSchemas(profile=self.config)
 
         return [row[0] for row in results]
-
 
     def check_schema_exists(self, database: str, schema: str) -> bool:
         #logger.debug("Datalake name is ", schema)

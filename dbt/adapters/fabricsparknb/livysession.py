@@ -17,11 +17,10 @@ from azure.core.credentials import AccessToken
 from azure.identity import AzureCliCredential, ClientSecretCredential
 from dbt.adapters.fabricspark.fabric_spark_credentials import SparkCredentials
 import nbformat as nbf
-
+from pathlib import Path
 import dbt.adapters
 import dbt.adapters.fabricsparknb
 import dbt.adapters.fabricsparknb.notebook
-import dbt.adapters.fabricsparknb.utils
 
 logger = AdapterLogger("fabricsparknb")
 NUMBERS = DECIMALS + (int, float)
@@ -436,10 +435,10 @@ class LivyCursor:
             print("Node ID not found in the SQL")
             print(sql)
 
-        project_root = merged_json['project_root']
-        notebook_dir = f'{project_root}/target/notebooks/'
+        project_root = merged_json['project_root'].replace("\\", "/")
+        notebook_dir = Path(project_root) / Path("target") / Path("notebooks")
         # Use the node_id as the filename
-        filename = f'{notebook_dir}/{node_id}.ipynb'
+        filename = str(Path(notebook_dir) / Path(f'{node_id}.ipynb'))
 
         # Create the directory if it does not exist
         os.makedirs(notebook_dir, exist_ok=True)
