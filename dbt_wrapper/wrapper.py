@@ -14,6 +14,8 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
 from rich.panel import Panel
 
+
+
 class Commands:
     def __init__(self, console):
         self.console = console
@@ -22,6 +24,7 @@ class Commands:
         self.profile_info = None
         self.target_info = None
         self.lakehouse = None
+        self.workspaceid = None
         self.project_root = None
         self.fa = fa(console=self.console)
     
@@ -53,8 +56,8 @@ class Commands:
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
         self.project_name = self.config['name']
-        
-        
+        #self.workspaceid = self.config['workspaceid']
+       
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
         print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
@@ -128,19 +131,12 @@ class Commands:
         print(Panel.fit("[blue]End of dbt build >>>>>>>>>>>>>>>>>>>>>>>[/blue]"))
 
     def DownloadMetadata(self, progress: ProgressConsoleWrapper, task_id):
-        progress.print("Downloading Metadata via Azcopy", level=LogLevel.INFO)
-        # Get Current Directory
+        progress.print("Downloading Metadata", level=LogLevel.INFO)
+        lakehouse = self.lakehouse
         curr_dir = os.getcwd()
-        target = Path(curr_dir) / self.dbt_project_dir / "target" / "pwsh" / "download.ps1"
-        result = subprocess.run(["pwsh", "–noprofile", str(target)], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        # Access the output and error
-        output = result.stdout.decode('utf-8')
-        error = result.stderr.decode('utf-8')
-
-        progress.print(f"Output: {output}", level=LogLevel.INFO)
-        if error:
-            progress.print(f"Error: {error}", level=LogLevel.ERROR)
+        dbt_project_dir = str(Path(Path(curr_dir) / Path(self.dbt_project_dir)))
+        workspacename = self.fa.GetWorkspaceName(workspace_id=self.target_info['workspaceid'])
+        mn.DownloadMetaFiles(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspacename=workspacename, datapath=lakehouse + ".lakehouse/Files/MetaExtracts/")
 
     def RunMetadataExtract(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"metadata_{self.project_name}_extract"
