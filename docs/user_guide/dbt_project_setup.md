@@ -136,7 +136,6 @@ my_project:
       retry_all: true
 ```
 
-Now we are ready to run our dbt project for the first time.
 
 !!! info
     You are now ready to move to the next step in which you will build your dbt project. Follow the [Dbt Build Process](./dbt_build_process.md) guide.
