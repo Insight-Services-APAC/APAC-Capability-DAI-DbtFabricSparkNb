@@ -9,7 +9,7 @@
 Documentation for this project is built using [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). To contribute to the documentation you will need to create a separate python environment. I suggest that you call this `.env_mkdocs` to avoid confusion with the dbt environment. Create your environment and install the required packages as shown below:
 
 !!! important 
-    The commands below assume that you have already performed the `Core Tools Installation` steps in the [User Guide](../user_guide/index.md#core-tools-installation). If you have not done this yet, please do so before proceeding. Note you **ONLY** have to install `core tools` it is not necessary to move on to the `other tools` section. 
+    The commands below assume that you have already performed the `Core Tools Installation` steps in the [User Guide](../user_guide/initial_setup/#core-tools-installation). If you have not done this yet, please do so before proceeding. Note you **ONLY** have to install `core tools` it is not necessary to move on to the `other tools` section. 
 
 ``` powershell title="Create and activate the Python environment"
 # Create and activate the Python environment
