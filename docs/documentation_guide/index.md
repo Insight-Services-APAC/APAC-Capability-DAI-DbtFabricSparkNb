@@ -14,8 +14,11 @@ Documentation for this project is built using [mkdocs-material](https://squidfun
 ``` powershell title="Create and activate the Python environment"
 # Create the Python environment
 python -m venv .env_mkdocs
+
 # Activate the Python environment
 .\.env_mkdocs\Scripts\activate.ps1
+
+#Install the mkdocs packages
 pip install -r ./requirements_mkdocs.txt
 
 ```
