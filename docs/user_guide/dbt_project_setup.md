@@ -136,18 +136,11 @@ my_project:
       retry_all: true
 ```
 
-Now we are ready to run our dbt project for the first time. But first we need to create a build script.
+Now we are ready to run our dbt project for the first time. But first we need to review the build script.
 
-### Create a python build script that will wrap our dbt process 
+### Review the build script that will wrap our dbt process 
 
-This repository contains a dbt build script created in python. Make a copy of this script by copying the code found at [https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/blob/main/test_post_install.py). Alternatively, you can copy the code in the code block titled [Python Build script template](#python-build-script-template) below. Paste the code into a new file in the root of your source code directory. You can create this file using the vscode command line shown in the code block titled [New file creation in vscode](#New-file-creation-in-vscode) below.
-
-!!! Important
-    Be sure to change the line `os.environ['DBT_PROJECT_DIR'] = "testproj"` by replacing "testproj" with the folder name of your dbt project.
-
-``` powershell title="New file creation in vscode"
-code post_install.py
-```
+To ensure a successful dbt build process, please verify that the Python script *test_post_install.py* exists in the root directory of your repository
 
 ```python title="Python Build script template"
 from dbt.adapters.fabricsparknb import utils as utils

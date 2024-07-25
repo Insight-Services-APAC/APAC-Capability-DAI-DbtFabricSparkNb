@@ -49,3 +49,4 @@ dbt-insightfabric/
 dbt-integration-tests
 */target/*
 /site
+/samples_tests
