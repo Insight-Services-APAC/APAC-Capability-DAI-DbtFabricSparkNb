@@ -203,7 +203,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../user_guide/" class="md-tabs__link">
+        <a href="../user_guide/initial_setup/" class="md-tabs__link">
           
   
     
@@ -360,10 +360,6 @@
     
       
         
-          
-        
-      
-        
       
         
       
@@ -390,24 +386,16 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../user_guide/" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
   
   <span class="md-ellipsis">
     User guide
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
@@ -415,8 +403,6 @@
             User guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -488,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../user_guide/notebooks/" class="md-nav__link">
+      <a href="../user_guide/generated_notebooks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -903,39 +889,32 @@
 
 <h1 id="documentation-guide">Documentation Guide<a class="headerlink" href="#documentation-guide" title="Permanent link">&para;</a></h1>
 <h2 id="building-you-environment">Building you environment<a class="headerlink" href="#building-you-environment" title="Permanent link">&para;</a></h2>
-<p>Documentation for this project is built using <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>. To contribute to the documentation you will need to create a separate python environment. I suggest that you call this <code>.env_mkdocs</code> to avoid confusion with the dbt environment. </p>
+<p>Documentation for this project is built using <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>. To contribute to the documentation you will need to create a separate python environment. I suggest that you call this <code>.env_mkdocs</code> to avoid confusion with the dbt environment. Create your environment and install the required packages as shown below:</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>The commands below assume that you have already performed the <code>Core Tools Installation</code> steps in the <a href="../user_guide/#core-tools-installation">User Guide</a>. If you have not done this yet, please do so before proceeding. Note you <strong>ONLY</strong> have to install <code>core tools</code> it is not necessary to move on to the <code>other tools</code> section. </p>
+<p>The commands below assume that you have already performed the <code>Core Tools Installation</code> steps in the <a href="../user_guide/index.md#core-tools-installation">User Guide</a>. If you have not done this yet, please do so before proceeding. Note you <strong>ONLY</strong> have to install <code>core tools</code> it is not necessary to move on to the <code>other tools</code> section. </p>
 </div>
-<p>Before creating the environment you will need to clone the repository. You can do this by running the command below:</p>
-<p><div class="highlight"><span class="filename">clone the repository</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">Insight-Services-APAC</span><span class="p">/</span><span class="n">APAC-Capability-DAI-DbtFabricSparkNb</span><span class="p">.</span><span class="n">git</span> <span class="n">MyDocsProject</span>
-</code></pre></div>
-This will clone the repository into a directory called <mark>MyDocsProject</mark>. You can rename this directory to whatever you like. Navigate into this new directory and then run the commands below.</p>
-<div class="highlight"><span class="filename">Create and activate the Python environment</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c"># Create and activate the Python environment</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">env_mkdocs</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">.\.</span><span class="n">env_mkdocs</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">ps1</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="p">./</span><span class="n">requirements_mkdocs</span><span class="p">.</span><span class="n">txt</span>
-</code></pre></div>
-<p>These commands will create a new python environment and install the required packages for building the documentation. To launch the new environment you will need to run the command below:</p>
-<div class="highlight"><span class="filename">Activate the Python environment</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">.\.</span><span class="n">env_mkdocs</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight"><span class="filename">Create and activate the Python environment</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Create and activate the Python environment</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">env_mkdocs</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">.\.</span><span class="n">env_mkdocs</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">ps1</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="p">./</span><span class="n">requirements_mkdocs</span><span class="p">.</span><span class="n">txt</span>
 </code></pre></div>
 <h2 id="updating-the-documentation">Updating the documentation<a class="headerlink" href="#updating-the-documentation" title="Permanent link">&para;</a></h2>
-<p>The documentation source is held in the <code>docs</code> directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for <a href="https://squidfunk.github.io/mkdocs-material/reference/">mkdocs-material</a>. Once you have made your changes you can build the documentation using the command below:</p>
-<div class="highlight"><span class="filename">Build the documentation</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">mkdocs</span> <span class="n">build</span>
+<p>The docucementation source is held in the <code>docs</code> directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for <a href="https://squidfunk.github.io/mkdocs-material/reference/">mkdocs-material</a>. Once you have made your changes you can build the documentation using the command below:</p>
+<div class="highlight"><span class="filename">Build the documentation</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">mkdocs</span> <span class="n">build</span>
 </code></pre></div>
 <p>To view the documentation locally you can use the command below:</p>
-<div class="highlight"><span class="filename">View the documentation locally</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">mkdocs</span> <span class="n">serve</span>
+<div class="highlight"><span class="filename">View the documentation locally</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">mkdocs</span> <span class="n">serve</span>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>The <code>mkdocs serve</code> command will start a local web server that will allow you to view the documentation in your browser. The server will also automatically rebuild the documentation when you make changes to the source files.</p>
 </div>
 <p>Before publishing the documentation you should ensure that the documentation is up to date and that the changes are correct. You should also pull the latest from the repository to ensure that you are not overwriting someone else's changes. Do this by running the command below:</p>
-<div class="highlight"><span class="filename">Pull the latest changes from the repository</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">git</span> <span class="n">pull</span>
+<div class="highlight"><span class="filename">Pull the latest changes from the repository</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">git</span> <span class="n">pull</span>
 </code></pre></div>
 <p>You can now publish the documentation to the repository by running the command below:</p>
-<div class="highlight"><span class="filename">Publish the documentation</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">mkdocs</span> <span class="n">gh-deploy</span>
+<div class="highlight"><span class="filename">Publish the documentation</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">mkdocs</span> <span class="n">gh-deploy</span>
 </code></pre></div>
 
 

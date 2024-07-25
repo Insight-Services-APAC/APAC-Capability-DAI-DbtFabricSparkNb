@@ -14,7 +14,7 @@
         <link rel="prev" href="../dbt_project_setup/">
       
       
-        <link rel="next" href="../notebooks/">
+        <link rel="next" href="../generated_notebooks/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dbt-build-process-dbt_wrapper" class="md-skip">
+        <a href="#dbt-build-process" class="md-skip">
           Skip to content
         </a>
       
@@ -205,7 +205,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+        <a href="../initial_setup/" class="md-tabs__link">
           
   
     
@@ -362,10 +362,6 @@
     
       
         
-          
-        
-      
-        
       
         
       
@@ -395,24 +391,16 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
   
   <span class="md-ellipsis">
     User guide
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
@@ -420,8 +408,6 @@
             User guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -478,6 +464,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -505,6 +493,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -547,7 +537,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../notebooks/" class="md-nav__link">
+      <a href="../generated_notebooks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -955,48 +945,46 @@
   
 
 
-  <h1>Dbt Build Process</h1>
-
+<h1 id="dbt-build-process">Dbt Build Process<a class="headerlink" href="#dbt-build-process" title="Permanent link">&para;</a></h1>
 <h2 id="dbt-build-process-dbt_wrapper">Dbt Build Process &amp; Dbt_Wrapper<a class="headerlink" href="#dbt-build-process-dbt_wrapper" title="Permanent link">&para;</a></h2>
-<p>The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called <code>dbt_wrapper</code> and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal:</p>
+<p>The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called <code>dbt_wrapper</code> and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using both az login. See the examples below and replace the tenant id with your own.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> <span class="p">-</span><span class="n">-allow-no-subscriptions</span>
+</code></pre></div></p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Make sure that you have activated your python virtual environment before running this code. Also be sure to replace <mark>my_project</mark> with the name of your dbt project folder</p>
+<p>Make sure that you have activated your python virtual environment before running this code. </p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dbt_wrapper</span> <span class="p">-</span><span class="n">-help</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">dbt_wrapper</span> <span class="p">-</span><span class="n">-help</span>
 </code></pre></div>
 <p>To build your dbt project and publish your notebook to your Fabric workspace you can run the command below:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder</p>
+<p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder. </p>
 </div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using both <code>az login</code> and <code>azcopy login</code>. See the examples below and replace the tenant id with your own.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">azcopy</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant-id</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> 
-</code></pre></div></p>
-</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> 
 </code></pre></div>
-<p>The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.</p>
-<p><img alt="alt text" src="../../assets/images/dbt_wrapper_run_all.png" /></p>
+<p>The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
+<img alt="notebooks" src="../../assets/images/dbt_wrapper_output.png" /></p>
 <h2 id="toggling-build-stages-off-and-on">Toggling Build Stages Off and On<a class="headerlink" href="#toggling-build-stages-off-and-on" title="Permanent link">&para;</a></h2>
-<p>There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the <code>dbt_wrapper</code> application. To view all of the options available to you run the command below:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">dbt_wrapper</span> <span class="n">build</span> <span class="p">-</span><span class="n">-help</span>
-</code></pre></div>
-<p>For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">dbt_wrapper</span> <span class="n">build</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
-</code></pre></div>
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:</p>
+<p>There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the dbt_wrapper application. To view all of the options available to you run the command below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-help</span>
+</code></pre></div></p>
+<p>For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
+</code></pre></div></p>
+<p>Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all-local</span> <span class="n">my_project</span>
-</code></pre></div>
-<p>Review all of the commands available to you by running using the help option as shown below:</p>
+</code></pre></div></p>
+<p>Review all of the commands available to you by running using the help option as shown below:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">dbt_wrapper</span> <span class="p">-</span><span class="n">-help</span>
-</code></pre></div>
+</code></pre></div></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>You are now ready to move to the next step in which you gain an understanding of the various kinds of notebooks generated by the adapter. Follow the <a href="../notebooks/">Understanding the Generated Notebooks</a> guide.</p>
+<p>You are now ready to move to the next step in which you gain an understanding of the various kinds of notebooks generated by the adapter. Follow the <a href="../generated_notebooks/">Understanding the Generated Notebooks</a> guide.</p>
 </div>
 
 

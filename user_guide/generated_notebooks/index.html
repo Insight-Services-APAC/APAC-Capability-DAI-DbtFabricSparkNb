@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/notebooks/">
+        <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/generated_notebooks/">
       
       
         <link rel="prev" href="../dbt_build_process/">
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#understanding-the-notebooks-generated" class="md-skip">
+        <a href="#understanding-the-generated-notebooks" class="md-skip">
           Skip to content
         </a>
       
@@ -205,7 +205,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+        <a href="../initial_setup/" class="md-tabs__link">
           
   
     
@@ -362,10 +362,6 @@
     
       
         
-          
-        
-      
-        
       
         
       
@@ -395,24 +391,16 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
   
   <span class="md-ellipsis">
     User guide
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
@@ -420,8 +408,6 @@
             User guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -499,6 +485,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -527,6 +515,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -540,21 +530,6 @@
       Understanding the Notebooks Generated
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Understanding the Notebooks Generated">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sample-listing-of-generated-notebooks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sample listing of Generated Notebooks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -962,7 +937,7 @@
                   
 
   
-    <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/user_guide/notebooks.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/user_guide/generated_notebooks.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -970,12 +945,11 @@
   
 
 
-  <h1>Understanding the Generated Notebooks</h1>
-
+<h1 id="understanding-the-generated-notebooks">Understanding the Generated Notebooks<a class="headerlink" href="#understanding-the-generated-notebooks" title="Permanent link">&para;</a></h1>
 <h2 id="understanding-the-notebooks-generated">Understanding the Notebooks Generated<a class="headerlink" href="#understanding-the-notebooks-generated" title="Permanent link">&para;</a></h2>
-<p>When you run this build script successfully, you will see a series of notebooks generated in your <mark>my_project</mark>/target/notebooks directory. This is the <code>"special sauce"</code> of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project. </p>
-<h4 id="sample-listing-of-generated-notebooks">Sample listing of Generated Notebooks<a class="headerlink" href="#sample-listing-of-generated-notebooks" title="Permanent link">&para;</a></h4>
-<p><img alt="notebooks" src="/assets/images/notebooks.png" /></p>
+<p>When you run this build script successfully, you will see a series of notebooks generated in your my_project/target/notebooks directory. This is the <code>special sauce</code> of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project.</p>
+<p><strong>Sample listing of Generated Notebooks</strong></p>
+<p><img alt="notebooks" src="../../assets/images/notebooks.png" /></p>
 <p>If you study the files shown above you will notice that there is a naming convention and that the notebooks are prefixed with a specific string. The following table explains at a high level the naming convention and the purpose of each type of notebook.</p>
 <table>
 <thead>
@@ -1018,8 +992,8 @@
 <details class="question">
 <summary>Notebooks with the Prefix <code>"model."</code></summary>
 <p>These are dbt <strong>model</strong> notebooks. A notebook will be generated for each dbt <strong>model</strong> that you define. You will be able to run, debug and monitor execution of these notebooks directly in the Fabric portal independently of dbt.</p>
-<p><img alt="alt text" src="./assets/images/model_notebook0.png" /></p>
-<p><img alt="alt text" src="./assets/images/model_notebook1.png" /></p>
+<p><img alt="alt text" src="../../assets/images/model_notebook0.png" /></p>
+<p><img alt="alt text" src="../../assets/images/model_notebook1.png" /></p>
 </details>
 <details class="question">
 <summary>Notebooks with the Prefix <code>"test."</code></summary>
@@ -1045,7 +1019,7 @@
 <p>If you login to your fabric workspace and navigate to the notebooks section you will see that the generated notebooks have been uploaded to your workspace.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>I suggest that you move your notebooks into a folder that matches the name of your dbt project. </p>
+<p>I suggest that you move your notebooks into a folder that matches the name of your dbt project.</p>
 </div>
 
 
