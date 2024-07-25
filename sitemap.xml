@@ -36,6 +36,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/</loc>
+         <lastmod>2024-07-25</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://fluffy-couscous-p8yev1r.pages.github.io/user_guide/dbt_build_process/</loc>
          <lastmod>2024-07-25</lastmod>
          <changefreq>daily</changefreq>
