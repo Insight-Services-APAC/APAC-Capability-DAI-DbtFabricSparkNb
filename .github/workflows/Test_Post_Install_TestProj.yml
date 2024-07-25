@@ -5,9 +5,9 @@ name: Build_TestProj_Post_Install_Main
 
 on:
   push:
-    branches: [ "feature/making-delta-logging-multilake-compatible" ]
+    branches: [ "main", "dev"]
   pull_request:
-    branches: [ "feature/making-delta-logging-multilake-compatible" ]
+    branches: [ "main", "dev"]
 
 permissions:
   contents: read
@@ -19,8 +19,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: feature/making-delta-logging-multilake-compatible
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
@@ -28,16 +26,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install azure-storage-file-datalake
-        pip install nbformat
-        pip install flake8 pytest
-        pip install dbt-core    
-        pip install dbt-fabricspark
-        pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
-        python test_post_install.py samples/testproj samples/testproj
+        pip install . 
+         dbt_wrapper run-all-local samples/testproj samples/testproj
     - name: Archive testproj artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist-without-markdown
         path: |
-            samples/testproj/target/            
+            samples_tests/target/

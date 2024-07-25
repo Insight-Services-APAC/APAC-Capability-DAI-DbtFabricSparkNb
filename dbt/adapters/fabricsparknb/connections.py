@@ -21,6 +21,8 @@ from dbt.dataclass_schema import StrEnum
 from typing import Any, Optional, Union, Tuple, List, Generator, Iterable, Sequence
 from abc import ABC, abstractmethod
 import time
+import json 
+import re
 
 logger = AdapterLogger("Microsoft Fabric-Spark")
 for logger_name in [
@@ -209,23 +211,41 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
         os.environ["DBT_SPARK_VERSION"] = SparkConnectionManager.spark_version
         logger.debug(f"SPARK VERSION {os.getenv('DBT_SPARK_VERSION')}")
 
+    def CheckSqlForModelCommentBlock(self, sql) -> bool:
+        # Extract the comments from the SQL
+        comments = re.findall(r'/\*(.*?)\*/', sql, re.DOTALL)
 
+        # Convert each comment to a JSON object
+        merged_json = {}
+        for comment in comments:
+            try:
+                json_object = json.loads(comment)
+                merged_json.update(json_object)
+            except json.JSONDecodeError:
+                #logger.error('Could not parse comment as JSON')
+                #logger.error(comment)
+                pass
+
+        if 'node_id' in merged_json.keys():
+            return True
+        else:
+            return False
 
     def add_query(
-    self,
-    sql: str,
-    auto_begin: bool = True,
-    bindings: Optional[Any] = None,
-    abridge_sql_log: bool = False,
-) -> Tuple[Connection, Any]:
+        self,
+        sql: str,
+        auto_begin: bool = True,
+        bindings: Optional[Any] = None,
+        abridge_sql_log: bool = False,
+    ) -> Tuple[Connection, Any]:
         
-        if(sql.__contains__('/*FABRICSPARKNB_ALERT:')):
+        if (sql.__contains__('/*FABRICSPARKNB_ALERT:')):
             raise dbt.exceptions.DbtRuntimeError(sql)            
 
         connection = self.get_thread_connection()
-        if(dbt.adapters.fabricsparknb.utils.CheckSqlForModelCommentBlock(sql) == False):
+        if (self.CheckSqlForModelCommentBlock(sql) == False):
             sql = self._add_query_comment(sql)
-            sql = '/*{"project_root": "'+ self.profile.project_root + '"}*/' + f'\n{sql}'
+            sql = '/*{"project_root": "' + self.profile.project_root + '"}*/' + f'\n{sql}'
 
         if auto_begin and connection.transaction_open is False:
             self.begin()

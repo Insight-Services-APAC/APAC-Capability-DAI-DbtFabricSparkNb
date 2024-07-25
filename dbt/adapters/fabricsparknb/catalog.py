@@ -1,5 +1,4 @@
 import io
-from types import SimpleNamespace
 import json
 import agate
 
@@ -51,23 +50,17 @@ def GetColumnsInRelation(profile, schema, identifier):
     with io.open(profile.project_root + '/metaextracts/DescribeRelations.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
-   
+    
+    #transforming Database/schema name and table name  to lower case
+    schema = schema.lower()
+    identifier = identifier.lower()
+    
     table = agate.Table.from_object(data)    
 
     # Filter the table
     filtered_table = table.where(lambda row: row['namespace'] == schema and row['tableName'] == identifier)
 
     return filtered_table
-
-
-@staticmethod
-def GetMetaHashes(project_root):
-    # Open the file
-    with io.open(project_root + '/metaextracts/MetaHashes.json', 'r') as file:
-        # Load JSON data from file
-        data = json.load(file)
-   
-    return data
 
 
 @staticmethod

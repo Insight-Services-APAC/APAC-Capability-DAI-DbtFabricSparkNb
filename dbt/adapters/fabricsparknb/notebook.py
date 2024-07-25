@@ -8,6 +8,12 @@ from sysconfig import get_paths
 from pathlib import Path
 
 
+@staticmethod
+def PureLibIncludeDirExists():
+    ChkPath = Path(get_paths()['purelib']) / Path(f'dbt/include/fabricsparknb/')
+    return os.path.exists(ChkPath)
+        
+
 
 @staticmethod
 def GetIncludeDir():
