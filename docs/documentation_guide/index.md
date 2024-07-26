@@ -12,15 +12,19 @@ Documentation for this project is built using [mkdocs-material](https://squidfun
     The commands below assume that you have already performed the `Core Tools Installation` steps in the [User Guide](../user_guide/initial_setup/#core-tools-installation). If you have not done this yet, please do so before proceeding. Note you **ONLY** have to install `core tools` it is not necessary to move on to the `other tools` section. 
 
 ``` powershell title="Create and activate the Python environment"
-# Create and activate the Python environment
+# Create the Python environment
 python -m venv .env_mkdocs
+
+# Activate the Python environment
 .\.env_mkdocs\Scripts\activate.ps1
+
+#Install the mkdocs packages
 pip install -r ./requirements_mkdocs.txt
 
 ```
 
 ## Updating the documentation
-The docucementation source is held in the `docs` directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for [mkdocs-material](https://squidfunk.github.io/mkdocs-material/reference/). Once you have made your changes you can build the documentation using the command below:
+The documentation source is held in the `docs` directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for [mkdocs-material](https://squidfunk.github.io/mkdocs-material/reference/). Once you have made your changes you can build the documentation using the command below:
 
 ``` powershell title="Build the documentation"
 mkdocs build
