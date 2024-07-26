@@ -67,6 +67,8 @@ Now that we have pwsh installed, Make sure that you have install the following a
 
 - Install Azure CLI - Refer [Azure CLI Doc](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli) for Windows
 
+- Install Azure PowerShell on Windows - Refer [Azure Powershell Doc](https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&tabs=powershell&pivots=windows-psgallery) for windows (You might need to run this in admin mode)
+
 !!! Important
     Optional packages you may need to install (Only run if you face issues)
 
@@ -101,7 +103,7 @@ Now lets create and activate our Python environment and install the required pac
     ./.env/Scripts/Activate.ps1
 
     # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade --no-deps --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
     ```
 
@@ -124,7 +126,7 @@ Now lets create and activate our Python environment and install the required pac
     ./.env/Scripts/Activate.ps1  
 
     # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade --no-deps --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
     ```
 
