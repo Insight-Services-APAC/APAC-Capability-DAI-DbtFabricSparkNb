@@ -97,6 +97,10 @@ Now lets create and activate our Python environment and install the required pac
 
     # Create the Python environment
     python -m venv .env
+
+    #Optional step to run if activate.ps1 failes due to security policy
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+ 
     # Activate the Python environment
     ./.env/Scripts/Activate.ps1
 
