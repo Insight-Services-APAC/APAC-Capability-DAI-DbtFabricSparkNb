@@ -40,10 +40,10 @@ class FabricAPI:
 
     # Generate py files for api update
     def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id):
-        progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")        
+        progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_dir = str(Path(target_dir) / Path("notebooks"))
-        notebooks_fabric_py_dir = str(Path(target_dir) / Path("notebooks_fabric_py"))    
+        notebooks_fabric_py_dir = str(Path(target_dir) / Path("notebooks_fabric_py"))
         os.makedirs(notebooks_fabric_py_dir, exist_ok=True)
         list_of_notebooks = os.listdir(notebooks_dir)
         for filename in list_of_notebooks:
