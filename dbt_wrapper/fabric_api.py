@@ -188,6 +188,11 @@ class FabricAPI:
             if item.type == 'Notebook' and item.display_name == notebook_name:
                 return item.id
         return None
+    
+    def GetWorkspaceName(self, workspace_id):
+        fc = FabricClientCore(silent=True)
+        workspace = fc.get_workspace_by_id(id=workspace_id)
+        return workspace.display_name
 
     def APIRunNotebook(self, progress: ProgressConsoleWrapper, task_id, workspace_id, notebook_name):
         fc = FabricClientCore(silent=True)
@@ -198,21 +203,28 @@ class FabricAPI:
         for item in ws_items:         
             if item.type == 'Notebook' and item.display_name == notebook_name:
                 item_found = True
+                nbfailed = False
                 try: 
                     progress.progress.update(task_id=task_id, description=f"Running {item.display_name}")
                     start = time.time()                
                     ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
-                    progress.progress.update(task_id=task_id, description=f"Running {item.display_name} - {ji.status}")
+                    progress.progress.update(task_id=task_id, description=f"Running {item.display_name}")
                     time.sleep(10)
-                    while ji.status == "InProgress" or ji.status == "NotStarted":
+                    while ji.status == "InProgress" or ji.status == "NotStarted" or ji.status == "Failed":
                         ji = fc.get_item_job_instance(workspace_id=workspace_id, item_id=item.id, job_instance_id=ji.id)
+                        if (ji.status == "Failed"):
+                            nbfailed = True
+                            break
                         # update progress with total runtime
                         runtime = time.time() - start
                         runtime_str = time.strftime("%H:%M:%S", time.gmtime(runtime))
                         progress.progress.update(task_id=task_id, description=f"Running {item.display_name} - {ji.status} - Total Runtime: {runtime_str}")
                         # wait for 10 seconds
                         time.sleep(10)
-                    progress.print(f"Notebook execution of {item.display_name} completed with status {ji.status}", level=LogLevel.INFO)
+                    if (nbfailed is False):  
+                        progress.print(f"Notebook execution of {item.display_name} completed with status {ji.status}", level=LogLevel.INFO)
+                    else:
+                        progress.print(f"Error running notebook {item.display_name}", level=LogLevel.ERROR)
                 except Exception as e:
                     progress.print(f"Error running notebook {item.display_name} - {e}", level=LogLevel.ERROR)
                 break

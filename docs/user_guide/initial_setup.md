@@ -8,6 +8,9 @@ To provide a common, cross-platform set of instructions we will first install Po
 
 ## Core Tools Installation
 
+!!!Tip
+    Following core tools can be installed using the standard powershell or in VS Code terminal (powershell)
+
 === "Windows"
 
     ```powershell
@@ -26,16 +29,13 @@ To provide a common, cross-platform set of instructions we will first install Po
     # TBA
     ```
 
-
-
 Next we will install Python and development tools such as vscode.
-
 
 === "Windows"
 
     ```powershell
     # Winget Installs 
-    winget install -e --id Python.Python -v 3.12
+    winget install Python.Python.3.12
     winget install -e --id Microsoft.VisualStudioCode
     winget install --id Git.Git -e --source winget
 
@@ -54,8 +54,6 @@ Next we will install Python and development tools such as vscode.
     # Python Environment Manager
     Python -m pip install --user virtualenv
 
-    # TODO 
-    # Add OSX AZ Copy Instructions
 
     ```
 
@@ -63,50 +61,28 @@ Next we will install Python and development tools such as vscode.
     ```bash
     # TBA
     ```
-
-
 
 ## Other tools
-Now that we have pwsh installed, we can use it as a cross platform shell to install the additional required tools. 
+Now that we have pwsh installed, Make sure that you have install the following additional required tools.
 
+- Install Azure CLI - Refer [Azure CLI Doc](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli) for Windows
 
+- Install Azure PowerShell on Windows - Refer [Azure Powershell Doc](https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&tabs=powershell&pivots=windows-psgallery) for windows (You might need to run this in admin mode)
 
-=== "Windows"
+!!! Important
+    Optional packages you may need to install (Only run if you face issues)
 
     ```powershell
-
-    # Az Copy Install - No Winget Package Available
-    Invoke-WebRequest -Uri https://aka.ms/downloadazcopy-v10-windows -OutFile AzCopy.zip -UseBasicParsing
-    Expand-Archive ./AzCopy.zip ./AzCopy -Force
-    New-Item -ItemType "directory" -Path "$home/AzCopy"  -Force  
-    Get-ChildItem ./AzCopy/*/azcopy.exe | Move-Item -Destination "$home\AzCopy\AzCopy.exe" -Force  
-    $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User") 
-    [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";$home\AzCopy", "User")
-    Remove-Item .\AzCopy\ -Force
-    Remove-Item AzCopy.zip -Force
-
+    pip config set global.trusted-host "pypi.org files.pythonhosted.org pypi.python.org"
+    pip install pip-system-certs
+    pip install setuptools
     ```
-
-=== "MacOS"
-
-    ```bash
-    # TODO 
-    # Add OSX AZ Copy Instructions
-
-    ```
-
-=== "Linux"
-    ```bash
-    # TBA
-    ```
-
 
 ## Source Directory & Python Env
 Now lets create and activate our Python environment and install the required packages.
 
-
 !!! tip
-    When doing pip install dbt-fabricspark below it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
+    When executing the following, it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
 
 
 === "Windows"
@@ -121,12 +97,13 @@ Now lets create and activate our Python environment and install the required pac
     # Navigate to the new directory
     cd dbt-fabricsparknb-test
 
-    # Create and activate the Python environment
+    # Create the Python environment
     python -m venv .env
+    # Activate the Python environment
     ./.env/Scripts/Activate.ps1
 
     # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
     ```
 
@@ -143,13 +120,13 @@ Now lets create and activate our Python environment and install the required pac
     # Navigate to the new directory
     cd dbt-fabricsparknb-test
 
-    # Create and activate the Python environment
+    # Create the Python environment
     python -m venv .env
+    # Activate the Python environment
     ./.env/Scripts/Activate.ps1  
 
     # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
-
+    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
 
     ```
 

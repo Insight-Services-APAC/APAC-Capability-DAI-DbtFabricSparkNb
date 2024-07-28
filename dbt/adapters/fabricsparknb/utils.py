@@ -25,6 +25,7 @@ from msfabricpysdkcore import FabricClientCore
 import base64
 
 
+
 @staticmethod
 def CheckSqlForModelCommentBlock(sql) -> bool:
     # Extract the comments from the SQL
@@ -549,18 +550,21 @@ def SortManifest(nodes_orig):
         sort_order += 1
     return nodes_orig
 
+
 def stringToBase64(s):
     return base64.b64encode(s.encode('utf-8')).decode('utf-8')
 
+
 def base64ToString(b):
     return base64.b64decode(b).decode('utf-8')
+
 
 def GenerateNotebookContent(notebookcontentBase64):
     notebook_w_content = {'parts': [{'path': 'notebook-content.py', 'payload': notebookcontentBase64, 'payloadType': 'InlineBase64'}]}
     return notebook_w_content
 
 
-def findnotebookid(notebooks,displayname):
+def findnotebookid(notebooks, displayname):
     for notebook in notebooks:
         if notebook.display_name == displayname:
             return notebook.id
@@ -607,7 +611,7 @@ def PrintFirstTimeRunningMessage():
 
 
 @staticmethod
-def RunDbtProject(PreInstall=False,Upload=False):
+def RunDbtProject(PreInstall=False, Upload=False):
     # Get Config and Profile Information from dbt
 
 
@@ -684,17 +688,23 @@ def RunDbtProjectArg(PreInstall:bool, argv:list[str]):
     else:
         print("Please supply at least DBT project directory as a parameter.")
 
-        
 
-#@staticmethod
-#def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
+
+
+
+
+
+
+
+# @staticmethod
+# def UploadNotebook(self, directory_client: DataLakeDirectoryClient, local_dir_path: str, file_name: str):
 #    file_client = directory_client.get_file_client(file_name)
 #    with io.open(file=os.path.join(local_dir_path, file_name), mode="rb") as data:
 #        file_client.upload_data(data, overwrite=True)
 
 
-#@staticmethod
-#def UploadAllNotebooks(workspacename: str, datapath: str):
+# @staticmethod
+# def UploadAllNotebooks(workspacename: str, datapath: str):
 #    print("Started uploading to :" + workspacename + " file path " + datapath)
 #    account_name = "onelake"  # always this
 #    account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
@@ -706,15 +716,17 @@ def RunDbtProjectArg(PreInstall:bool, argv:list[str]):
 #    print(datapath)
 #    paths = file_system_client.get_paths(path=datapath)
 #    print("\nCurrent paths in the workspace:")
-#
+
 #    for path in paths:
 #        print(path.name + '\n')
-#
+
 #    # directory_client = DataLakeDirectoryClient(account_url,workspacename,datapath, credential=token_credential);
 #    notebookarr = os.listdir(Path(local_notebook_path))
-#
+
 #    for notebook in notebookarr:
 #        # UploadNotebook(file_system_client,directory_client,local_notebook_path,notebook)
 #        print("Uploaded:" + notebook)
 #    print("Completed uploading to :" + workspacename + " file path " + datapath)
 #    print("Be sure to run the notebook import from Fabric")
+
+

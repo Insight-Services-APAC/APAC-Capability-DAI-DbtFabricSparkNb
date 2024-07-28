@@ -1,5 +1,5 @@
 ---
-  weight: 5
+  weight: 6
 ---
 
 # Fabric CI/CD with Git Deployment
