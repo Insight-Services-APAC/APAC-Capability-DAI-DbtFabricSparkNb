@@ -65,8 +65,6 @@ Next we will install Python and development tools such as vscode.
 ## Other tools
 Now that we have pwsh installed, Make sure that you have install the following additional required tools.
 
-- Install Azure CLI - Refer [Azure CLI Doc](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli) for Windows
-
 - Install Azure PowerShell on Windows - Refer [Azure Powershell Doc](https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&tabs=powershell&pivots=windows-psgallery) for windows (You might need to run this in admin mode)
 
 !!! Important
@@ -99,6 +97,10 @@ Now lets create and activate our Python environment and install the required pac
 
     # Create the Python environment
     python -m venv .env
+
+    #Optional step to run if activate.ps1 failes due to security policy
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+ 
     # Activate the Python environment
     ./.env/Scripts/Activate.ps1
 
@@ -122,6 +124,10 @@ Now lets create and activate our Python environment and install the required pac
 
     # Create the Python environment
     python -m venv .env
+
+    #Optional step to run if activate.ps1 failes due to security policy
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+    
     # Activate the Python environment
     ./.env/Scripts/Activate.ps1  
 

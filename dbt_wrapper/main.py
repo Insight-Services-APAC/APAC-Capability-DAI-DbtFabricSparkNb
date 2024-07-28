@@ -55,19 +55,19 @@ def run_all(
     clean_target_dir: Annotated[
         bool,
         typer.Option(
-            help="The option to automatically refresh metadata before dbt project build."
+            help="The option to clear out the target folder before dbt project build."
         ),
     ] = True,
     generate_pre_dbt_scripts: Annotated[
         bool,
         typer.Option(
-            help="The option to automatically refresh metadata before dbt project build."
+            help="The option to generate the pre dbt scripts before dbt project build."
         ),
     ] = True,
     generate_post_dbt_scripts: Annotated[
         bool,
         typer.Option(
-            help="The option to automatically refresh metadata before dbt project build."
+            help="The option to generate the post dbt scripts before dbt project build."
         ),
     ] = True,
     auto_execute_metadata_extract: Annotated[
