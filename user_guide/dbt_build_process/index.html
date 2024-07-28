@@ -860,10 +860,10 @@
 <p><img alt="alt text" src="../../assets/images/dbt_wrapper_run_all.png" /></p>
 <h2 id="toggling-build-stages-off-and-on">Toggling Build Stages Off and On<a class="headerlink" href="#toggling-build-stages-off-and-on" title="Permanent link">&para;</a></h2>
 <p>There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the <code>dbt_wrapper</code> application. To view all of the options available to you run the command below:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">dbt_wrapper</span> <span class="n">build</span> <span class="p">-</span><span class="n">-help</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-help</span>
 </code></pre></div>
 <p>For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:</p>
-<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dbt_wrapper</span> <span class="n">build</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
 </code></pre></div>
 Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all-local</span> <span class="n">my_project</span>
