@@ -184,7 +184,7 @@ def execute_master_notebook(
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
         ),
-    ] = 1900
+    ] = 1800
 ):
     """
     This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
@@ -237,7 +237,7 @@ def run_all_local(
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
         ),
-    ] = 1900
+    ] = 1800
 ):
     """
     This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
@@ -290,7 +290,7 @@ def build_dbt_project(
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
         ),
-    ] = 1900
+    ] = 1800
 ):
     """
     This command will just build the dbt project. It assumes all other stages have been completed.
