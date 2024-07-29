@@ -80,7 +80,7 @@ setup(
         "azure-core>=1.26.4",
         "requests==2.31.0",
         "typer>=0.12.3",
-        "setuptools>=71.0.4",
+        "setuptools>=72.1.0",
         "azure-storage-file-datalake"
        
    ],
