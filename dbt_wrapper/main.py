@@ -111,11 +111,19 @@ def run_all(
         typer.Option(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
-    ] = "WARNING"
+    ] = "WARNING",
+    timeout_config: Annotated[
+        int,
+        typer.Option(
+            help="Use this option to change the default notebook execution timeout setting.",
+        ),
+    ] = 1900
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
     """    
+    
+
     _log_level: LogLevel = LogLevel.from_string(log_level)    
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
@@ -135,7 +143,7 @@ def run_all(
         wrapper_commands.BuildDbtProject(PreInstall=pre_install)
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, **kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, timeout_config=timeout_config, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
@@ -170,7 +178,13 @@ def execute_master_notebook(
         typer.Option(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
-    ] = "WARNING"
+    ] = "WARNING",
+    timeout_config: Annotated[
+        int,
+        typer.Option(
+            help="Use this option to change the default notebook execution timeout setting.",
+        ),
+    ] = 1900
 ):
     """
     This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
@@ -187,7 +201,8 @@ def execute_master_notebook(
         pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=True,
-        log_level=log_level
+        log_level=log_level,
+        timeout_config=timeout_config
     )
 
 
@@ -216,7 +231,13 @@ def run_all_local(
         typer.Option(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
-    ] = "WARNING"
+    ] = "WARNING",
+    timeout_config: Annotated[
+        int,
+        typer.Option(
+            help="Use this option to change the default notebook execution timeout setting.",
+        ),
+    ] = 1900
 ):
     """
     This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
@@ -233,7 +254,8 @@ def run_all_local(
         pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
-        log_level=log_level
+        log_level=log_level,
+        timeout_config=timeout_config
     )
 
 
@@ -262,7 +284,13 @@ def build_dbt_project(
         typer.Option(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
-    ] = "WARNING"
+    ] = "WARNING",
+    timeout_config: Annotated[
+        int,
+        typer.Option(
+            help="Use this option to change the default notebook execution timeout setting.",
+        ),
+    ] = 1900
 ):
     """
     This command will just build the dbt project. It assumes all other stages have been completed.
@@ -279,7 +307,8 @@ def build_dbt_project(
         pre_install=pre_install,
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
-        log_level=log_level
+        log_level=log_level,
+        timeout_config=timeout_config
     )
 
 if __name__ == "__main__":
