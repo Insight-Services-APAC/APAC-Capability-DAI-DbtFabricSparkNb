@@ -81,7 +81,8 @@ setup(
         "requests==2.31.0",
         "typer>=0.12.3",
         "setuptools>=72.1.0",
-        "azure-storage-file-datalake"
+        "azure-storage-file-datalake",
+        "pip-system-certs"
        
    ],
     zip_safe=False,

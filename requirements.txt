@@ -11,3 +11,4 @@ requests==2.31.0
 typer>=0.12
 azure-storage-file-datalake
 setuptools>=72.1.0
+pip-system-certs
