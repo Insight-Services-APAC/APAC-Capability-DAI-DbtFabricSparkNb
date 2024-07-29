@@ -112,12 +112,12 @@ def run_all(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
     ] = "WARNING",
-    timeout_config: Annotated[
+    notebook_timeout: Annotated[
         int,
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
         ),
-    ] = 1900
+    ] = 1800
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
@@ -143,7 +143,7 @@ def run_all(
         wrapper_commands.BuildDbtProject(PreInstall=pre_install)
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, timeout_config=timeout_config, **kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
@@ -179,7 +179,7 @@ def execute_master_notebook(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
     ] = "WARNING",
-    timeout_config: Annotated[
+    notebook_timeout: Annotated[
         int,
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
@@ -202,7 +202,7 @@ def execute_master_notebook(
         upload_notebooks_via_api=False,
         auto_run_master_notebook=True,
         log_level=log_level,
-        timeout_config=timeout_config
+        notebook_timeout=notebook_timeout
     )
 
 
@@ -232,7 +232,7 @@ def run_all_local(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
     ] = "WARNING",
-    timeout_config: Annotated[
+    notebook_timeout: Annotated[
         int,
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
@@ -255,7 +255,7 @@ def run_all_local(
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
         log_level=log_level,
-        timeout_config=timeout_config
+        notebook_timeout=notebook_timeout
     )
 
 
@@ -285,7 +285,7 @@ def build_dbt_project(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
     ] = "WARNING",
-    timeout_config: Annotated[
+    notebook_timeout: Annotated[
         int,
         typer.Option(
             help="Use this option to change the default notebook execution timeout setting.",
@@ -308,7 +308,7 @@ def build_dbt_project(
         upload_notebooks_via_api=False,
         auto_run_master_notebook=False,
         log_level=log_level,
-        timeout_config=timeout_config
+        notebook_timeout=notebook_timeout
     )
 
 if __name__ == "__main__":
