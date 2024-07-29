@@ -10,10 +10,12 @@
       --md-accent-fg-color: #B01C87;
       --md-accent-fg-color--transparent: #57B5E6;
       --md-accent-bg-color: #fff;
-      --md-accent-bg-color--light: #ffffffb3
+      --md-accent-bg-color--light: #ffffffb3;
 
       .md-button {
-        color: var(--md-typeset-a-color)
+        background-color: var(--md-typeset-a-color);
+        border-color: var(--md-typeset-a-color);
+        color: hsla(var(--md-hue),0%,100%,1)
       }
       
       .md-button--primary {
