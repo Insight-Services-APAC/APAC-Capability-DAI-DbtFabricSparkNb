@@ -15,7 +15,7 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, timeout_config):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -81,7 +81,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, timeout_config=timeout_config)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
