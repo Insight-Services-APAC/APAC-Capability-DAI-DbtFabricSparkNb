@@ -53,13 +53,13 @@ The command above will carry out all of the necessary "stages" required to fully
 There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the `dbt_wrapper` application. To view all of the options available to you run the command below:
 
 ```powershell
-dbt_wrapper build --help
+dbt_wrapper run-all --help
 ```
 
 For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
 
 ```powershell
-dbt_wrapper build my_project --no-upload-notebooks-via-api  
+dbt_wrapper run-all my_project --no-upload-notebooks-via-api  
 ```
 Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:
 
