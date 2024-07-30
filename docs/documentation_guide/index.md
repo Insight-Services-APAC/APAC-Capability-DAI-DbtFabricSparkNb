@@ -6,10 +6,19 @@
 # Documentation Guide
 
 ## Building you environment 
-Documentation for this project is built using [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). To contribute to the documentation you will need to create a separate python environment. I suggest that you call this `.env_mkdocs` to avoid confusion with the dbt environment. Create your environment and install the required packages as shown below:
+Documentation for this project is built using [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). To contribute to the documentation you will need to create a separate python environment. I suggest that you call this `.env_mkdocs` to avoid confusion with the dbt environment. 
 
 !!! important 
     The commands below assume that you have already performed the `Core Tools Installation` steps in the [User Guide](../user_guide/initial_setup/#core-tools-installation). If you have not done this yet, please do so before proceeding. Note you **ONLY** have to install `core tools` it is not necessary to move on to the `other tools` section. 
+
+
+Before creating the environment you will need to clone the repository. You can do this by running the command below:
+
+``` powershell title="clone the repository"
+git clone https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb.git MyDocsProject
+
+```
+This will clone the repository into a directory called ==MyDocsProject==. You can rename this directory to whatever you like. Navigate into this new directory and then run the commands below.
 
 ``` powershell title="Create and activate the Python environment"
 # Create the Python environment
@@ -21,6 +30,12 @@ python -m venv .env_mkdocs
 #Install the mkdocs packages
 pip install -r ./requirements_mkdocs.txt
 
+```
+
+These commands will create a new python environment and install the required packages for building the documentation. To launch the new environment you will need to run the command below:
+
+``` powershell title="Activate the Python environment"
+.\.env_mkdocs\Scripts\activate.ps1
 ```
 
 ## Updating the documentation
