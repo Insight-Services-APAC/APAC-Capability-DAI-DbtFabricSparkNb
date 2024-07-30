@@ -80,4 +80,30 @@ extra:
   site_url: https://legendary-adventure-22vkokv.pages.github.io
   client_organisation: "AdventureWorks"
   project_start: "2024-07-01"
-  
+  analytics:
+    provider: google
+    property: G-K2F0EYYZSP
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
+  consent:
+    title: Cookie consent
+    description: >- 
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+copyright: >
+  By Insight Enterprises –
+  <a href="#__consent">Change cookie settings</a>
