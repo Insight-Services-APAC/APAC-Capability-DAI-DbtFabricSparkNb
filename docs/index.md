@@ -26,6 +26,10 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 - [x] Opensource and free to use
 - [x] Extensible and customisable
 
+## Unsupported Features
+
+- [x] High Concurrency Sessions is currently not supported
+
 ## Getting Started
 
 
