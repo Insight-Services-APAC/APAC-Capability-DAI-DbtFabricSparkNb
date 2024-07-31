@@ -28,7 +28,7 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 
 ## Unsupported Features
 
-- [x] High Concurrency Sessions is currently not supported
+* "High Concurrency Sessions" currently not supported.
 
 ## Getting Started
 
