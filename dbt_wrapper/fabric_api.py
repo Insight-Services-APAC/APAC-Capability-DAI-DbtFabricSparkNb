@@ -39,7 +39,7 @@ class FabricAPI:
             file.writelines(lines[:-1])
 
     # Generate py files for api update
-    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id):
+    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id, workspace_id, lakehouse_id, lakehouse):
         progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_dir = str(Path(target_dir) / Path("notebooks"))
@@ -50,7 +50,12 @@ class FabricAPI:
             filenamewithoutext = filename[:-6]  # # remove .ipynb
             py_fabric_file = str(Path(notebooks_fabric_py_dir) / Path(filenamewithoutext + ".py"))
             # path = dbt_project_dir
-            FabricPlatformContent = self.GetFabricPlatformContent(filenamewithoutext)          
+            FabricPlatformContent = self.GetFabricPlatformContent(filenamewithoutext)
+            lhid_string = "# META       \"default_lakehouse\": \"{}\",\n".format(lakehouse_id)
+            lh_string = "# META       \"default_lakehouse_name\": \"{}\",\n".format(lakehouse)
+            wsid_string = "# META       \"default_lakehouse_workspace_id\": \"{}\",\n".format(workspace_id)
+
+
             with open(py_fabric_file, "w", encoding="utf-8") as python_file:
                 python_file.write("# Fabric notebook source\n\n")
                 python_file.write("# METADATA ********************\n\n")
@@ -60,9 +65,9 @@ class FabricAPI:
                 python_file.write("# META   },\n")
                 python_file.write("# META   \"dependencies\": {\n")
                 python_file.write("# META     \"lakehouse\": {\n")
-                python_file.write("# META       \"default_lakehouse\": \"a1de4e30-114f-4741-a3ea-bb0237499dea\",\n")
-                python_file.write("# META       \"default_lakehouse_name\": \"lh_raw\",\n")
-                python_file.write("# META       \"default_lakehouse_workspace_id\": \"5022811b-8f96-42cc-8718-c5d124d4eb9e\"\n")
+                python_file.write(lhid_string)
+                python_file.write(lh_string)
+                python_file.write(wsid_string)
                 python_file.write("# META     }\n")
                 python_file.write("# META   }\n")
                 python_file.write("# META }\n\n")
