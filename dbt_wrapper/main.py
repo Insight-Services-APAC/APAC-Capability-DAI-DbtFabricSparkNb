@@ -118,12 +118,18 @@ def run_all(
             help="Use this option to change the default notebook execution timeout setting.",
         ),
     ] = 1800
+    ,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="Use this option to run a specific model or model group. EG tag:my_tag",
+        ),
+    ] = ""
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
     """    
     
-
     _log_level: LogLevel = LogLevel.from_string(log_level)    
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
@@ -140,7 +146,7 @@ def run_all(
     se.perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
 
     if (build_dbt_project):
-        wrapper_commands.BuildDbtProject(PreInstall=pre_install)
+        wrapper_commands.BuildDbtProject(PreInstall=pre_install, select=select)
 
     action_callables = [
         lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, **kwargs),
