@@ -180,7 +180,7 @@ class FabricAPI:
                 notebook_w_content_new = self.GenerateNotebookContent(notebookcontentBase64) 
 
                 ##Issue 87 - Create a hash value of the notebook contents and compare it to value stored in description
-                notebook_w_content_new_str = json.dump(notebook_w_content_new)
+                notebook_w_content_new_str = json.dumps(notebook_w_content_new)
                 notebookhashvalue = hashlib.sha256(notebook_w_content_new_str.encode()).hexdigest()
                 notebookhashcheck = self.NotebookHashCheck(servernotebooks, notebookname, notebookhashvalue)
 
