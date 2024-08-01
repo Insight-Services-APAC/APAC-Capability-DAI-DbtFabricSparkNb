@@ -50,3 +50,5 @@ dbt-integration-tests
 */target/*
 /site
 /samples_tests
+/.vs
+/my_project
