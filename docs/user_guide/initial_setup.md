@@ -72,8 +72,6 @@ Now that we have pwsh installed, Make sure that you have install the following a
 
     ```powershell
     pip config set global.trusted-host "pypi.org files.pythonhosted.org pypi.python.org"
-    pip install pip-system-certs
-    pip install setuptools
     ```
 
 ## Source Directory & Python Env
