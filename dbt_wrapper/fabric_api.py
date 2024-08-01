@@ -191,7 +191,8 @@ class FabricAPI:
                     progress.progress.update(task_id=task_id, description="Notebook created " + notebookname)
                 else:
                     if notebookhashcheck == -1:
-                        notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new, description="Notebook Hash:" + notebookhashvalue)
+                        notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
+                        notebook3 = fc.update_item(workspace_id, notebookid, display_name=notebookname, description="Notebook Hash:" + notebookhashvalue)
                         progress.progress.update(task_id=task_id, description="Notebook updated " + notebookname)
         progress.progress.update(task_id=task_id, description="Completed uploading notebooks via API")
 
