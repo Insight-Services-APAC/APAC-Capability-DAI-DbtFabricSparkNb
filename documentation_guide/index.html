@@ -800,25 +800,23 @@ This will clone the repository into a directory called <mark>MyDocsProject</mark
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c">#Install the mkdocs packages</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="p">./</span><span class="n">requirements_mkdocs</span><span class="p">.</span><span class="n">txt</span>
 </code></pre></div>
-<p>These commands will create a new python environment and install the required packages for building the documentation. To launch the new environment you will need to run the command below:</p>
-<div class="highlight"><span class="filename">Activate the Python environment</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">.\.</span><span class="n">env_mkdocs</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">activate</span><span class="p">.</span><span class="n">ps1</span>
-</code></pre></div>
+<p>These commands will create a new python environment and install the required packages for building the documentation. </p>
 <h2 id="updating-the-documentation">Updating the documentation<a class="headerlink" href="#updating-the-documentation" title="Permanent link">&para;</a></h2>
 <p>The documentation source is held in the <code>docs</code> directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for <a href="https://squidfunk.github.io/mkdocs-material/reference/">mkdocs-material</a>. Once you have made your changes you can build the documentation using the command below:</p>
-<div class="highlight"><span class="filename">Build the documentation</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">mkdocs</span> <span class="n">build</span>
+<div class="highlight"><span class="filename">Build the documentation</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">mkdocs</span> <span class="n">build</span>
 </code></pre></div>
 <p>To view the documentation locally you can use the command below:</p>
-<div class="highlight"><span class="filename">View the documentation locally</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">mkdocs</span> <span class="n">serve</span>
+<div class="highlight"><span class="filename">View the documentation locally</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">mkdocs</span> <span class="n">serve</span>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>The <code>mkdocs serve</code> command will start a local web server that will allow you to view the documentation in your browser. The server will also automatically rebuild the documentation when you make changes to the source files.</p>
 </div>
 <p>Before publishing the documentation you should ensure that the documentation is up to date and that the changes are correct. You should also pull the latest from the repository to ensure that you are not overwriting someone else's changes. Do this by running the command below:</p>
-<div class="highlight"><span class="filename">Pull the latest changes from the repository</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">git</span> <span class="n">pull</span>
+<div class="highlight"><span class="filename">Pull the latest changes from the repository</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">git</span> <span class="n">pull</span>
 </code></pre></div>
 <p>You can now publish the documentation to the repository by running the command below:</p>
-<div class="highlight"><span class="filename">Publish the documentation</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">mkdocs</span> <span class="n">gh-deploy</span>
+<div class="highlight"><span class="filename">Publish the documentation</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">mkdocs</span> <span class="n">gh-deploy</span>
 </code></pre></div>
 
 
