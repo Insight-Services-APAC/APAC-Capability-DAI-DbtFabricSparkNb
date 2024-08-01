@@ -215,7 +215,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+        <a href="../applications_setup/" class="md-tabs__link">
           
   
     
@@ -352,7 +352,7 @@
     
       
         
-          
+      
         
       
         
@@ -379,24 +379,16 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
   
   <span class="md-ellipsis">
     Developer guide
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
@@ -404,8 +396,6 @@
             Developer guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -418,7 +408,7 @@
         
   
   <span class="md-ellipsis">
-    Applications Required for Development (Windows)
+    Environment Setup
   </span>
   
 
@@ -481,27 +471,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#repo-clone" class="md-nav__link">
+  <a href="#a-clone-the-main-repo-in-powershell" class="md-nav__link">
     <span class="md-ellipsis">
-      Repo Clone
+      a. Clone the main repo in powershell
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-environment-setup" class="md-nav__link">
+  <a href="#b-clone-the-main-repo-in-vscode" class="md-nav__link">
     <span class="md-ellipsis">
-      Python Environment Setup
+      b. Clone the main repo in VSCode
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dbt-installation" class="md-nav__link">
+  <a href="#dbt-dependency-installation" class="md-nav__link">
     <span class="md-ellipsis">
-      dbt Installation
+      dbt dependency installation
     </span>
   </a>
   
@@ -528,6 +518,48 @@
   
   <span class="md-ellipsis">
     Framework Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dbt_build_process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dbt Build Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generated_notebooks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Understanding the Generated Notebooks
   </span>
   
 
@@ -851,42 +883,53 @@
 
 <h1 id="setting-up-dbt">Setting Up dbt<a class="headerlink" href="#setting-up-dbt" title="Permanent link">&para;</a></h1>
 <p>The following sections are covered in this document:</p>
-<ul>
-<li>Repo clone</li>
-<li>python environment setup</li>
-<li>dbt installation</li>
-</ul>
-<h3 id="repo-clone">Repo Clone<a class="headerlink" href="#repo-clone" title="Permanent link">&para;</a></h3>
-<p>First you need to clone this repo locally using Visual studio code. For these instructions the feature/dev or dev branch will be the branches to work with.</p>
-<p>If you do not get the Clone Repository option when selecting Source Control from the menu, then you have not installed GIT and will need to complete that first.</p>
-<p><img alt="image info" src="../images/CloneRepo.png" /></p>
-<h3 id="python-environment-setup">Python Environment Setup<a class="headerlink" href="#python-environment-setup" title="Permanent link">&para;</a></h3>
-<p>Once the repo has been cloned you can open a terminal window in VS Code and open a bash console.</p>
-<p>In new terminal window there is a plus symbol with a drop down. Select this drop down and click Git Bash. This will open a bash console. </p>
-<p><img alt="image info" src="../images/OpenBash.png" /></p>
-<p>To create a virtual python environment execute the code below, "dbt-env" being the name of your virtual environment:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Python Virtual Environment</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>dbt-env
-</code></pre></div></p>
-<p>To activate the environment execute this:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Python Virtual Environment</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>dbt-env/Scripts/activate
-</code></pre></div></p>
-<p><img alt="image info" src="../images/pythonvenv.png" /></p>
-<p>The virtual environment would have created a folder structure in your repo. This can be excluded in your gitignore file. If you used the default above it is already in the gitignore file.</p>
-<h3 id="dbt-installation">dbt Installation<a class="headerlink" href="#dbt-installation" title="Permanent link">&para;</a></h3>
-<p>Still in the bash console and having your virtual environment active, you can execute the following command to install all the components required for this dbt framework. The requirements.txt file is in the root of the repo.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># dbt installation</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<ol>
+<li>Clone the main Repo<ol>
+<li>Clone the main repo in powershell</li>
+<li>Clone the repo in VSCode</li>
+</ol>
+</li>
+<li>dbt dependency installation</li>
+</ol>
+<h3 id="a-clone-the-main-repo-in-powershell">a. Clone the main repo in powershell<a class="headerlink" href="#a-clone-the-main-repo-in-powershell" title="Permanent link">&para;</a></h3>
+<p>Clone the main repo from the Github. Use the following pwsh code for that. </p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Clone the repo</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">Insight-Services-APAC</span><span class="p">/</span><span class="n">APAC-Capability-DAI-DbtFabricSparkNb</span><span class="p">.</span><span class="n">git</span>
 </code></pre></div>
-<strong>NOTE:</strong> The installation can take sometime to complete. It may look like it's hanging but it is busy executing. If you close the installation you can restart it using the same command above. It will skip any components already installed. </p>
+<h3 id="b-clone-the-main-repo-in-vscode">b. Clone the main repo in VSCode<a class="headerlink" href="#b-clone-the-main-repo-in-vscode" title="Permanent link">&para;</a></h3>
+<p>Clone the main repo locally using Visual studio code. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you do not get the Clone Repository option when selecting Source Control from the menu, then you have not installed GIT and will need to complete that first.</p>
+</div>
+<p><img alt="image info" src="../images/CloneRepo.png" /></p>
+<h3 id="dbt-dependency-installation">dbt dependency installation<a class="headerlink" href="#dbt-dependency-installation" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Ensure you remain in the PowerShell console with your virtual environment activated. 
+You can then execute the following command to install or update all the components needed for the dbt framework. Since the <code>requirements.txt</code> file is located in the root of the repository, be sure to run the command from the root directory.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c"># dbt dependency installation/updation</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">pip</span> <span class="n">install</span> <span class="n">-r</span> <span class="n">requirements</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The installation or update process might take some time to complete and could appear to be hanging, but it is actively running. If you need to stop the process, you can restart it using the same command. It will bypass any components that are already installed.</p>
+</div>
 <p>This concludes the dbt installation.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>You are now ready to move to the next step in which you set up the build process. Follow the <a href="../dbt_build_process/">Dbt Build Process</a> guide.</p>
+</div>
 
 
 
 
 
 
+
+  
+  
 
 
 

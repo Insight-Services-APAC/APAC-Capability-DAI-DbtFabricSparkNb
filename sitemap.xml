@@ -6,12 +6,12 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/</loc>
+         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/applications_setup/</loc>
          <lastmod>2024-08-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/applications_setup/</loc>
+         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/dbt_build_process/</loc>
          <lastmod>2024-08-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -22,6 +22,11 @@
     </url>
     <url>
          <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/framework_setup/</loc>
+         <lastmod>2024-08-01</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/generated_notebooks/</loc>
          <lastmod>2024-08-01</lastmod>
          <changefreq>daily</changefreq>
     </url>

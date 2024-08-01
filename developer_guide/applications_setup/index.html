@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/applications_setup/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../..">
       
       
         <link rel="next" href="../dbt_setup/">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Applications Required for Development (Windows) - Dbt Adapter for Fabric Spark - By Insight</title>
+        <title>Environment Setup - Dbt Adapter for Fabric Spark - By Insight</title>
       
     
     
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#applications-required-for-development-windows" class="md-skip">
+        <a href="#environment-setup" class="md-skip">
           Skip to content
         </a>
       
@@ -119,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Applications Required for Development (Windows)
+              Environment Setup
             
           </span>
         </div>
@@ -215,7 +215,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
     
@@ -352,7 +352,7 @@
     
       
         
-          
+      
         
       
         
@@ -379,24 +379,16 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
   
   <span class="md-ellipsis">
     Developer guide
   </span>
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
@@ -404,8 +396,6 @@
             Developer guide
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
             
               
                 
@@ -427,7 +417,7 @@
           
   
   <span class="md-ellipsis">
-    Applications Required for Development (Windows)
+    Environment Setup
   </span>
   
 
@@ -438,7 +428,7 @@
         
   
   <span class="md-ellipsis">
-    Applications Required for Development (Windows)
+    Environment Setup
   </span>
   
 
@@ -460,38 +450,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install-python" class="md-nav__link">
+  <a href="#core-tools-installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Install python
+      Core Tools Installation
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-visual-studio-code" class="md-nav__link">
+  <a href="#other-tools" class="md-nav__link">
     <span class="md-ellipsis">
-      Install Visual Studio Code
+      Other tools
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-git-for-windows" class="md-nav__link">
+  <a href="#source-directory-python-env" class="md-nav__link">
     <span class="md-ellipsis">
-      Install GIT for Windows
+      Source Directory &amp; Python Env
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Source Directory & Python Env">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#onelake-explorer-preview" class="md-nav__link">
     <span class="md-ellipsis">
       OneLake Explorer (Preview)
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -537,6 +533,48 @@
   
   <span class="md-ellipsis">
     Framework Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dbt_build_process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dbt Build Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generated_notebooks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Understanding the Generated Notebooks
   </span>
   
 
@@ -858,47 +896,142 @@
   
 
 
-<h1 id="applications-required-for-development-windows">Applications Required for Development (Windows)<a class="headerlink" href="#applications-required-for-development-windows" title="Permanent link">&para;</a></h1>
-<p>This section covers the applications required for developing using the dbt framework. The applications are:</p>
+<h1 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">&para;</a></h1>
+<p>This section outlines the steps required to setup the development environment to use this dbt-adapter as part of a dbt data transformation project.</p>
+<p>To provide a common, cross-platform set of instructions we will first install Powershell. To facilitate the installation process we will use package managers such as <a href="https://learn.microsoft.com/en-us/windows/package-manager/winget/">winget</a> for Windows, <a href="https://brew.sh/">brew</a> for MacOS and <code>apt</code> for Linux.</p>
+<h2 id="core-tools-installation">Core Tools Installation<a class="headerlink" href="#core-tools-installation" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Following core tools can be installed using the standard powershell or in VS Code terminal (powershell)</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">MacOS</label><label for="__tabbed_1_3">Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c"># Winget Installs </span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">winget</span> <span class="n">install</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">PowerShell</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew<span class="w"> </span>install<span class="w"> </span>powershell/tap/powershell
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># TBA</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Next we will install Python and development tools such as vscode.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Windows</label><label for="__tabbed_2_2">MacOS</label><label for="__tabbed_2_3">Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c"># Winget Installs </span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">winget</span> <span class="n">install</span> <span class="n">Python</span><span class="p">.</span><span class="n">Python</span><span class="p">.</span><span class="n">3</span><span class="p">.</span><span class="n">12</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">winget</span> <span class="n">install</span> <span class="n">-e</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">VisualStudioCode</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">winget</span> <span class="n">install</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Git</span><span class="p">.</span><span class="n">Git</span> <span class="n">-e</span> <span class="p">-</span><span class="n">-source</span> <span class="n">winget</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c"># Python Environment Manager</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">Python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-user</span> <span class="n">virtualenv</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Brew Installs</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>brew<span class="w"> </span>install<span class="w"> </span>python@3.12
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>brew<span class="w"> </span>install<span class="w"> </span>--cask<span class="w"> </span>visual-studio-code
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>brew<span class="w"> </span>install<span class="w"> </span>git
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># Python Environment Manager</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>virtualenv
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># TBA</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="other-tools">Other tools<a class="headerlink" href="#other-tools" title="Permanent link">&para;</a></h2>
+<p>Now that we have pwsh installed, Make sure that you have install the following additional required tools.</p>
 <ul>
-<li>python (latest version available)</li>
-<li>Visual Studio Code</li>
-<li>GIT for Windows</li>
-<li>OneLake Explorer (Preview)</li>
+<li>Install Azure PowerShell on Windows - Refer <a href="https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&amp;tabs=powershell&amp;pivots=windows-psgallery">Azure Powershell Doc</a> for windows (You might need to run this in admin mode)</li>
 </ul>
-<h3 id="install-python">Install python<a class="headerlink" href="#install-python" title="Permanent link">&para;</a></h3>
-<p>First you need to install python. This can be done from this link <a href="https://www.python.org/downloads/">Download Python | Python.org</a> download the latest version and install it. </p>
-<p><strong>NOTE:</strong> Make sure to tick the box on the first window of the installation to Add Python.exe to PATH</p>
-<p>Use Install now for standard installation.</p>
-<p>Once installed, confirm installation by opening the command line. WindowsKey + R then enter “cmd” click OK. </p>
-<p>Type the following and you should get a reply similar to the screenshot below.
-<code>command prompt 
-“python --version”</code></p>
-<p><img alt="image info" src="../images/pythonversioncheck.png" /></p>
-<h3 id="install-visual-studio-code">Install Visual Studio Code<a class="headerlink" href="#install-visual-studio-code" title="Permanent link">&para;</a></h3>
-<p>Browse to website <a href="https://code.visualstudio.com/">Visual Studio Code - Code Editing. Redefined</a> and download Visual Studio Code and then open the file.</p>
-<p>Select the standard options and install.</p>
-<h3 id="install-git-for-windows">Install GIT for Windows<a class="headerlink" href="#install-git-for-windows" title="Permanent link">&para;</a></h3>
-<p>Browse to website <a href="https://git-scm.com/download/win">Git - Downloading Package (git-scm.com)</a> and download the latest by clicking “Click here to download” option. Open the file and install following the step examples.</p>
-<p><img alt="image info" src="../images/downloadgitforwindows.png" /></p>
-<p>Select the standard options until you get these next steps.</p>
-<p>This step will ask you about your default git application please change this to Use Visual Studio Code as Git default. </p>
-<p><img alt="image info" src="../images/defaulteditor.png" /></p>
-<p>This step will ask you about your default git console, please select Use Windows default console window.</p>
-<p><img alt="image info" src="../images/defaultconsole.png" /></p>
-<p>The rest of the installation options should be standard unless you need to change them for other reasons.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Optional packages you may need to install (Only run if you face issues)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">pip</span> <span class="n">config</span> <span class="nb">set </span><span class="n">global</span><span class="p">.</span><span class="n">trusted-host</span> <span class="s2">&quot;pypi.org files.pythonhosted.org pypi.python.org&quot;</span>
+</code></pre></div>
+</div>
+<h2 id="source-directory-python-env">Source Directory &amp; Python Env<a class="headerlink" href="#source-directory-python-env" title="Permanent link">&para;</a></h2>
+<p>Now lets create and activate our Python environment and install the required packages. Be sure to run the following commands from the root directory.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>When executing the following, it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. </p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Windows</label><label for="__tabbed_3_2">MacOS</label><label for="__tabbed_3_3">Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c"># Ensure that you are in the pwsh shell</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">pwsh</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c"># Create a new source code directory</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">mkdir</span> <span class="n">dbt-fabricsparknb-test</span> <span class="c">#Note that the name of the directory is arbitrary... call it whatever you like</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c"># Navigate to the new directory</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="nb">cd </span><span class="n">dbt-fabricsparknb-test</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="c"># Create the Python environment</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">env</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="c">#Optional step to run if activate.ps1 failes due to security policy</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="nb">Set-ExecutionPolicy</span> <span class="n">-ExecutionPolicy</span> <span class="n">Unrestricted</span> <span class="n">-Scope</span> <span class="n">CurrentUser</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="c"># Activate the Python environment</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">./.</span><span class="n">env</span><span class="p">/</span><span class="n">Scripts</span><span class="p">/</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c"># Ensure that you are in the pwsh shell</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">pwsh</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c"># Create a new source code directory</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">mkdir</span> <span class="n">dbt-fabricsparknb-test</span> <span class="c">#Note that the name of the directory is arbitrary... call it whatever you like</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c"># Navigate to the new directory</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nb">cd </span><span class="n">dbt-fabricsparknb-test</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="c"># Create the Python environment</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">env</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="c">#Optional step to run if activate.ps1 failes due to security policy</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="nb">Set-ExecutionPolicy</span> <span class="n">-ExecutionPolicy</span> <span class="n">Unrestricted</span> <span class="n">-Scope</span> <span class="n">CurrentUser</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="c"># Activate the Python environment</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">./.</span><span class="n">env</span><span class="p">/</span><span class="n">Scripts</span><span class="p">/</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>  
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c"># TBA</span>
+</code></pre></div>
+</div>
+</div>
+</div>
 <h3 id="onelake-explorer-preview">OneLake Explorer (Preview)<a class="headerlink" href="#onelake-explorer-preview" title="Permanent link">&para;</a></h3>
 <p>Browse to website <a href="https://learn.microsoft.com/en-us/fabric/onelake/onelake-file-explorer">OneLake Explorer</a> and browse down the page to Installation instructions and download OneLake file explorer and then open the file.</p>
 <p>Click install and follow standard install options. </p>
 <p>Opening up for the first time will require you to login using your Fabric tenant details. You will then be able to access the Lakehouses from your Windows Explorer.</p>
 <p><img alt="image info" src="../images/onelake.png" /></p>
 <p>This concludes the required applications.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>You are now ready to move to the next step in which you will set up your dbt project. Follow the <a href="../dbt_setup/">Dbt Project Setup</a> guide.</p>
+</div>
 
 
 
 
 
 
+
+  
+  
 
 
 

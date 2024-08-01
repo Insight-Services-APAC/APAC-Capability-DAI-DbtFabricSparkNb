@@ -8,26 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/">
+        <link rel="canonical" href="https://fluffy-couscous-p8yev1r.pages.github.io/developer_guide/dbt_build_process/">
       
       
+        <link rel="prev" href="../framework_setup/">
       
-        <link rel="next" href="developer_guide/applications_setup/">
+      
+        <link rel="next" href="../generated_notebooks/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
     
     
       
-        <title>Home - Dbt Adapter for Fabric Spark - By Insight</title>
+        <title>Dbt Build Process - Dbt Adapter for Fabric Spark - By Insight</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,9 +48,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/extra.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -82,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dbt-fabric-spark-notebook-generator-dbt-fabricsparknb" class="md-skip">
+        <a href="#dbt-build-process" class="md-skip">
           Skip to content
         </a>
       
@@ -98,9 +100,9 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Dbt Adapter for Fabric Spark - By Insight" class="md-header__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
+    <a href="../.." title="Dbt Adapter for Fabric Spark - By Insight" class="md-header__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
       
-  <img src="assets/insight_logo_only.png" alt="logo">
+  <img src="../../assets/insight_logo_only.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -117,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Dbt Build Process
             
           </span>
         </div>
@@ -190,11 +192,9 @@
         
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
         
   
     
@@ -209,11 +209,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="developer_guide/applications_setup/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../applications_setup/" class="md-tabs__link">
           
   
     
@@ -233,7 +235,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="user_guide/" class="md-tabs__link">
+        <a href="../../user_guide/" class="md-tabs__link">
           
   
     
@@ -253,7 +255,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="documentation_guide/" class="md-tabs__link">
+        <a href="../../documentation_guide/" class="md-tabs__link">
           
   
     
@@ -296,9 +298,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Dbt Adapter for Fabric Spark - By Insight" class="md-nav__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
+    <a href="../.." title="Dbt Adapter for Fabric Spark - By Insight" class="md-nav__button md-logo" aria-label="Dbt Adapter for Fabric Spark - By Insight" data-md-component="logo">
       
-  <img src="assets/insight_logo_only.png" alt="logo">
+  <img src="../../assets/insight_logo_only.png" alt="logo">
 
     </a>
     Dbt Adapter for Fabric Spark - By Insight
@@ -322,6 +324,146 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Developer guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Developer guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../applications_setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Environment Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dbt_setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setting Up dbt
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../framework_setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Framework Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -338,18 +480,18 @@
           
   
   <span class="md-ellipsis">
-    Home
+    Dbt Build Process
   </span>
   
 
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Home
+    Dbt Build Process
   </span>
   
 
@@ -371,80 +513,20 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-it" class="md-nav__link">
+  <a href="#dbt-build-process-dbt_wrapper" class="md-nav__link">
     <span class="md-ellipsis">
-      What is it
+      Dbt Build Process &amp; Dbt_Wrapper
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-did-we-build-it" class="md-nav__link">
+  <a href="#toggling-build-stages-off-and-on" class="md-nav__link">
     <span class="md-ellipsis">
-      Why did we build it?
+      Toggling Build Stages Off and On
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-does-it-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      How does it work?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key Features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#unsupported-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Unsupported features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      Getting Started
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contributing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contributing
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Contributing">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#branching" class="md-nav__link">
-    <span class="md-ellipsis">
-      Branching
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -455,78 +537,6 @@
     </li>
   
 
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Developer guide
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            Developer guide
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="developer_guide/applications_setup/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Environment Setup
-  </span>
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -536,70 +546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="developer_guide/dbt_setup/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Setting Up dbt
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="developer_guide/framework_setup/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Framework Setup
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="developer_guide/dbt_build_process/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Dbt Build Process
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="developer_guide/generated_notebooks/" class="md-nav__link">
+      <a href="../generated_notebooks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -664,7 +611,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="user_guide/" class="md-nav__link ">
+            <a href="../../user_guide/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -697,7 +644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/initial_setup/" class="md-nav__link">
+      <a href="../../user_guide/initial_setup/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -718,7 +665,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/dbt_project_setup/" class="md-nav__link">
+      <a href="../../user_guide/dbt_project_setup/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -739,7 +686,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/dbt_build_process/" class="md-nav__link">
+      <a href="../../user_guide/dbt_build_process/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -760,7 +707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/generated_notebooks/" class="md-nav__link">
+      <a href="../../user_guide/generated_notebooks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -781,7 +728,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/notebooks/" class="md-nav__link">
+      <a href="../../user_guide/notebooks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -802,7 +749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/development_workflow/" class="md-nav__link">
+      <a href="../../user_guide/development_workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -823,7 +770,7 @@
   
   
     <li class="md-nav__item">
-      <a href="user_guide/fabric_ci_cd_process/" class="md-nav__link">
+      <a href="../../user_guide/fabric_ci_cd_process/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -874,7 +821,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="documentation_guide/" class="md-nav__link ">
+            <a href="../../documentation_guide/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -917,7 +864,7 @@
                   
 
   
-    <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb/edit/main/docs/developer_guide/dbt_build_process.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4v-2m10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1 2.1 2.1Z"/></svg>
     </a>
@@ -925,65 +872,57 @@
   
 
 
-<h1 id="dbt-fabric-spark-notebook-generator-dbt-fabricsparknb">Dbt Fabric Spark Notebook Generator (Dbt-FabricSparkNb)<a class="headerlink" href="#dbt-fabric-spark-notebook-generator-dbt-fabricsparknb" title="Permanent link">&para;</a></h1>
-<p><em><p style="text-align: center;"><b>"The first and only dbt adapter for a true, modern, software-as-a-service (SAAS) Lakehouse."</b></p></em></p>
-<h2 id="what-is-it">What is it<a class="headerlink" href="#what-is-it" title="Permanent link">&para;</a></h2>
-<p>The <code>dbt-fabricsparknb</code> package contains all of the code enabling dbt to work with Microsoft Fabric <strong>WITHOUT</strong> a connection endpoint like livy or the Datawarehouse SQL endpoint. </p>
-<h2 id="why-did-we-build-it">Why did we build it?<a class="headerlink" href="#why-did-we-build-it" title="Permanent link">&para;</a></h2>
-<p>As a team of data specialists we have been working with dbt for a number of years. We have found that dbt is a powerful tool for data transformation, but it has some limitations. We have built this adapter to address some of these limitations and to make it easier to work with dbt in a modern, software-as-a-service (SAAS) lakehouse environment. </p>
-<h2 id="how-does-it-work">How does it work?<a class="headerlink" href="#how-does-it-work" title="Permanent link">&para;</a></h2>
-<p>Dbt-FabricSparkNb works by leverging the power of the dbt-core, and the <a href="https://github.com/microsoft/dbt-fabricspark">dbt-fabrickspark</a> apater to create a new adapter. As such, it can be described as a "child apater" of <a href="https://github.com/microsoft/dbt-fabricspark">dbt-fabrickspark</a>. </p>
-<p>The adapter inherits all of the functionality of the <a href="https://github.com/microsoft/dbt-fabricspark">dbt-fabrickspark</a> adapter and simply extends it to meet the unique requirements of our project.</p>
-<p>Consequently, to use this adapter, you will need to install the <a href="https://github.com/microsoft/dbt-fabricspark">dbt-fabrickspark</a> adapter and then install the <a href="https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb">dbt-fabricksparknb</a> adapter.</p>
-<h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Support for SAAS only lakehouse architecture (No PAAS components requried)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Support for lightweight, disconnected local development workflow</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Fully featured with modern data transformation capabilities such as data lineage, data catalog, data quality checks and templated data transformation activities</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Opensource and free to use</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Extensible and customisable</li>
-</ul>
-<h2 id="unsupported-features">Unsupported features<a class="headerlink" href="#unsupported-features" title="Permanent link">&para;</a></h2>
-<p>Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.</p>
-<p><img alt="alt text" src="../assets/images/unsupported.png" /></p>
-<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<div class="grid cards">
-<ul>
-<li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 4a8 8 0 0 1 8 8 8 8 0 0 1-8 8 8 8 0 0 1-8-8 8 8 0 0 1 8-8m0 2a6 6 0 0 0-6 6 6 6 0 0 0 6 6 6 6 0 0 0 6-6 6 6 0 0 0-6-6m-1 2h1.5v3.78l2.33 2.33-1.06 1.06L14 12.4V8M2 18a1 1 0 0 1-1-1 1 1 0 0 1 1-1h3.83c.31.71.71 1.38 1.17 2H2m1-5a1 1 0 0 1-1-1 1 1 0 0 1 1-1h2.05L5 12l.05 1H3m1-5a1 1 0 0 1-1-1 1 1 0 0 1 1-1h3c-.46.62-.86 1.29-1.17 2H4Z"/></svg></span> <strong>User Guide</strong></p>
-<hr />
-<p>For data engineers looking to use the adapter to create data transformation projects</p>
-<p><a href="user_guide/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/></svg></span> User Guide</a></p>
+<h1 id="dbt-build-process">Dbt Build Process<a class="headerlink" href="#dbt-build-process" title="Permanent link">&para;</a></h1>
+<h2 id="dbt-build-process-dbt_wrapper">Dbt Build Process &amp; Dbt_Wrapper<a class="headerlink" href="#dbt-build-process-dbt_wrapper" title="Permanent link">&para;</a></h2>
+<p>The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called <code>dbt_wrapper</code> and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using both az login. See the examples below and replace the tenant id with your own.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">az</span> <span class="n">login</span> <span class="p">-</span><span class="n">-tenant</span> <span class="n">73738727-cfc1</span><span class="p">-</span><span class="n">4875</span><span class="p">-</span><span class="n">90c2</span><span class="p">-</span><span class="n">2a7a1149ed3d</span> <span class="p">-</span><span class="n">-allow-no-subscriptions</span>
+</code></pre></div>
+<p>If you're encountering an az not found error, install az using the following command (powershell admin mode)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">Install-Module</span> <span class="n">-Name</span> <span class="n">Az</span> <span class="n">-Repository</span> <span class="n">PSGallery</span> <span class="n">-Force</span>
+</code></pre></div></p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is the guide appropriate for <strong>MOST</strong> users.</p>
+<p>Make sure that you have activated your python virtual environment before running this code. </p>
 </div>
-</li>
-<li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M5.433 2.304A4.492 4.492 0 0 0 3.5 6c0 1.598.832 3.002 2.09 3.802.518.328.929.923.902 1.64v.008l-.164 3.337a.75.75 0 1 1-1.498-.073l.163-3.33c.002-.085-.05-.216-.207-.316A5.996 5.996 0 0 1 2 6a5.993 5.993 0 0 1 2.567-4.92 1.482 1.482 0 0 1 1.673-.04c.462.296.76.827.76 1.423v2.82c0 .082.041.16.11.206l.75.51a.25.25 0 0 0 .28 0l.75-.51A.249.249 0 0 0 9 5.282V2.463c0-.596.298-1.127.76-1.423a1.482 1.482 0 0 1 1.673.04A5.993 5.993 0 0 1 14 6a5.996 5.996 0 0 1-2.786 5.068c-.157.1-.209.23-.207.315l.163 3.33a.752.752 0 0 1-1.094.714.75.75 0 0 1-.404-.64l-.164-3.345c-.027-.717.384-1.312.902-1.64A4.495 4.495 0 0 0 12.5 6a4.492 4.492 0 0 0-1.933-3.696c-.024.017-.067.067-.067.16v2.818a1.75 1.75 0 0 1-.767 1.448l-.75.51a1.75 1.75 0 0 1-1.966 0l-.75-.51A1.75 1.75 0 0 1 5.5 5.282V2.463c0-.092-.043-.142-.067-.159Z"/></svg></span> <strong>Developer Guide</strong></p>
-<hr />
-<p>For advanced users looking to extend or customise the adapter</p>
-<p><a href="developer_guide/applications_setup/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/></svg></span> Developer Guide</a></p>
-<div class="admonition danger">
-<p class="admonition-title">Danger</p>
-<p>This is the guide for advanced users only.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-help</span>
+</code></pre></div>
+<p>To build your dbt project and publish your notebook to your Fabric workspace you can run the command below:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be sure to replace <mark>my_project</mark> with the name of your dbt project folder. </p>
 </div>
-</li>
-<li>
-<p><span class="twemoji lg middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v8.586A1.75 1.75 0 0 1 14.25 15h-9a.75.75 0 0 1 0-1.5h9a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 10 4.25V1.5H5.75a.25.25 0 0 0-.25.25v2.5a.75.75 0 0 1-1.5 0Zm1.72 4.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734l1.47-1.47-1.47-1.47a.75.75 0 0 1 0-1.06ZM3.28 7.78 1.81 9.25l1.47 1.47a.751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018l-2-2a.75.75 0 0 1 0-1.06l2-2a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Zm8.22-6.218V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></svg></span> <strong>Documentation Guide</strong></p>
-<hr />
-<p>For users who are looking to contribute to the adapter documentation</p>
-<p><a href="documentation_guide/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"/></svg></span> Documentation Guide</a></p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This guide is still under construction</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-pre-install</span> <span class="n">my_project</span> 
+</code></pre></div>
+<p>The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
+<img alt="notebooks" src="../../assets/images/dbt_wrapper_output.png" /></p>
+<h2 id="toggling-build-stages-off-and-on">Toggling Build Stages Off and On<a class="headerlink" href="#toggling-build-stages-off-and-on" title="Permanent link">&para;</a></h2>
+<p>There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the dbt_wrapper application. To view all of the options available to you run the command below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-help</span>
+</code></pre></div></p>
+<p>For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
+</code></pre></div></p>
+<p>Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all-local</span> <span class="n">my_project</span>
+</code></pre></div>
+Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you can change the int value to anything you want as long as it's not larger than 7 days in seconds</p>
 </div>
-</li>
-</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-pre-install</span> <span class="p">-</span><span class="n">-notebook-timeout</span><span class="p">=</span><span class="n">2100</span> <span class="n">my_project</span>
+</code></pre></div>
+<p>Review all of the commands available to you by running using the help option as shown below:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-help</span>
+</code></pre></div></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>You are now ready to move to the next step in which you gain an understanding of the various kinds of notebooks generated by the adapter. Follow the <a href="../generated_notebooks/">Understanding the Generated Notebooks</a> guide.</p>
 </div>
-<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
-<h3 id="branching">Branching<a class="headerlink" href="#branching" title="Permanent link">&para;</a></h3>
-<p>When creating a branch to work on from please use the branch name of <code>feature/YourBranchName</code>. The case on <code>feature/</code> matters so please make sure to keep it lower case. Pull requests are to be made into the "dev" branch only. Any pull requests made into "Main" will be removed and not merged.</p>
 
 
 
@@ -1159,14 +1098,14 @@
       </div>
       <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout(function(){document.querySelector("[data-md-component=consent]").hidden=!1},250);var action,form=document.forms.consent;for(action of["submit","reset"])form.addEventListener(action,function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map(function(e){return[e,!0]}))),location.hash="",location.reload()})</script>
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.copy", "content.code.select", "content.code.annotate"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.tooltips", "navigation.top", "navigation.path", "toc.integrate", "content.action.edit", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.copy", "content.code.select", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
       
         <script src="https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js"></script>
       
-        <script src="javascripts/tablesort.js"></script>
+        <script src="../../javascripts/tablesort.js"></script>
       
     
   </body>
