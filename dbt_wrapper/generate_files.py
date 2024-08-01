@@ -145,6 +145,81 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
+def GenerateCompareNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    # Define the directory containing the Jinja templates
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('compare_notebook.ipynb')
+
+    with io.open(project_root + '/metaextracts/metadata_missingtables.json', 'r') as file:
+        # Load JSON data from file
+        data = json.load(file)
+
+    uniqueTables  = list({item['tableName'] for item in data})
+
+
+    ##create the CREATE statements for new tables
+    create_statements = """"""
+
+    for tbl in uniqueTables:
+        print(f"tabkle name is: {tbl}-----")
+        create_statements =  create_statements + f"----- CREATE TABLE {tbl} ---------\\n\\n" 
+        create_statements =  create_statements + f"CREATE TABLE {tbl} ( \\n"
+
+        filtered = [x for x in data if x['tableName'] == tbl]
+                
+                
+        for r in filtered:
+            create_statements = create_statements + f"\\r\\t {r['col_name']} {r['data_type']},"
+
+        create_statements =  create_statements.rstrip(',') + "\\n)\\n"
+
+    #create_statements = str(create_statements)
+
+
+    ##create the ALTER statements for new tables
+    with io.open(project_root + '/metaextracts/metadata_missingtable_columns.json', 'r') as file:
+        # Load JSON data from file
+        data = json.load(file)
+
+    uniqueTables  = list({item['tableName'] for item in data})
+ 
+  
+    alter_statements = """"""
+
+    for tbl in uniqueTables:
+        print(f"tabkle name is: {tbl}-----")
+        alter_statements =  alter_statements + f"----- ALTER TABLE {tbl} ---------\\n\\n" 
+        
+        filtered = [x for x in data if x['tableName'] == tbl]                
+                
+        for r in filtered:
+            alter_statements =  alter_statements + f"ALTER TABLE {tbl} \\n"
+            alter_statements = alter_statements + f"\\r\\t ADD COLUMN {r['col_name']} {r['data_type']}\\n\\n"
+
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, create_statements=create_statements, alter_statements=alter_statements)
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
+
+    # Write the notebook to a file    
+    target_file_name = f'compare_{project_name}_notebook.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)            
+        except Exception as ex:
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
+            raise ex
+
+
 def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates

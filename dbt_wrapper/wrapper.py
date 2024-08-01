@@ -152,3 +152,25 @@ class Commands:
     def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"master_{self.project_name}_notebook"
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+
+    def RunBuildMetadataNotebook_Source(self, progress: ProgressConsoleWrapper, task_id):
+        nb_name = f"util_BuildMetadata"
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+
+    def RunBuildMetadataNotebook_Target(self, progress: ProgressConsoleWrapper, task_id):
+        nb_name = f"util_BuildMetadata"
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['nextenv_workspaceid'], notebook_name=nb_name)
+
+    def RunCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):
+        nb_name = f"util_Compare"
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+
+    def GenerateCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):        
+        gf.GenerateCompareNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+
+    def UploadCompareNotebookViaApi(self, progress: ProgressConsoleWrapper, task_id):
+        curr_dir = os.getcwd()
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        file_name = f"compare_{self.config['name']}_notebook"
+        print(f"\n\nUploading file: {file_name}")
+        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['nextenv_workspaceid'], notebook_name=file_name)

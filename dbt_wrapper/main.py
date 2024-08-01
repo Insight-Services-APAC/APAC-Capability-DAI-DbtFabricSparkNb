@@ -8,6 +8,7 @@ from rich import print
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import stage_executor
 
+
 app = typer.Typer(no_args_is_help=True)
 
 custom_theme = Theme({"info": "dim cyan", "warning": "dark_orange", "danger": "bold red", "error": "bold red", "debug": "khaki1"})
@@ -37,6 +38,70 @@ def docs():
     """
     print(f"Goodbye")
 
+
+@app.command()
+def buildcomparemetadata(  
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None):
+    """
+    This command will generate compare two environments lakehouses.
+    """
+    log_level = "WARNING"
+
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name="Run Build Metadata Notebook (Source)")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name="Run Build Metadata Notebook (Target)")
+
+    print(f"Goodbye")
+
+
+@app.command()
+def compare(  
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None):
+    """
+    This command will generate compare two environments lakehouses.
+    """
+    log_level = "WARNING"
+
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunCompareNotebook], stage_name="Run Compare Notebook")
+
+    # #download the metadata
+    se.perform_stage(option=True, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateCompareNotebook], stage_name="Generate Compare Notebook")
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook to Target Workspace")
+
+    print(f"Goodbye")
 
 @app.command()
 def run_all(
