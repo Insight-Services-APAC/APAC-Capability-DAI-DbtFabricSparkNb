@@ -80,8 +80,8 @@ class Commands:
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None):
         curr_dir = os.getcwd()
-        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir) 
-        self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id)
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], lakehouse_id=self.target_info['lakehouseid'], lakehouse=self.lakehouse)
     
     def CleanProjectTargetDirectory(self, progress: ProgressConsoleWrapper, task_id):
         if os.path.exists(self.dbt_project_dir + "/target"):
