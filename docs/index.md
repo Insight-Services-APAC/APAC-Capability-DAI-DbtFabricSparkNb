@@ -54,7 +54,7 @@ Our DBT framework does not yet support schemas in Data lake. So please do not ti
 
     For advanced users looking to extend or customise the adapter
 
-    [:octicons-arrow-right-24: Developer Guide](./developer_guide/index.md)
+    [:octicons-arrow-right-24: Developer Guide](./developer_guide/applications_setup.md)
 
     !!! danger
         This is the guide for advanced users only.

@@ -1,3 +1,6 @@
+---
+  weight: 4
+---
 # Framework Setup
 
 ### Fabric Workspace Setup
