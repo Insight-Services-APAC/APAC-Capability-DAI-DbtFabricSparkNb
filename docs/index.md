@@ -26,6 +26,11 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 - [x] Opensource and free to use
 - [x] Extensible and customisable
 
+## Unsupported features
+Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.
+
+![alt text](../assets/images/unsupported.png)
+
 ## Getting Started
 
 

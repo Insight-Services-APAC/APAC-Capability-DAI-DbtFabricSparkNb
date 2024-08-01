@@ -32,12 +32,6 @@ To build your dbt project and publish your notebook to your Fabric workspace you
 !!! note
     Be sure to replace ==my_project== with the name of your dbt project folder
 
-!!! important
-      Before running the dbt_wrapper make sure you're logged into your tenant in the PowerShell terminal using both `az login` and `azcopy login`. See the examples below and replace the tenant id with your own.
-    ```powershell
-    az login --tenant 73738727-cfc1-4875-90c2-2a7a1149ed3d 
-    azcopy login --tenant-id 73738727-cfc1-4875-90c2-2a7a1149ed3d 
-    ```
 
 ```powershell
 dbt_wrapper run-all my_project
@@ -66,6 +60,14 @@ Alternatively, you might want to make use of some additional "helper" commands t
 
 ```powershell
 dbt_wrapper run-all-local my_project
+```
+
+Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
+!!!note
+    you can change the int value to anything you want as long as it's not larger than 7 days in seconds
+
+```powershell
+dbt_wrapper run-all my_project --notebook-timeout=2100
 ```
 
 Review all of the commands available to you by running using the help option as shown below:
