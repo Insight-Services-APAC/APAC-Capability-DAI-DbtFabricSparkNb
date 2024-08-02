@@ -55,14 +55,7 @@ For example, should you wish to run all stages except for the upload of the gene
 ```powershell
 dbt_wrapper run-all my_project --no-upload-notebooks-via-api  
 ```
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:
-
-
-```powershell
-dbt_wrapper run-all-local my_project
-```
-
-Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
+Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
 !!!note
     you can change the int value to anything you want as long as it's not larger than 7 days in seconds
 
