@@ -15,7 +15,7 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -32,10 +32,25 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             notebook_file['name'] = file
             notebook_file['sort_order'] = matching_node.sort_order
             notebook_files.append(notebook_file)
-
+   
+    if len(notebook_files) == 0:
+        print("No notebooks found.Try checking your model configs and model specification args")
+        exit(1)
+    
     # Find the minimum and maximum sort_order
     min_sort_order = min(file['sort_order'] for file in notebook_files)
     max_sort_order = max(file['sort_order'] for file in notebook_files)
+
+    # Validate and set max worker (thread) property 
+    match max_worker:
+        case _ if max_worker < 5:
+            max_worker = 5
+            progress.print("Max worker property (thread) is lesser than 5, default thread value 5 has been set.", LogLevel.WARNING)
+        case _ if max_worker > 19:
+            progress.print("Max worker property (thread) is high !!\nPlease update thread property in profile.yml, if this is not expected.", LogLevel.WARNING)
+        case _:
+            max_worker = 5
+            progress.print("Max worker property (thread) value is not set, default thread value 5 has been set.", LogLevel.WARNING)
 
     # Loop from min_sort_order to max_sort_order
     for sort_order in range(min_sort_order, max_sort_order + 1):
@@ -54,7 +69,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name,max_worker=max_worker)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)

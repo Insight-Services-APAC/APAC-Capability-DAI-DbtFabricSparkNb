@@ -3,10 +3,12 @@
     title: "Dbt Build Process"
     excerpt: "This guide will walk you through the process of building your dbt project using the dbt-fabricsparknb package."
     sidebar_label: "Dbt Build Process"
-    slug: /user_guide/dbt_build_process
-    weight: 3
+    slug: /documentation_guide/dbt_build_process
+    weight: 5
 
 ---
+
+# Dbt Build Process
 
 ## Dbt Build Process & Dbt_Wrapper
 The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called `dbt_wrapper` and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal.
@@ -19,54 +21,53 @@ The dbt-fabricksparknb package includes a console application that will allow yo
     az login --tenant 73738727-cfc1-4875-90c2-2a7a1149ed3d --allow-no-subscriptions
     ```
 
+    If you're encountering an az not found error, install az using the following command (powershell admin mode)
+    ```powershell
+    Install-Module -Name Az -Repository PSGallery -Force
+    ```
 
 !!! Note
     Make sure that you have activated your python virtual environment before running this code. 
 
 ```powershell
-dbt_wrapper --help
+python test_pre_install.py run-all --help
 ```
 
 To build your dbt project and publish your notebook to your Fabric workspace you can run the command below:
 
-!!! note
-    Be sure to replace ==my_project== with the name of your dbt project folder
-
+!!! Note
+    Be sure to replace ==my_project== with the name of your dbt project folder. 
 
 ```powershell
-dbt_wrapper run-all my_project
+python test_pre_install.py run-all --pre-install my_project 
 ```
 
 The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
+![notebooks](../assets/images/dbt_wrapper_output.png)
 
-![alt text](./../assets/images/dbt_wrapper_run_all.png)
-
-
-## Toggling Build Stages Off and On 
-
-There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the `dbt_wrapper` application. To view all of the options available to you run the command below:
-
+## Toggling Build Stages Off and On
+There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the dbt_wrapper application. To view all of the options available to you run the command below:
 ```powershell
-dbt_wrapper run-all --help
+python test_pre_install.py run-all --help
 ```
 
 For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
-
 ```powershell
-dbt_wrapper run-all my_project --no-upload-notebooks-via-api  
+python test_pre_install.py run-all my_project --no-upload-notebooks-via-api  
 ```
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
+
+Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. 
+For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
 !!!note
     you can change the int value to anything you want as long as it's not larger than 7 days in seconds
 
 ```powershell
-dbt_wrapper run-all my_project --notebook-timeout=2100
+python test_pre_install.py run-all --pre-install --notebook-timeout=2100 my_project
 ```
 
 Review all of the commands available to you by running using the help option as shown below:
-
 ```powershell
-dbt_wrapper --help
+python test_pre_install.py --help
 ```
 
 !!! Info

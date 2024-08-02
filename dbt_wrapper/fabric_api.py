@@ -6,6 +6,7 @@ import base64
 import os
 import json
 import typer
+import hashlib
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
@@ -39,7 +40,7 @@ class FabricAPI:
             file.writelines(lines[:-1])
 
     # Generate py files for api update
-    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id):
+    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id, workspace_id, lakehouse_id, lakehouse):
         progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_dir = str(Path(target_dir) / Path("notebooks"))
@@ -50,13 +51,25 @@ class FabricAPI:
             filenamewithoutext = filename[:-6]  # # remove .ipynb
             py_fabric_file = str(Path(notebooks_fabric_py_dir) / Path(filenamewithoutext + ".py"))
             # path = dbt_project_dir
-            FabricPlatformContent = self.GetFabricPlatformContent(filenamewithoutext)          
+            FabricPlatformContent = self.GetFabricPlatformContent(filenamewithoutext)
+            lhid_string = "# META       \"default_lakehouse\": \"{}\",\n".format(lakehouse_id)
+            lh_string = "# META       \"default_lakehouse_name\": \"{}\",\n".format(lakehouse)
+            wsid_string = "# META       \"default_lakehouse_workspace_id\": \"{}\",\n".format(workspace_id)
+
+
             with open(py_fabric_file, "w", encoding="utf-8") as python_file:
                 python_file.write("# Fabric notebook source\n\n")
                 python_file.write("# METADATA ********************\n\n")
                 python_file.write("# META {\n")
                 python_file.write("# META   \"kernel_info\": {\n")
                 python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
+                python_file.write("# META   },\n")
+                python_file.write("# META   \"dependencies\": {\n")
+                python_file.write("# META     \"lakehouse\": {\n")
+                python_file.write(lhid_string)
+                python_file.write(lh_string)
+                python_file.write(wsid_string)
+                python_file.write("# META     }\n")
                 python_file.write("# META   }\n")
                 python_file.write("# META }\n\n")
                 f = open(Path(notebooks_dir) / Path(filename), "r", encoding="utf-8")
@@ -149,6 +162,15 @@ class FabricAPI:
                 return notebook.id
         return -1
     
+    ##Issue 87 - Added function to check if the hash value of the notebook definition against the value stored in the description
+    def NotebookHashCheck(self, notebooks, displayname, notebookhash):
+        for notebook in notebooks:
+            if notebook.display_name == displayname:
+                if notebookhash in notebook.description:
+                    return 1
+                    break
+        return -1
+    
     def APIUpsertNotebooks(self, progress: ProgressConsoleWrapper, task_id, dbt_project_dir, workspace_id, notebook_name=None):
         progress.progress.update(task_id=task_id, description="Logging in... Make sure you use `az login` to authenticate before running for the first time")
         progress.print("Uploading notebooks via API ...", level=LogLevel.INFO)
@@ -167,16 +189,23 @@ class FabricAPI:
                 notebookcontent = file.read()
                 notebookname = filename[:-3]  # # remove .py
                 notebookcontentBase64 = self.stringToBase64(notebookcontent)
-                notebook_w_content_new = self.GenerateNotebookContent(notebookcontentBase64)  
+                notebook_w_content_new = self.GenerateNotebookContent(notebookcontentBase64) 
+
+                ##Issue 87 - Create a hash value of the notebook contents and compare it to value stored in description
+                notebook_w_content_new_str = json.dumps(notebook_w_content_new)
+                notebookhashvalue = hashlib.sha256(notebook_w_content_new_str.encode()).hexdigest()
+                notebookhashcheck = self.NotebookHashCheck(servernotebooks, notebookname, notebookhashvalue)
 
                 # notebook_w_content = fc.get_notebook(workspace_id, notebook_name=notebookname)
                 notebookid = self.findnotebookid(servernotebooks, notebookname)
                 if notebookid == -1:
-                    notebook = fc.create_notebook(workspace_id, definition=notebook_w_content_new, display_name=notebookname)
+                    notebook = fc.create_notebook(workspace_id, definition=notebook_w_content_new, display_name=notebookname, description="Notebook Hash:" + notebookhashvalue)
                     progress.progress.update(task_id=task_id, description="Notebook created " + notebookname)
-                else: 
-                    notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
-                    progress.progress.update(task_id=task_id, description="Notebook updated " + notebookname)                    
+                else:
+                    if notebookhashcheck == -1:
+                        notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
+                        notebook3 = fc.update_item(workspace_id, notebookid, display_name=notebookname, description="Notebook Hash:" + notebookhashvalue)
+                        progress.progress.update(task_id=task_id, description="Notebook updated " + notebookname)
         progress.progress.update(task_id=task_id, description="Completed uploading notebooks via API")
 
     def GetNotebookIdByName(self, workspace_id, notebook_name):
