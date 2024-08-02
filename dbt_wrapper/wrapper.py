@@ -90,7 +90,7 @@ class Commands:
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
         self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'])
 
-    def BuildDbtProject(self, PreInstall=False, select=""):
+    def BuildDbtProject(self, PreInstall=False, select="", exclude=""):
         print(Panel.fit("[blue]<<<<<<<<<<<<<<<<<<<<<<< Start of dbt build[/blue]"))
         # Check if PreInstall is True
         if (PreInstall is True):
@@ -114,12 +114,23 @@ class Commands:
                 if (len(select.strip()) > 0):
                     Buildarr.append('--select')
                     Buildarr.append(select)
+                if (len(exclude.strip()) > 0):
+                    Buildarr.append('--exclude')
+                    Buildarr.append(exclude)
 
                 foo.run_dbt(Buildarr)
 
             else:
-                # Call dbt build                
-                result = subprocess.run(["dbt", "build"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # Call dbt build     
+                Buildarr = ['dbt', 'build']
+                if (len(select.strip()) > 0):
+                    Buildarr.append('--select')
+                    Buildarr.append(select)
+                if (len(exclude.strip()) > 0):
+                    Buildarr.append('--exclude')
+                    Buildarr.append(exclude)
+
+                result = subprocess.run(Buildarr, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 # Access the output and error
                 output = result.stdout.decode('utf-8')
                 error = result.stderr.decode('utf-8')

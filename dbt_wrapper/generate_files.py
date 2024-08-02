@@ -32,7 +32,11 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             notebook_file['name'] = file
             notebook_file['sort_order'] = matching_node.sort_order
             notebook_files.append(notebook_file)
-
+   
+    if len(notebook_files) == 0:
+        print("No notebooks found.Try checking your model configs and model specification args")
+        exit(1)
+    
     # Find the minimum and maximum sort_order
     min_sort_order = min(file['sort_order'] for file in notebook_files)
     max_sort_order = max(file['sort_order'] for file in notebook_files)
