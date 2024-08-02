@@ -59,14 +59,8 @@ class Commands:
         #self.workspaceid = self.config['workspaceid']
        
     def PrintFirstTimeRunningMessage(self):
-        print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
-        print(f"1. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/upload.ps1")
-        print("2. Login to the Fabric Portal and navigate to the workspace and lakehouse you are using")
-        print(f"3. Manually upload the following notebook to your workspace: {os.environ['DBT_PROJECT_DIR']}/target/notebooks/import_{os.environ['DBT_PROJECT_DIR']}_notebook.ipynb. See https://learn.microsoft.com/en-us/fabric/data-engineering/how-to-use-notebook#import-existing-notebooks")
-        print("4. Open the notebook in the workspace and run all cells. This will upload the generated notebooks to your workspace.")
-        print(f"5. A new notebook should appear in the workspace called metadata_{os.environ['DBT_PROJECT_DIR']}_extract.ipynb. Open this notebook and run all cells. This will generate the metadata extract json files in the metaextracts directory.")
-        print(f"6. Run ./{os.environ['DBT_PROJECT_DIR']}/target/pwsh/download.ps1. This will download the metadata extract json files to the metaextracts directory.")
-        print("7. Re-run this script to generate the model and master notebooks.")
+        print('\033[1;33;48m', "Error!")
+        print(f"Directory ./{os.environ['DBT_PROJECT_DIR']}/metaextracts/ does not exist and should have been created automatically.")
 
     def GeneratePreDbtScripts(self, PreInstall, progress: ProgressConsoleWrapper, task_id):        
         gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
@@ -96,7 +90,7 @@ class Commands:
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
         self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'])
 
-    def BuildDbtProject(self, PreInstall=False):
+    def BuildDbtProject(self, PreInstall=False, select="", exclude=""):
         print(Panel.fit("[blue]<<<<<<<<<<<<<<<<<<<<<<< Start of dbt build[/blue]"))
         # Check if PreInstall is True
         if (PreInstall is True):
@@ -115,12 +109,28 @@ class Commands:
                 spec = importlib.util.spec_from_file_location("util.name", utilpath)
                 foo = importlib.util.module_from_spec(spec)
                 sys.modules["module.name"] = foo
-                spec.loader.exec_module(foo)
-                foo.run_dbt(['build'])
-                
+                spec.loader.exec_module(foo)              
+                Buildarr = ['build']
+                if (len(select.strip()) > 0):
+                    Buildarr.append('--select')
+                    Buildarr.append(select)
+                if (len(exclude.strip()) > 0):
+                    Buildarr.append('--exclude')
+                    Buildarr.append(exclude)
+
+                foo.run_dbt(Buildarr)
+
             else:
-                # Call dbt build                
-                result = subprocess.run(["dbt", "build"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # Call dbt build     
+                Buildarr = ['dbt', 'build']
+                if (len(select.strip()) > 0):
+                    Buildarr.append('--select')
+                    Buildarr.append(select)
+                if (len(exclude.strip()) > 0):
+                    Buildarr.append('--exclude')
+                    Buildarr.append(exclude)
+
+                result = subprocess.run(Buildarr, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 # Access the output and error
                 output = result.stdout.decode('utf-8')
                 error = result.stderr.decode('utf-8')
