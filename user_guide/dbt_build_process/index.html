@@ -877,18 +877,15 @@
 <p>For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:</p>
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-no-upload-notebooks-via-api</span>  
 </code></pre></div>
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, you can run the run-all-local command to run all stages except for those that require a live Fabric connection. This is useful when you are testing the build process locally. To run this command you can use the command below:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all-local</span> <span class="n">my_project</span>
-</code></pre></div>
-<p>Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. </p>
+Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. </p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>you can change the int value to anything you want as long as it's not larger than 7 days in seconds</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-notebook-timeout</span><span class="p">=</span><span class="n">2100</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-notebook-timeout</span><span class="p">=</span><span class="n">2100</span>
 </code></pre></div>
 <p>Review all of the commands available to you by running using the help option as shown below:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">dbt_wrapper</span> <span class="p">-</span><span class="n">-help</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">dbt_wrapper</span> <span class="p">-</span><span class="n">-help</span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
