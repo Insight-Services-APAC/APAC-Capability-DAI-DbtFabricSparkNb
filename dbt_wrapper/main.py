@@ -6,6 +6,7 @@ from rich.theme import Theme
 from dbt_wrapper.wrapper import Commands
 from rich import print
 from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.hashcheck_levels import HashCheckLevel
 from dbt_wrapper.stage_executor import stage_executor
 
 app = typer.Typer(no_args_is_help=True)
@@ -21,14 +22,20 @@ _log_level: LogLevel = None
 if (_log_level is None):
     _log_level = LogLevel.WARNING
 
+#JM issues61 adding _hashcheck_level
+_hashcheck_level: HashCheckLevel = None
+if (_hashcheck_level is None):
+    _hashcheck_level = HashCheckLevel.BYPASS
 
 def docs_options():
     return ["generate", "serve"]
 
-
 def log_levels():
     return ["DEBUG", "INFO", "WARNING", "ERROR"]
 
+#JM issues61 adding _hashcheck_level
+def hashcheck_levels():
+    return ["BYPASS", "WARNING", "ERROR"]
 
 @app.command()
 def docs():
@@ -112,6 +119,13 @@ def run_all(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
     ] = "WARNING",
+    #JM issues61 adding _hashcheck_level
+    hashcheck_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the hash check level. This controls the verbosity of the output. Allowed values are `BYPASS`, `WARNING`, `ERROR`. Default is `BYPASS`.",
+        ),
+    ] = "BYPASS",
     notebook_timeout: Annotated[
         int,
         typer.Option(
@@ -138,6 +152,9 @@ def run_all(
     """    
     
     _log_level: LogLevel = LogLevel.from_string(log_level)    
+    #JM issues61 adding _hashcheck_level
+    _hashcheck_level: HashCheckLevel = HashCheckLevel.from_string(hashcheck_level)
+
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
     se.perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
@@ -155,8 +172,9 @@ def run_all(
     if (build_dbt_project):
         wrapper_commands.BuildDbtProject(PreInstall=pre_install, select=select, exclude=exclude)
 
+#JM issues61 adding _hashcheck_level
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, **kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, notebook_hashcheck==_hashcheck_level **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
