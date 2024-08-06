@@ -11,7 +11,7 @@ class HashCheckLevel:
             "WARNING": HashCheckLevel.WARNING,
             "ERROR": HashCheckLevel.ERROR
         }
-        return level_mapping.get(str(level_str).upper(), None)
+        return hashcheck_mapping.get(str(level_str).upper(), None)
 
     @staticmethod
     def to_string(level):
