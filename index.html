@@ -407,9 +407,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#unsupported-features" class="md-nav__link">
+  <a href="#limitations-and-best-practices" class="md-nav__link">
     <span class="md-ellipsis">
-      Unsupported features
+      Limitations and best practices
     </span>
   </a>
   
@@ -944,9 +944,15 @@
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Opensource and free to use</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Extensible and customisable</li>
 </ul>
-<h2 id="unsupported-features">Unsupported features<a class="headerlink" href="#unsupported-features" title="Permanent link">&para;</a></h2>
-<p>Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.</p>
+<h2 id="limitations-and-best-practices">Limitations and best practices<a class="headerlink" href="#limitations-and-best-practices" title="Permanent link">&para;</a></h2>
+<ul>
+<li><em>Limitation on Schema supported lakehouse</em>: Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.</li>
+</ul>
 <p><img alt="alt text" src="assets/images/unsupported.png" /></p>
+<ul>
+<li><em>Unique Tables Across Lakehouses</em>:  It is recommended to use unique table names across multiple lakehouses. This is because the current dbt framework’s schema template does not support duplicate table names.</li>
+<li><em>Column Naming Conventions</em>: Avoid using special characters such as <em>#</em> and <em>%</em> in column names within your models.</li>
+</ul>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
 <ul>
