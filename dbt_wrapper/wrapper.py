@@ -27,8 +27,10 @@ class Commands:
         self.workspaceid = None
         self.project_root = None
         self.fa = fa(console=self.console)
+        self.next_env = None
+        self.next_env_name = None
     
-    def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None):
+    def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None):
         if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
             self.console.print(
                 "Warning: :file_folder: The dbt_project_dir provided is nested and not a valid dbt project directory in windows. Copying the dbt_project_dir to the samples_tests directory.",
@@ -57,6 +59,11 @@ class Commands:
         self.lakehouse = self.target_info['lakehouse']
         self.project_name = self.config['name']
         #self.workspaceid = self.config['workspaceid']
+
+        if target_env is not None:
+            self.next_env = self.profile_info['outputs'][target_env]
+            self.next_env_name = target_env
+
        
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "It seems like this is the first time you are running this project. Please update the metadata extract json files in the metaextracts directory by performing the following steps:")
@@ -70,7 +77,6 @@ class Commands:
 
     def GeneratePreDbtScripts(self, PreInstall, progress: ProgressConsoleWrapper, task_id):        
         gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
-        gf.GenerateCompareNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.target_info['nextenv_workspaceid'], self.target_info['nextenv_lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
         gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
         
         gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], progress=progress, task_id=task_id)
@@ -160,18 +166,29 @@ class Commands:
 
     def RunBuildMetadataNotebook_Target(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"util_BuildMetadata"
-        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['nextenv_workspaceid'], notebook_name=nb_name)
+        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.next_env['workspaceid'], notebook_name=nb_name)
 
     def RunCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"util_Compare"
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
 
     def GenerateMissingObjectsNotebook(self, progress: ProgressConsoleWrapper, task_id):        
-        gf.GenerateMissingObjectsNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+        gf.GenerateMissingObjectsNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, sourceenv=self.profile_info['target'], targetenv=self.target_info['next_env_name'])
+
+    def GenerateCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):
+        gf.GenerateCompareNotebook(self.dbt_project_dir, self.profile_info['target'], self.target_info['workspaceid'], self.target_info['lakehouseid'], self.next_env_name, self.next_env['workspaceid'], self.next_env['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+
+    def UploadMissingObjectsNotebookViaApi(self, progress: ProgressConsoleWrapper, task_id):
+        curr_dir = os.getcwd()
+        dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
+        file_name = f"missing_objects_{self.config['name']}_notebook_{self.profile_info['target']}_to_{self.next_env_name}"
+        print(f"\n\nUploading file: {file_name}")
+        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=file_name)
 
     def UploadCompareNotebookViaApi(self, progress: ProgressConsoleWrapper, task_id):
         curr_dir = os.getcwd()
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
-        file_name = f"missing_objects_{self.config['name']}_notebook"
-        print(f"\n\nUploading file: {file_name}")
-        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['nextenv_workspaceid'], notebook_name=file_name)
+        file_name = f"compare_{self.config['name']}_{self.profile_info['target']}_to_{self.next_env_name}_notebook"
+        print(f"\n\nUploading file: {file_name}, folder: {dbt_project_dir}")
+        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=file_name)
+

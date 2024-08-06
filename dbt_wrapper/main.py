@@ -47,22 +47,40 @@ def buildcomparemetadata(
             help="The path to the dbt_project directory. If left blank it will use the current directory"
         ),
     ],
+    source: Annotated[
+        str,
+        typer.Argument(
+            help="Source environment name from profile.yml"
+        ),
+    ],
+    target: Annotated[
+        str,
+        typer.Argument(
+            help="Target environment name from profile.yml"
+        ),
+    ],
     dbt_profiles_dir: Annotated[
         str,
         typer.Argument(
             help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
         ),
-    ] = None):
+    ] = None
+    ):
     """
-    This command will generate compare two environments lakehouses.
+    This command will compare two environments lakehouses.
     """
     log_level = "WARNING"
 
     _log_level: LogLevel = LogLevel.from_string(log_level)    
-    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir, source_env=source, target_env=target)
+
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
-    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name="Run Build Metadata Notebook (Source)")
-    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name="Run Build Metadata Notebook (Target)")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateCompareNotebook], stage_name="GenerateCompareNotebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook")
+    # se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name="Run Build Metadata Notebook (Source)")
+    # se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name="Run Build Metadata Notebook (Target)")
+
 
     print(f"Goodbye")
 
@@ -73,6 +91,18 @@ def compare(
         str,
         typer.Argument(
             help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    source: Annotated[
+        str,
+        typer.Argument(
+            help="Source environment name from profile.yml"
+        ),
+    ],
+    target: Annotated[
+        str,
+        typer.Argument(
+            help="Target environment name from profile.yml"
         ),
     ],
     dbt_profiles_dir: Annotated[
@@ -95,11 +125,11 @@ def compare(
     # # #download the metadata
     # se.perform_stage(option=True, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
 
-    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateMissingObjectsNotebook], stage_name="Generate Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateMissingObjectsNotebook], stage_name="Generate Missing Objects Notebook")
 
     se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
 
-    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook to Target Workspace")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadMissingObjectsNotebookViaApi], stage_name="Upload Missing Objects Notebook to Target Workspace")
 
     print(f"Goodbye")
 

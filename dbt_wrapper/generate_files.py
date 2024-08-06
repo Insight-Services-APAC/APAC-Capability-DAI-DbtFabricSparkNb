@@ -14,6 +14,7 @@ from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
+
 @staticmethod
 def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     # Iterate through the notebooks directory and create a list of notebook files
@@ -144,7 +145,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
 
-def GenerateCompareNotebook(project_root, workspaceid, lakehouseid, target_workspaceid, target_lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, target_env, target_workspaceid, target_lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -156,13 +157,13 @@ def GenerateCompareNotebook(project_root, workspaceid, lakehouseid, target_works
     template = env.get_template('compare_notebook.ipynb')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid)
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid, source_env=source_env, target_env=target_env)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
     # Write the notebook to a file    
-    target_file_name = f'compare_{project_name}_notebook.ipynb'
+    target_file_name = f'compare_{project_name}_{source_env}_to_{target_env}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
@@ -173,7 +174,7 @@ def GenerateCompareNotebook(project_root, workspaceid, lakehouseid, target_works
             raise ex
         
 
-def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, source_env, target_env):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -181,8 +182,10 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
 
-    # Load the template
-    template = env.get_template('missing_objects_notebook.ipynb')
+    #create new notebook variables
+    nb = nbf.v4.new_notebook()
+    cells = []
+
 
     with io.open(project_root + '/metaextracts/metadata_missingtables.json', 'r') as file:
         # Load JSON data from file
@@ -190,22 +193,33 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
     uniqueTables  = list({item['tableName'] for item in data})
 
+    desc = "# New Tables"
+    desc = desc + "\n\n### Some description here"
+    cell = nbf.v4.new_markdown_cell(desc)
+    cells.append(cell)
+
 
     ##create the CREATE statements for new tables
     create_statements = """"""
 
     for tbl in uniqueTables:
+
         print(f"table name is: {tbl}-----")
-        create_statements =  create_statements + f"#----- CREATE TABLE {tbl} ---------\\n\\n" 
-        create_statements =  create_statements + f"spark.sql('''\\nCREATE TABLE {tbl} ("
+
+        cell = nbf.v4.new_markdown_cell(f"----- CREATE TABLE {tbl} ---------")
+        cells.append(cell)
+       
+        create_statements =  f"%%sql\n\n CREATE TABLE {tbl} (\n"
 
         filtered = [x for x in data if x['tableName'] == tbl]
-                
-                
+                             
         for r in filtered:
-            create_statements = create_statements + f"\\r\\t {r['col_name']} {r['data_type']},"
+            create_statements = create_statements + f"\r\t {r['col_name']} {r['data_type']},"
 
-        create_statements =  create_statements.rstrip(',') + "\\n)\\n''')\\n\\n"
+        create_statements =  create_statements.rstrip(',') + "\n)"
+
+        cell = nbf.v4.new_code_cell(create_statements)
+        cells.append(cell)
 
     #create_statements = str(create_statements)
 
@@ -217,27 +231,30 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
     uniqueTables  = list({item['tableName'] for item in data})
  
-  
+    cell = nbf.v4.new_markdown_cell("# Altered Tables")
+    cells.append(cell)  
+
     alter_statements = """"""
 
     for tbl in uniqueTables:
-        print(f"tabkle name is: {tbl}-----")
-        alter_statements =  alter_statements + f"#----- ALTER TABLE {tbl} ---------\\n\\n" 
+        print(f"table name is: {tbl}-----")
+        cell = nbf.v4.new_markdown_cell(f"----- ALTER TABLE {tbl} ---------")
+        cells.append(cell)
         
         filtered = [x for x in data if x['tableName'] == tbl]                
                 
         for r in filtered:
-            alter_statements =  alter_statements + f"spark.sql('''\\nALTER TABLE {tbl} \\n"
-            alter_statements = alter_statements + f"\\t ADD COLUMN {r['col_name']} {r['data_type']} \\n''')\\n\\n"
+            alter_statements =  f"%%sql\n\nALTER TABLE {tbl} (\n"
+            alter_statements = alter_statements + f"\t ADD COLUMN {r['col_name']} {r['data_type']} \n)\n\n"
 
-    # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, create_statements=create_statements, alter_statements=alter_statements)
+            cell = nbf.v4.new_code_cell(alter_statements)
+            cells.append(cell)
 
-    # Parse the rendered template as a notebook
-    nb = nbf.reads(rendered_template, as_version=4)
+    nb['cells'] = cells
 
     # Write the notebook to a file    
-    target_file_name = f'missing_objects_{project_name}_notebook.ipynb'
+    #target_file_name = f'missing_objects_{project_name}_notebook.ipynb'
+    target_file_name = f"missing_objects_{project_name}_notebook_{source_env}_to_{target_env}.ipynb"
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
