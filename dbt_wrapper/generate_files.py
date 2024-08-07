@@ -12,6 +12,7 @@ from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from dbt.clients.system import load_file_contents
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
+from datetime import datetime
 
 
 
@@ -144,6 +145,36 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
         except Exception as ex:
             progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
+        
+def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    # Define the directory containing the Jinja templates
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('util_BuildMetadata.ipynb')
+
+    createddate = datetime.now()
+
+    # Render the template with the notebook_file variable
+    rendered_template = template.render(lakehouse_name=lakehouse_name, createddate=createddate)
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
+
+    # Write the notebook to a file    
+    target_file_name = f'util_BuildMetadata.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)            
+        except Exception as ex:
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
+            raise ex
 
 def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, target_env, target_workspaceid, target_lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
@@ -156,8 +187,10 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
     # Load the template
     template = env.get_template('compare_notebook.ipynb')
 
+    createddate = datetime.now()
+
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid, source_env=source_env, target_env=target_env)
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid, source_env=source_env, target_env=target_env, createddate=createddate)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -180,20 +213,24 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
-    env = Environment(loader=FileSystemLoader(template_dir))
+    #env = Environment(loader=FileSystemLoader(template_dir))
+
+    createddate = datetime.now()
 
     #create new notebook variables
     nb = nbf.v4.new_notebook()
     cells = []
 
+    cell = nbf.v4.new_markdown_cell(f"Created at: {createddate}")
+    cells.append(cell)
 
-    with io.open(project_root + '/metaextracts/metadata_missingtables.json', 'r') as file:
+    with io.open(project_root + f'/metaextracts/metadata_missingtables_{source_env}_to_{target_env}.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
 
     uniqueTables  = list({item['tableName'] for item in data})
 
-    desc = "# New Tables"
+    desc = f"# New Tables that exists in `{source_env}` but not in `{target_env}`"
     desc = desc + "\n\n### Some description here"
     cell = nbf.v4.new_markdown_cell(desc)
     cells.append(cell)
@@ -225,13 +262,13 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
 
     ##create the ALTER statements for new tables
-    with io.open(project_root + '/metaextracts/metadata_missingtable_columns.json', 'r') as file:
+    with io.open(project_root + f'/metaextracts/metadata_missingtable_columns_{source_env}_to_{target_env}.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
 
     uniqueTables  = list({item['tableName'] for item in data})
  
-    cell = nbf.v4.new_markdown_cell("# Altered Tables")
+    cell = nbf.v4.new_markdown_cell(f"# New columns that exists in `{source_env}` but not in `{target_env}`")
     cells.append(cell)  
 
     alter_statements = """"""

@@ -67,7 +67,7 @@ def buildcomparemetadata(
     ] = None
     ):
     """
-    This command will compare two environments lakehouses.
+    This command will execute the 'build metadata' notebooks in the two specified environments.
     """
     log_level = "WARNING"
 
@@ -75,11 +75,8 @@ def buildcomparemetadata(
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir, source_env=source, target_env=target)
 
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
-    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateCompareNotebook], stage_name="GenerateCompareNotebook")
-    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
-    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook")
-    # se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name="Run Build Metadata Notebook (Source)")
-    # se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name="Run Build Metadata Notebook (Target)")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name=f"Run Build Metadata Notebook (Source: {source})")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name=f"Run Build Metadata Notebook (Target: {target})")
 
 
     print(f"Goodbye")
@@ -112,24 +109,30 @@ def compare(
         ),
     ] = None):
     """
-    This command will generate compare two environments lakehouses.
+    This command will generate compare two environments lakehouses. Generated notebooks will be uploaed to the 'target' 
+    environment configured in the 'profile.yml' file.
     """
     log_level = "WARNING"
 
     _log_level: LogLevel = LogLevel.from_string(log_level)    
-    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir, source_env=source, target_env=target)
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
 
-    # se.perform_stage(option=True, action_callables=[wrapper_commands.RunCompareNotebook], stage_name="Run Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateCompareNotebook], stage_name="Generate Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunCompareNotebook], stage_name="Run Compare Notebook")
 
-    # # #download the metadata
-    # se.perform_stage(option=True, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+
+    # #download the metadata
+    se.perform_stage(option=True, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
 
     se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateMissingObjectsNotebook], stage_name="Generate Missing Objects Notebook")
-
     se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
-
     se.perform_stage(option=True, action_callables=[wrapper_commands.UploadMissingObjectsNotebookViaApi], stage_name="Upload Missing Objects Notebook to Target Workspace")
+
+
+
 
     print(f"Goodbye")
 
