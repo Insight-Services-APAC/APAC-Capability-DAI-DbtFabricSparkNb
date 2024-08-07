@@ -132,6 +132,13 @@ def run_all(
             help="Use this option to provide a dbt resource exclude syntax.Default is ``",
         ),
     ] = ""
+    ,
+    log_lakehouse: Annotated[
+        str,
+        typer.Option(
+            help="Use this option to specify a lakehouse to save logging too.",
+        ),
+    ] = ""
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
@@ -156,7 +163,7 @@ def run_all(
         wrapper_commands.BuildDbtProject(PreInstall=pre_install, select=select, exclude=exclude)
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, **kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
