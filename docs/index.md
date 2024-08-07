@@ -26,10 +26,13 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 - [x] Opensource and free to use
 - [x] Extensible and customisable
 
-## Unsupported features
-Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.
+## Limitations and best practices
+- *Limitation on Schema supported lakehouse*: Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.
 
 ![alt text](./assets/images/unsupported.png)
+
+- *Unique Tables Across Lakehouses*:  It is recommended to use unique table names across multiple lakehouses. This is because the current dbt framework’s schema template does not support duplicate table names.
+- *Column Naming Conventions*: Avoid using special characters such as *#* and *%* in column names within your models.
 
 ## Getting Started
 
