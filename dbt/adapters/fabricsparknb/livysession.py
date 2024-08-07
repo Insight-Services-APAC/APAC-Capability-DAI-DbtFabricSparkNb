@@ -251,9 +251,14 @@ class LivySession:
         else:
             json_string = re.search(r'/\* (.*) \*/', sql).group(1)
 
+        #print(json_string)
+
         # Parse the JSON
         data = json.loads(json_string)
 
+        print(data)
+        exit(1)
+        
         # Extract the node_id
         node_id = data['node_id']
 
