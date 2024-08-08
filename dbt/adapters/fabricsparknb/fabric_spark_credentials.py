@@ -9,6 +9,7 @@ class SparkCredentials(Credentials):
     method: str = "livy"
     workspaceid: str = None
     database: Optional[str] = None
+    log_lakehouse: Optional[str] = None
     lakehouse: str = None
     lakehouseid: str = None  # type: ignore    
     endpoint: Optional[str] = "https://msitapi.fabric.microsoft.com/v1"
