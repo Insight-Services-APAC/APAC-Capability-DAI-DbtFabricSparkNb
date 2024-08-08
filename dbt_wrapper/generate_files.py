@@ -42,8 +42,8 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     max_sort_order = max(file['sort_order'] for file in notebook_files)
 
     # Validate and set max worker (thread) property 
-    lr_max_worker = 5
-    hr_max_worker = 20
+    lr_max_worker = 5 # Default value (low Range)
+    hr_max_worker = 20 # High range value
 
     match max_worker:
         case _ if max_worker < lr_max_worker:
