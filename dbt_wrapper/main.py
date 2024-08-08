@@ -67,7 +67,7 @@ def buildcomparemetadata(
     ] = None
     ):
     """
-    This command will execute the 'build metadata' notebooks in the two specified environments.
+    This command will execute the 'build metadata' notebooks in the two specified environments within Fabric. This notebook will create a `comparemetadata` table in their respective environment that will store the Lakehouse schema information.
     """
     log_level = "WARNING"
 
@@ -109,8 +109,9 @@ def compare(
         ),
     ] = None):
     """
-    This command will generate compare two environments lakehouses. Generated notebooks will be uploaed to the 'target' 
-    environment configured in the 'profile.yml' file.
+    This command will compare two environments Lakehouse's. Generated notebooks will be uploaded to the 'target' 
+    environment configured in the 'profile.yml' file which will contain the sql commands that can be used to 
+    create and alter tables, from one environment to the next.
     """
     log_level = "WARNING"
 
