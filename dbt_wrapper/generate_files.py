@@ -43,7 +43,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Validate and set max worker (thread) property 
     lr_max_worker = 5 # Default value (low Range)
-    hr_max_worker = 20 # High range value
+    hr_max_worker = 20
 
     match max_worker:
         case _ if max_worker < lr_max_worker:
