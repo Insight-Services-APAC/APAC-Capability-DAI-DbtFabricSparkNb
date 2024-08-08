@@ -138,7 +138,7 @@ def run_all(
         typer.Option(
             help="Use this option to specify a lakehouse to save logging too.",
         ),
-    ] = ""
+    ] = None
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
