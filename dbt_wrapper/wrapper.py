@@ -9,6 +9,7 @@ import subprocess
 import dbt_wrapper.utils as mn
 import dbt_wrapper.generate_files as gf
 from dbt_wrapper.fabric_api import FabricAPI as fa
+import dbt_wrapper.fabric_sql as fas
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
@@ -55,6 +56,7 @@ class Commands:
         self.profile_info = self.profile[self.config['profile']]
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
+        self.sql_endpoint = self.target_info['sql_endpoint']
         self.project_name = self.config['name']
         #self.workspaceid = self.config['workspaceid']
        
@@ -160,3 +162,20 @@ class Commands:
     def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"master_{self.project_name}_notebook"
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+
+    def GetExecutionResults(self, progress: ProgressConsoleWrapper, task_id):
+        sql = f"""
+            Select a.notebook, replace(CONVERT(varchar(20), DATEADD(second, a.start_time, '1970/01/01 00:00:00'),126), 'T',' ') start_time, status, error
+            from {self.lakehouse}.dbo.execution_log a 
+            join 
+            (
+            Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
+            from {self.lakehouse}.dbo.execution_log  
+            group by batch_id 
+            order by start_time desc
+            ) b on a.batch_id = b.batch_id
+            where a.status = 'error'
+        """
+        _fas = fas.FabricApiSql(console=self.console, server=self.sql_endpoint, database=self.lakehouse)
+        _fas.ExecuteSQL(sql=sql, progress=progress, task_id=task_id)
+
