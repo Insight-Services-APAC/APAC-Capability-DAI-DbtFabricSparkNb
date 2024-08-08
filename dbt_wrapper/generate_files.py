@@ -16,7 +16,7 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 @staticmethod
 def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse):
-    # If log lakehouse is none use lakehouse as default
+    # If log lakehouse is None use lakehouse as default
     if log_lakehouse is None:
         log_lakehouse = lakehouse_name
     
