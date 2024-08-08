@@ -70,7 +70,7 @@ class Commands:
     
     def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None, notebook_timeout=None, log_lakehouse=None): 
         gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id)
-        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout,max_worker = self.target_info['threads'], log_lakehouse=log_lakehouse)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout,max_worker = self.target_info['threads'], log_lakehouse=self.target_info['log_lakehouse'])
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None):
         curr_dir = os.getcwd()
