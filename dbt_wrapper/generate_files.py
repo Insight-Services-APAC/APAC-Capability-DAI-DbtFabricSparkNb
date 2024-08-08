@@ -42,15 +42,23 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     max_sort_order = max(file['sort_order'] for file in notebook_files)
 
     # Validate and set max worker (thread) property 
+    lr_max_worker = 5
+    hr_max_worker = 20
+
     match max_worker:
-        case _ if max_worker < 5:
-            max_worker = 5
-            progress.print("Max worker property (thread) is lesser than 5, default thread value 5 has been set.", LogLevel.WARNING)
-        case _ if max_worker > 19:
-            progress.print("Max worker property (thread) is high !!\nPlease update thread property in profile.yml, if this is not expected.", LogLevel.WARNING)
+        case _ if max_worker < lr_max_worker:
+            max_worker = lr_max_worker
+            msg_text = "Max worker (thread) property is lesser than the default value, default thread value of "+str(lr_max_worker)+" has been set."
+            progress.print(msg_text, LogLevel.WARNING)
+        case _ if max_worker >= lr_max_worker and max_worker < hr_max_worker:
+            pass
+        case _ if max_worker >= hr_max_worker:
+            msg_text = "Max worker (thread) property is high !!\nPlease update thread property in profile.yml, if this is not expected."
+            progress.print(msg_text, LogLevel.WARNING)
         case _:
-            max_worker = 5
-            progress.print("Max worker property (thread) value is not set, default thread value 5 has been set.", LogLevel.WARNING)
+           max_worker = lr_max_worker
+           msg_text = "Max worker (thread) property value is not set, default thread value of "+str(lr_max_worker)+" has been set."
+           progress.print(msg_text, LogLevel.WARNING)
 
     # Loop from min_sort_order to max_sort_order
     for sort_order in range(min_sort_order, max_sort_order + 1):
