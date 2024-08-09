@@ -42,6 +42,16 @@ The command above will carry out all of the necessary "stages" required to fully
 ![alt text](./../assets/images/dbt_wrapper_run_all.png)
 
 
+!!!Tip
+    - You can view the execution results of the master notebook directly in the console. To enable this, manually add the `sql_endpoint` of your default lakehouse in your `profile.yml`. (You can find the `sql_endpoint` value in your SQL connection string from the Fabric lakehouse.) 
+    - Additionally, ensure that version 18 of the SQL Server driver is installed on your machine. Refer - [ODBC Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/microsoft-odbc-driver-for-sql-server?view=sql-server-ver16) 
+
+    ![alt text](./../assets/images/sql_endpoint_profile.png)
+    
+    Here is the sample scheenshot of the execution results of the master notebook directly in the console
+    ![alt text](./../assets/images/console_output.png)
+
+
 ## Toggling Build Stages Off and On 
 
 There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the `dbt_wrapper` application. To view all of the options available to you run the command below:
