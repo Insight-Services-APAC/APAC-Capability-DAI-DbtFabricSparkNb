@@ -190,7 +190,10 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
     createddate = datetime.now()
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid, source_env=source_env, target_env=target_env, createddate=createddate)
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root
+                                        , lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid
+                                        , source_env=source_env, target_env=target_env, createddate=createddate
+                                        ,project_name=project_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -224,7 +227,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
     cell = nbf.v4.new_markdown_cell(f"Created at: {createddate}")
     cells.append(cell)
 
-    with io.open(project_root + f'/metaextracts/metadata_missingtables_{source_env}_to_{target_env}.json', 'r') as file:
+    with io.open(project_root + f'/metaextracts/metadata_missingtables_{project_name}_{source_env}_to_{target_env}.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
 
@@ -262,7 +265,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
 
     ##create the ALTER statements for new tables
-    with io.open(project_root + f'/metaextracts/metadata_missingtable_columns_{source_env}_to_{target_env}.json', 'r') as file:
+    with io.open(project_root + f'/metaextracts/metadata_missingtable_{project_name}_columns_{source_env}_to_{target_env}.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
 
