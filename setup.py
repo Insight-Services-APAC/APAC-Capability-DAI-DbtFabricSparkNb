@@ -82,7 +82,8 @@ setup(
         "typer>=0.12.3",
         "setuptools>=72.1.0",
         "azure-storage-file-datalake",
-        "pip-system-certs"
+        "pip-system-certs",
+        "pyodbc"
        
    ],
     zip_safe=False,
