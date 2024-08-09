@@ -53,7 +53,7 @@ class ModelNotebook:
         # Concatenate all the SQL cells in the notebook
         self.sql = []
         for cell in self.GetSparkSqlCells():
-            self.sql.append(cell.source.replace("%%sql", ""))
+            self.sql.append(cell.source.replace("%%sql", "").lower())
 
     def SetTheSqlVariable(self):
         # Find the first code cell and set the sql variable
@@ -74,6 +74,8 @@ class ModelNotebook:
         for i, cell in enumerate(self.nb.cells):
             if cell.cell_type == 'markdown' and "# SPARK SQL Cells for Debugging" in cell.source:
                 spark_sql_cells = self.nb.cells[(i + 1):len(self.nb.cells)]
+            if cell.cell_type == 'code' and "%%sql" in cell.source:
+                cell.source = cell.source.lower()
 
         return spark_sql_cells
 
