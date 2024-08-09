@@ -15,7 +15,7 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck):
     # If log lakehouse is None use lakehouse as default
     if log_lakehouse is None:
         log_lakehouse = lakehouse_name
@@ -46,15 +46,23 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     max_sort_order = max(file['sort_order'] for file in notebook_files)
 
     # Validate and set max worker (thread) property 
+    lr_max_worker = 5 # Default value (low Range)
+    hr_max_worker = 20
+
     match max_worker:
-        case _ if max_worker < 5:
-            max_worker = 5
-            progress.print("Max worker property (thread) is lesser than 5, default thread value 5 has been set.", LogLevel.WARNING)
-        case _ if max_worker > 19:
-            progress.print("Max worker property (thread) is high !!\nPlease update thread property in profile.yml, if this is not expected.", LogLevel.WARNING)
+        case _ if max_worker < lr_max_worker:
+            max_worker = lr_max_worker
+            msg_text = "Max worker (thread) property is lesser than the default value, default thread value of "+str(lr_max_worker)+" has been set."
+            progress.print(msg_text, LogLevel.WARNING)
+        case _ if max_worker >= lr_max_worker and max_worker < hr_max_worker:
+            pass
+        case _ if max_worker >= hr_max_worker:
+            msg_text = "Max worker (thread) property is high !!\nPlease update thread property in profile.yml, if this is not expected."
+            progress.print(msg_text, LogLevel.WARNING)
         case _:
-            max_worker = 5
-            progress.print("Max worker property (thread) value is not set, default thread value 5 has been set.", LogLevel.WARNING)
+           max_worker = lr_max_worker
+           msg_text = "Max worker (thread) property value is not set, default thread value of "+str(lr_max_worker)+" has been set."
+           progress.print(msg_text, LogLevel.WARNING)
 
     # Loop from min_sort_order to max_sort_order
     for sort_order in range(min_sort_order, max_sort_order + 1):
@@ -100,7 +108,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse,notebook_hashcheck=notebook_hashcheck)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
