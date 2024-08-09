@@ -876,6 +876,16 @@
 </code></pre></div>
 <p>The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
 <img alt="notebooks" src="../../assets/images/dbt_wrapper_output.png" /></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<ul>
+<li>You can view the execution results of the master notebook directly in the console. To enable this, manually add the <code>sql_endpoint</code> of your default lakehouse in your <code>profile.yml</code>. (You can find the <code>sql_endpoint</code> value in your SQL connection string from the Fabric lakehouse.) </li>
+<li>Additionally, ensure that version 18 of the SQL Server driver is installed on your machine. Refer - <a href="https://learn.microsoft.com/en-us/sql/connect/odbc/microsoft-odbc-driver-for-sql-server?view=sql-server-ver16">ODBC Driver for SQL Server</a> </li>
+</ul>
+<p><img alt="alt text" src="../../assets/images/sql_endpoint_profile.png" /></p>
+<p>Here is the sample scheenshot of the execution results of the master notebook directly in the console
+<img alt="alt text" src="../../assets/images/console_output.png" /></p>
+</div>
 <h2 id="toggling-build-stages-off-and-on">Toggling Build Stages Off and On<a class="headerlink" href="#toggling-build-stages-off-and-on" title="Permanent link">&para;</a></h2>
 <p>There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the dbt_wrapper application. To view all of the options available to you run the command below:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-help</span>
