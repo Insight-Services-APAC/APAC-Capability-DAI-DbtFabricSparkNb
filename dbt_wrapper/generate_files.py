@@ -117,7 +117,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id, master_notebook, gv_log_lakehouse)'
+        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id, master_notebook)'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
