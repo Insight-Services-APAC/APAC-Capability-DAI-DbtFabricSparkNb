@@ -222,7 +222,7 @@ class FabricAPI:
         fc = FabricClientCore(silent=True)
         workspace = fc.get_workspace_by_id(id=workspace_id)
         return workspace.display_name
-
+  
     def APIRunNotebook(self, progress: ProgressConsoleWrapper, task_id, workspace_id, notebook_name):
         fc = FabricClientCore(silent=True)
         workspace = fc.get_workspace_by_id(id=workspace_id)
