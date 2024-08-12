@@ -9,7 +9,7 @@ class SparkCredentials(Credentials):
     method: str = "livy"
     workspaceid: str = None
     database: Optional[str] = None
-    log_lakehouse: str = None
+    log_lakehouse: Optional[str] = None
     lakehouse: str = None
     lakehouseid: str = None  # type: ignore    
     endpoint: Optional[str] = "https://msitapi.fabric.microsoft.com/v1"
@@ -43,8 +43,6 @@ class SparkCredentials(Credentials):
             raise dbt.exceptions.DbtRuntimeError("Must specify `workspace guid` in profile")
         if self.lakehouseid is None:
             raise dbt.exceptions.DbtRuntimeError("Must specify `lakehouse guid` in profile")
-        if self.log_lakehouse is None:
-            raise dbt.exceptions.DbtRuntimeError("Must specify `log lakehouse` in profile")
         if self.schema is None:
             raise dbt.exceptions.DbtRuntimeError("Must specify `schema` in profile")
         if self.database is not None:
