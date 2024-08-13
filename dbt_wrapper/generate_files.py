@@ -12,10 +12,11 @@ from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 from dbt.clients.system import load_file_contents
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
+import fnmatch
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck, lakehouse_config):
     # If log lakehouse is None use lakehouse as default
     if log_lakehouse is None:
         log_lakehouse = lakehouse_name
@@ -86,6 +87,23 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
 
+        # Check if lakehouse_config option is not set to CODE
+        lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+        if lhconfig != "CODE":
+            # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+            index_to_remove = None
+            for i, cell in enumerate(nb.cells):
+                if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                    index_to_remove = i
+                    break
+
+            # Remove the found markdown cell and the next cell
+            if index_to_remove is not None:
+                nb.cells.pop(index_to_remove)
+                if index_to_remove < len(nb.cells):
+                    nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
+
         # Write the notebook to a file
         target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:            
@@ -112,6 +130,23 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
+
+    # Check if lakehouse_config option is not set to CODE
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig != "CODE":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
     # Find Markdown cell contaning # Executions for Each Run Order Below:
     insertion_point = None
@@ -143,7 +178,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -160,6 +195,23 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
+    # Check if lakehouse_config option is not set to CODE
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig != "CODE":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
+
     # Write the notebook to a file    
     target_file_name = f'metadata_{project_name}_extract.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -172,7 +224,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -188,6 +240,23 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
+
+    # Check if lakehouse_config option is not set to CODE
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig != "CODE":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
     
     # Write the notebook to a file    
     target_file_name = f'import_{project_name}_notebook.ipynb'
@@ -236,7 +305,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Prog
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
@@ -258,6 +327,23 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         mnb.SetTheSqlVariable()
         # always set the config in first code cell
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
+
+        # Check if lakehouse_config option is not set to CODE
+        lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+        if lhconfig != "CODE":
+            # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+            index_to_remove = None
+            for i, cell in enumerate(nb.cells):
+                if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                    index_to_remove = i
+                    break
+
+            # Remove the found markdown cell and the next cell
+            if index_to_remove is not None:
+                nb.cells.pop(index_to_remove)
+                if index_to_remove < len(nb.cells):
+                    nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
         # Write the notebook to a file
         target_file_name = notebook_file
