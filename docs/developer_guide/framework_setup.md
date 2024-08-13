@@ -112,6 +112,7 @@ my_project:
       endpoint: dkld #remove
       lakehouse: 'lakehouse' #the name of your lakehouse
       lakehouseid: 'aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9' #the guid of your lakehouse
+      log_lakehouse: 'loglakehouse' #the name of your logging lakehouse, this is not required as lakehouse will be used by default
       method: livy
       schema: dbo #the schema you want to use
       tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' #your power bi tenant id
