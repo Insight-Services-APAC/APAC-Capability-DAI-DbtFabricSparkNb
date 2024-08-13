@@ -168,7 +168,7 @@ def run_all(
 
     action_callables = [
         lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, lakehouse_config=lakehouse_config, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs),
     ]
     se.perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
 
@@ -182,7 +182,7 @@ def run_all(
 #JM issues61 adding _hashcheck_level
     action_callables = [
         lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, notebook_hashcheck=_hashcheck_level, lakehouse_config=lakehouse_config, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 

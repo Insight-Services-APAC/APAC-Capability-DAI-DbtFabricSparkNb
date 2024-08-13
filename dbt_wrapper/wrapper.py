@@ -83,10 +83,10 @@ class Commands:
         gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
         gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout,max_worker = self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
     
-    def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None):
+    def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
         curr_dir = os.getcwd()
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
-        self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], lakehouse_id=self.target_info['lakehouseid'], lakehouse=self.lakehouse)
+        self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], lakehouse_id=self.target_info['lakehouseid'], lakehouse=self.lakehouse, lakehouse_config=lakehouse_config)
     
     def CleanProjectTargetDirectory(self, progress: ProgressConsoleWrapper, task_id):
         if os.path.exists(self.dbt_project_dir + "/target"):
