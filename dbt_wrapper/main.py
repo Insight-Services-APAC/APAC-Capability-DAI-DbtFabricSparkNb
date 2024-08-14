@@ -148,7 +148,7 @@ def run_all(
     ] = ""
     ,
     lakehouse_config: Annotated[
-        str,
+        Optional[str],
         typer.Option(
             help="Use this option to set the default lakehouse in code or metadata. Allowed values are `CODE` or `METADATA`. Default is `METADATA`.",
         ),

@@ -87,10 +87,10 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
 
-        # Check if lakehouse_config option is not set to CODE
+        # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-        if lhconfig != "CODE":
+        if lhconfig == "METADATA":
             # Find the index of the markdown cell containing "THIS IS MARKDOWN"
             index_to_remove = None
             for i, cell in enumerate(nb.cells):
@@ -131,10 +131,10 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
-    # Check if lakehouse_config option is not set to CODE
+    # Check if lakehouse_config option is set to METADATA
     lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-    if lhconfig != "CODE":
+    if lhconfig == "METADATA":
         # Find the index of the markdown cell containing "THIS IS MARKDOWN"
         index_to_remove = None
         for i, cell in enumerate(nb.cells):
@@ -195,10 +195,10 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
-    # Check if lakehouse_config option is not set to CODE
+    # Check if lakehouse_config option is set to METADATA
     lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-    if lhconfig != "CODE":
+    if lhconfig == "METADATA":
         # Find the index of the markdown cell containing "THIS IS MARKDOWN"
         index_to_remove = None
         for i, cell in enumerate(nb.cells):
@@ -241,10 +241,10 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
 
-    # Check if lakehouse_config option is not set to CODE
+    # Check if lakehouse_config option is set to METADATA
     lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-    if lhconfig != "CODE":
+    if lhconfig == "METADATA":
         # Find the index of the markdown cell containing "THIS IS MARKDOWN"
         index_to_remove = None
         for i, cell in enumerate(nb.cells):
@@ -328,10 +328,10 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         # always set the config in first code cell
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
 
-        # Check if lakehouse_config option is not set to CODE
+        # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-        if lhconfig != "CODE":
+        if lhconfig == "METADATA":
             # Find the index of the markdown cell containing "THIS IS MARKDOWN"
             index_to_remove = None
             for i, cell in enumerate(nb.cells):
