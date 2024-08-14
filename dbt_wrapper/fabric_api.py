@@ -63,8 +63,8 @@ class FabricAPI:
                 python_file.write("# META {\n")
                 python_file.write("# META   \"kernel_info\": {\n")
                 python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
-                python_file.write("# META   },\n")
                 if (lakehouse_config == "METADATA"):
+                    python_file.write("# META   },\n")
                     python_file.write("# META   \"dependencies\": {\n")
                     python_file.write("# META     \"lakehouse\": {\n")
                     python_file.write(lhid_string)
