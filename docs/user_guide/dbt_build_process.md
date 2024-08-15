@@ -72,6 +72,11 @@ Alternatively, you might want to make use of some additional "helper" commands t
 ```powershell
 dbt_wrapper run-all my_project --notebook-timeout=2100
 ```
+The default lakehouse is set in the metadata of each notebook that gets created. You can override this and include a cell with the magic command %%configure to set the default lakehouse for the notebooks using this wrapper command when building:
+
+```powershell
+dbt_wrapper run-all my_project --lakehouse-config="CODE"
+```
 
 Review all of the commands available to you by running using the help option as shown below:
 
