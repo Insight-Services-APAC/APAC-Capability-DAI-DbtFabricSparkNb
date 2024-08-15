@@ -15,7 +15,11 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, notebook_hashcheck):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck):
+    # If log lakehouse is None use lakehouse as default
+    if log_lakehouse is None:
+        log_lakehouse = lakehouse_name
+    
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -77,7 +81,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name,max_worker=max_worker)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name,max_worker=max_worker, log_lakehouse=log_lakehouse)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
@@ -104,7 +108,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout,notebook_hashcheck=notebook_hashcheck)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse,notebook_hashcheck=notebook_hashcheck)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -121,7 +125,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id)'
+        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id, master_notebook)'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
