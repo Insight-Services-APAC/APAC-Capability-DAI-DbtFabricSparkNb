@@ -39,15 +39,16 @@ dbt init my_project # Note that the name of the project is arbitrary... call it 
     3. `workspaceid (GUID of the workspace. Open the workspace from fabric.microsoft.com and copy the workspace url):` <br/>**Enter the workspace id**
     4. `lakehouse (Name of the Lakehouse in the workspace that you want to connect to):` <br/>**Enter the lakehouse name**
     5. `lakehouseid (GUID of the lakehouse, which can be extracted from url when you open lakehouse artifact from fabric.microsoft.com):` <br/>**Enter the lakehouse id**
-    6. `endpoint [https://api.fabric.microsoft.com/v1]:` <br/>**Press enter to accept the default**
-    7. `auth (Use CLI (az login) for interactive execution or SPN for automation) [CLI]:` <br/>**select `cli`**
-    8. `client_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
-    9. `client_scrent (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
-    10. `tenant_id (Use when SPN auth is used.):` <br/>**Enter a single space or Enter your PowerBI tenant id**
-    11. `connect_retries [0]:` <br/>**Enter 0**
-    12. `connect_timeout [10]:` <br/>**Enter 10**
-    13. `schema (default schema that dbt will build objects in):` <br/>**Enter `dbo`**
-    14. threads (1 or more) [1]: <br/>**Enter 1**
+    6. `log_lakehouse (Name of the log Lakehouse in the workspace that you want to log to):` <br/>**Enter the log_lakehouse name**
+    7. `endpoint [https://api.fabric.microsoft.com/v1]:` <br/>**Press enter to accept the default**
+    8. `auth (Use CLI (az login) for interactive execution or SPN for automation) [CLI]:` <br/>**select `cli`**
+    9. `client_id (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    10. `client_scrent (Use when SPN auth is used.):` <br/>**Enter a single space and press enter**
+    11. `tenant_id (Use when SPN auth is used.):` <br/>**Enter a single space or Enter your PowerBI tenant id**
+    12. `connect_retries [0]:` <br/>**Enter 0**
+    13. `connect_timeout [10]:` <br/>**Enter 10**
+    14. `schema (default schema that dbt will build objects in):` <br/>**Enter `dbo`**
+    15. threads (1 or more) [1]: <br/>**Enter 1**
     
 The command above will create a new directory called `my_project`. Within this directory you will find a `dbt_project.yml` file. Open this file in your favourite text editor and note that it should look like the example below except that in your case my_project will be replaced with the name of the project you created above.:
 
@@ -113,9 +114,10 @@ The dbt init command will also update your `profiles.yml` file with a profile ma
 When run this will display a file similar to the one below. Check that your details are correct.
 
 !!! note 
-    The `profiles.yml` file should look like the example below except that in your case the highlighted lines may contain different values.
+    * The `profiles.yml` file should look like the example below except that in your case the highlighted lines may contain different values. 
+    * log_lakehouse is an optional value in the profile.
 
-```{.yaml hl_lines="1 2 4 10 11 13 14" linenums="1" title="profiles.yml"}
+```{.yaml hl_lines="1 2 4 10 11 13 14 15" linenums="1" title="profiles.yml"}
 my_project:
   target: my_project_target
   outputs:
@@ -130,6 +132,7 @@ my_project:
       lakehousedatapath: /lakehouse
       lakehouseid: 031feff6-071d-42df-818a-984771c083c4
       lakehouse: datalake
+      log_lakehouse: logdatalake
       schema: dbo
       threads: 1
       type: fabricsparknb

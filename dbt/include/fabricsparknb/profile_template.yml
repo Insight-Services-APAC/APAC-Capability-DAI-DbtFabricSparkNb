@@ -10,6 +10,8 @@ prompts:
         hint: Name of the Lakehouse in the workspace that you want to connect to
       lakehouseid:
         hint: GUID of the lakehouse, which can be extracted from url when you open lakehouse artifact from fabric.microsoft.com
+      log_lakehouse:
+        hint: Name of the Lakehouse in the workspace that you want to log to
       endpoint:
         default: https://api.fabric.microsoft.com/v1
       auth:
