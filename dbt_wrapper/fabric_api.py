@@ -40,7 +40,7 @@ class FabricAPI:
             file.writelines(lines[:-1])
 
     # Generate py files for api update
-    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id, workspace_id, lakehouse_id, lakehouse):
+    def IPYNBtoFabricPYFile(self, dbt_project_dir, progress, task_id, workspace_id, lakehouse_id, lakehouse, lakehouse_config):
         progress.update(task_id=task_id, description=f"Converting notebooks to Fabric PY format")
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_dir = str(Path(target_dir) / Path("notebooks"))
@@ -63,13 +63,15 @@ class FabricAPI:
                 python_file.write("# META {\n")
                 python_file.write("# META   \"kernel_info\": {\n")
                 python_file.write("# META     \"name\": \"synapse_pyspark\"\n")
-                python_file.write("# META   },\n")
-                python_file.write("# META   \"dependencies\": {\n")
-                python_file.write("# META     \"lakehouse\": {\n")
-                python_file.write(lhid_string)
-                python_file.write(lh_string)
-                python_file.write(wsid_string)
-                python_file.write("# META     }\n")
+                if (lakehouse_config == "METADATA"):
+                    python_file.write("# META   },\n")
+                    python_file.write("# META   \"dependencies\": {\n")
+                    python_file.write("# META     \"lakehouse\": {\n")
+                    python_file.write(lhid_string)
+                    python_file.write(lh_string)
+                    python_file.write(wsid_string)
+                    python_file.write("# META     }\n")
+
                 python_file.write("# META   }\n")
                 python_file.write("# META }\n\n")
                 f = open(Path(notebooks_dir) / Path(filename), "r", encoding="utf-8")

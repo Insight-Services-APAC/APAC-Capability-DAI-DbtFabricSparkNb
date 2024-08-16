@@ -146,6 +146,13 @@ def run_all(
             help="Use this option to provide a dbt resource exclude syntax.Default is ``",
         ),
     ] = ""
+    ,
+    lakehouse_config: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Use this option to set the default lakehouse in code or metadata. Allowed values are `CODE` or `METADATA`. Default is `METADATA`.",
+        ),
+    ] = "METADATA"
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
@@ -160,8 +167,8 @@ def run_all(
     se.perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, lakehouse_config=lakehouse_config, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs),
     ]
     se.perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
 
@@ -174,8 +181,8 @@ def run_all(
 
 #JM issues61 adding _hashcheck_level
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, notebook_hashcheck=_hashcheck_level, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, notebook_hashcheck=_hashcheck_level, lakehouse_config=lakehouse_config, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 
