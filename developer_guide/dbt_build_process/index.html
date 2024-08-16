@@ -899,10 +899,13 @@ For example, Notebooks are defaulted to the timeout of 1800 seconds. You can inc
 <p class="admonition-title">Note</p>
 <p>you can change the int value to anything you want as long as it's not larger than 7 days in seconds</p>
 </div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-pre-install</span> <span class="p">-</span><span class="n">-notebook-timeout</span><span class="p">=</span><span class="n">2100</span> <span class="n">my_project</span>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="n">run-all</span> <span class="p">-</span><span class="n">-pre-install</span> <span class="p">-</span><span class="n">-notebook-timeout</span><span class="p">=</span><span class="n">2100</span> <span class="n">my_project</span>
+</code></pre></div>
+The default lakehouse is set in the metadata of each notebook that gets created. You can override this and include a cell with the magic command %%configure to set the default lakehouse for the notebooks using this wrapper command when building:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">dbt_wrapper</span> <span class="n">run-all</span> <span class="n">my_project</span> <span class="p">-</span><span class="n">-lakehouse-config</span><span class="p">=</span><span class="s2">&quot;CODE&quot;</span>
 </code></pre></div>
 <p>Review all of the commands available to you by running using the help option as shown below:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-help</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">python</span> <span class="n">test_pre_install</span><span class="p">.</span><span class="n">py</span> <span class="p">-</span><span class="n">-help</span>
 </code></pre></div></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
