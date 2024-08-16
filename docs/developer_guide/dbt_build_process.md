@@ -74,6 +74,11 @@ For example, Notebooks are defaulted to the timeout of 1800 seconds. You can inc
 ```powershell
 python test_pre_install.py run-all --pre-install --notebook-timeout=2100 my_project
 ```
+The default lakehouse is set in the metadata of each notebook that gets created. You can override this and include a cell with the magic command %%configure to set the default lakehouse for the notebooks using this wrapper command when building:
+
+```powershell
+dbt_wrapper run-all my_project --lakehouse-config="CODE"
+```
 
 Review all of the commands available to you by running using the help option as shown below:
 ```powershell
