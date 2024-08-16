@@ -254,7 +254,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
         filtered = [x for x in data if x['tableName'] == tbl]
                              
         for r in filtered:
-            create_statements = create_statements + f"\r\t {r['col_name']} {r['data_type']},"
+            create_statements = create_statements + f"\r\t `{r['col_name']}` {r['data_type']},"
 
         create_statements =  create_statements.rstrip(',') + "\n)"
 
@@ -285,7 +285,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
                 
         for r in filtered:
             alter_statements =  f"%%sql\n\nALTER TABLE {tbl} (\n"
-            alter_statements = alter_statements + f"\t ADD COLUMN {r['col_name']} {r['data_type']} \n)\n\n"
+            alter_statements = alter_statements + f"\t ADD COLUMN `{r['col_name']}` {r['data_type']} \n)\n\n"
 
             cell = nbf.v4.new_code_cell(alter_statements)
             cells.append(cell)
