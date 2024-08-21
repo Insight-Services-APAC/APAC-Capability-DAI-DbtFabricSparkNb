@@ -224,13 +224,13 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
-    notebook_dir = f'./{project_root}/target/notebooks/'
+#def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
+ #   notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+  #  template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
-    env = Environment(loader=FileSystemLoader(template_dir))
+   # env = Environment(loader=FileSystemLoader(template_dir))
 
     # Load the template
     #template = env.get_template('import_notebook.ipynb')
@@ -270,38 +270,38 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
     #        raise ex
 
 
-def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: ProgressConsoleWrapper, task_id):
-    notebook_dir = f'./{project_root}/target/pwsh/'
+#def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: ProgressConsoleWrapper, task_id):
+  #  notebook_dir = f'./{project_root}/target/pwsh/'
 
-    Path(notebook_dir).mkdir(parents=True, exist_ok=True)
+ #   Path(notebook_dir).mkdir(parents=True, exist_ok=True)
     # Define the directory containing the Jinja templates
-    template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
+  #  template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
 
     # Create a Jinja environment
 
-    env = Environment(loader=FileSystemLoader(template_dir))
+   # env = Environment(loader=FileSystemLoader(template_dir))
 
     # Load the template
-    template = env.get_template('upload.ps1')
+    #template = env.get_template('upload.ps1')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
+    #rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with io.open(notebook_dir + 'upload.ps1', 'w') as f:
-        f.write(rendered_template)
-        progress.print("upload.ps1 created", level=LogLevel.INFO)        
+    #with io.open(notebook_dir + 'upload.ps1', 'w') as f:
+   #     f.write(rendered_template)
+   #     progress.print("upload.ps1 created", level=LogLevel.INFO)        
 
         # Load the template
-    template = env.get_template('download.ps1')
+   # template = env.get_template('download.ps1')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
+  #  rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with io.open(notebook_dir + 'download.ps1', 'w') as f:
-        f.write(rendered_template)
-        progress.print("download.ps1 created", level=LogLevel.INFO)        
+  #  with io.open(notebook_dir + 'download.ps1', 'w') as f:
+   #     f.write(rendered_template)
+    #    progress.print("download.ps1 created", level=LogLevel.INFO)        
 
 
 @staticmethod
