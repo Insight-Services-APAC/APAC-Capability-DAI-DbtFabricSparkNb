@@ -70,7 +70,7 @@ setup(
     include_package_data=True,
     install_requires=[   ##ensure this aligns to requirements.txt in project
         "sqlparse>=0.4.2",
-        "dbt-fabricspark",
+        "dbt-fabricspark==1.7.0rc1",
         "nbformat",
         "types-PyYAML",
         "types-python-dateutil",
