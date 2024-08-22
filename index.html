@@ -951,7 +951,12 @@
 <p><img alt="alt text" src="assets/images/unsupported.png" /></p>
 <ul>
 <li><em>Unique Tables Across Lakehouses</em>:  It is recommended to use unique table names across multiple lakehouses. This is because the current dbt framework’s schema template does not support duplicate table names.</li>
-<li><em>Column Naming Conventions</em>: Avoid using special characters such as <em>#</em> and <em>%</em> in column names within your models.</li>
+<li>
+<p><em>Column Naming Conventions</em>: Avoid using special characters such as <em>#</em> and <em>%</em> in column names within your models.</p>
+</li>
+<li>
+<p><em>Limitation on service principal</em>: Service principal authentication is only supported for selective read-only Fabric admin APIs. Due to these limitations, The framework does not support service principal authentication for deployment into cloud service. Please refer to Microsoft documentation for more details on the list of APIs supported. </p>
+</li>
 </ul>
 <h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
