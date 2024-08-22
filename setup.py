@@ -52,7 +52,7 @@ def _get_dbt_core_version():
 
 
 package_name = "dbt-fabricsparknb"
-package_version = "1.7.0"
+package_version = "1.7.7"
 dbt_core_version = _get_dbt_core_version()
 print(f"printing version --------- {dbt_core_version}")
 description = """The Apache Spark adapter plugin for dbt"""
