@@ -32,11 +32,7 @@ pip install -r ./requirements_mkdocs.txt
 
 ```
 
-These commands will create a new python environment and install the required packages for building the documentation. To launch the new environment you will need to run the command below:
-
-``` powershell title="Activate the Python environment"
-.\.env_mkdocs\Scripts\activate.ps1
-```
+These commands will create a new python environment and install the required packages for building the documentation. 
 
 ## Updating the documentation
 The documentation source is held in the `docs` directory. To update the documentation you will need to edit the markdown files in this directory. In order to understand the syntax used for the markdown be sure to review the reference section for [mkdocs-material](https://squidfunk.github.io/mkdocs-material/reference/). Once you have made your changes you can build the documentation using the command below:

@@ -83,6 +83,9 @@ def ListSchema(profile, schema):
    
     table = agate.Table.from_object(data)    
 
+    #transforming Database/schema name to lower case
+    schema = schema.lower()   
+    
     # Filter the table
     filtered_table = table.where(lambda row: row['namespace'] == schema)
 

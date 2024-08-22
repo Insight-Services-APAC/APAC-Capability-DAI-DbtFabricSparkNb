@@ -9,13 +9,15 @@ class SparkCredentials(Credentials):
     method: str = "livy"
     workspaceid: str = None
     database: Optional[str] = None
+    log_lakehouse: Optional[str] = None
     lakehouse: str = None
     lakehouseid: str = None  # type: ignore    
     endpoint: Optional[str] = "https://msitapi.fabric.microsoft.com/v1"
+    sql_endpoint: Optional[str] = None
     client_id: Optional[str] = None
     client_secret: Optional[str] = None
     tenant_id: Optional[str] = None
-    authentication: str= "CLI"
+    authentication: str = "CLI"
     connect_retries: int = 1
     connect_timeout: int = 10
     livy_session_parameters: Dict[str, Any] = field(default_factory=dict)

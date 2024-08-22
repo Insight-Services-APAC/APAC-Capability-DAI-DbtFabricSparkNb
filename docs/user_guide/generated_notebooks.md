@@ -6,7 +6,7 @@
 
 ## Understanding the Notebooks Generated
 
-When you run this build script successfully, you will see a series of notebooks generated in your my_project/target/notebooks directory. This is the `special sauce` of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project.
+When you run the build script successfully, you will see a series of notebooks generated in your my_project/target/notebooks directory. This is the `special sauce` of this dbt-adapter that allows your to run your dbt project natively as notebooks in a Fabric workspace. The image below shows a sample listing of generated notebooks. Your specific notebooks will be contain the name of your dbt project and may be different depending on the models and tests that you have defined in your dbt project.
 
 **Sample listing of Generated Notebooks**
 
