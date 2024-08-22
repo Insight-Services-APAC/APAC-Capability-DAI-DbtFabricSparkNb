@@ -30,17 +30,17 @@ jobs:
       run: |
           az login --user ${{secrets.AUDAIFABRICSERVICEACCOUNTNAME}} --password ${{secrets.AUDAIFABRICSERVICEACCOUNTPWD}} --allow-no-subscriptions
 
-# Move a sample project(testproj) to the execution directory , Update Project directory if required
+# Move a sample project(testproj2) to the execution directory , Update Project directory if required
 
     - name: Move directory for dbt execution
       shell: pwsh
       run: |
-        Move-Item -Path /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/samples/testproj -Destination /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/testproj
+        Move-Item -Path /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/samples/testproj2 -Destination /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/testproj2
 
     - name: DBT Execution
       run: |
         pip install .
-          dbt_wrapper run-all testproj testproj
+          dbt_wrapper run-all testproj2 testproj2
          
     - name: AZ Logout
       run: |
