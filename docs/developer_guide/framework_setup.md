@@ -1,3 +1,6 @@
+---
+  weight: 4
+---
 # Framework Setup
 
 ### Fabric Workspace Setup
@@ -71,7 +74,29 @@ models:
 
 ```
 
-The dbt init command will also update your `profiles.yml` file with a profile matching your dbt project name. Open this file in VS Code. This file can be found in *"./%USER_DIRECTORY%/.dbt/"*
+The dbt init command will also update your `profiles.yml` file with a profile matching your dbt project name. 
+Open this file in your favourite text editor using the command below:
+
+=== "Windows"
+
+    ```powershell
+
+    code  $home/.dbt/profiles.yml
+
+    ```
+
+=== "MacOS"
+
+    ```powershell
+    code  ~/.dbt/profiles.yml
+    ```
+
+=== "Linux"
+
+    ```powershell
+    code  ~/.dbt/profiles.yml
+    ```
+
 
 When run this will display a file similar to the one below. Check that your details are correct. 
 
@@ -87,6 +112,7 @@ my_project:
       endpoint: dkld #remove
       lakehouse: 'lakehouse' #the name of your lakehouse
       lakehouseid: 'aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9' #the guid of your lakehouse
+      log_lakehouse: 'loglakehouse' #the name of your logging lakehouse, this is not required as lakehouse will be used by default
       method: livy
       schema: dbo #the schema you want to use
       tenant_id: '72f988bf-86f1-41af-91ab-2d7cd011db47' #your power bi tenant id
@@ -96,54 +122,7 @@ my_project:
   target: dev
 ```
 
-To complete the newly created project you will need to copy some directories from the project called *"ptfproj"* dbt project. Copy *ptfproj/macros/* and *ptfproj/metaextracts/* directories with their files into your new dbt project. Overwrite any directories or files if they exist. Now in metaextracts the file ListSchemas.json contains the lakehouses in your workspace. You can manually update this file.
-
-```json
-[{"namespace":"lh_raw"},{"namespace":"lh_conformed"},{"namespace":"lh_consolidated"}]
-```
-
-### Review the build python Script
-
-To ensure a successful dbt build process, please verify that the Python script *test_pre_install.py* exists in the root directory of your repository
-
-```python
-from dbt.adapters.fabricsparknb import utils as utils
-import os 
-import sys
-
-utils.RunDbtProjectArg(PreInstall=True,argv = sys.argv)
-```
-
-### Execute the build python Script
-You can execute this file by passing your project name as the parameter
-```bash
-python test_pre_install.py my_project
-```
-
-If you get an error with Azure CLI connection issues or type errors. This is because the Profile.yaml file has the incorrect adaptor set. It should be *"fabricsparknb"* not *"fabricspark"*.
-
-After successful execution and number of notebooks have been created in your project/target folder under notebooks. 
-
-*import_notebook.ipynb* this will be used to import notebook files into your lakehouse.
-
-*metadata_extract.ipynb* is used to update the metadata json files in your project. 
-
-The above two notebooks can be imported using the standard import notebooks function in fabric. The rest of the notebooks can be copied into your lakehouse Files/notebooks folder by running the following script in pwsh. 
-
-```powershell
-#Run upload.ps1
-Invoke-Expression -Command $env:DBT_PROJECT_DIR/target/pwsh/upload.ps1
-```
-
-You then open the *import_notebook.ipynb* in fabric and *Run All* to import the notebooks from the Files/Notebooks directory in fabric. 
-
-Similar to  upload, using the following pwsh script will help you to download the metaextract files to the metaextrcats folder in repo.
-
-```powershell
-#Run upload.ps1
-Invoke-Expression -Command $env:DBT_PROJECT_DIR/target/pwsh/download.ps1
-```
-
-Executing the *master_notebook.ipynb* notebook will execute all notebooks created in your project.
-
 This concludes the Framework setup.
+
+!!! Info
+    You are now ready to move to the next step in which you will set up your dbt project. Follow the [dbt Build Process](./dbt_build_process.md) guide.

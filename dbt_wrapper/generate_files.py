@@ -15,11 +15,12 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 import fnmatch
 from datetime import datetime
 
-
-
-
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck, lakehouse_config):
+    # If log lakehouse is None use lakehouse as default
+    if log_lakehouse is None:
+        log_lakehouse = lakehouse_name
+    
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
@@ -36,10 +37,33 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             notebook_file['name'] = file
             notebook_file['sort_order'] = matching_node.sort_order
             notebook_files.append(notebook_file)
-
+   
+    if len(notebook_files) == 0:
+        print("No notebooks found.Try checking your model configs and model specification args")
+        exit(1)
+    
     # Find the minimum and maximum sort_order
     min_sort_order = min(file['sort_order'] for file in notebook_files)
     max_sort_order = max(file['sort_order'] for file in notebook_files)
+
+    # Validate and set max worker (thread) property 
+    lr_max_worker = 5 # Default value (low Range)
+    hr_max_worker = 20
+
+    match max_worker:
+        case _ if max_worker < lr_max_worker:
+            max_worker = lr_max_worker
+            msg_text = "Max worker (thread) property is lesser than the default value, default thread value of "+str(lr_max_worker)+" has been set."
+            progress.print(msg_text, LogLevel.WARNING)
+        case _ if max_worker >= lr_max_worker and max_worker < hr_max_worker:
+            pass
+        case _ if max_worker >= hr_max_worker:
+            msg_text = "Max worker (thread) property is high !!\nPlease update thread property in profile.yml, if this is not expected."
+            progress.print(msg_text, LogLevel.WARNING)
+        case _:
+           max_worker = lr_max_worker
+           msg_text = "Max worker (thread) property value is not set, default thread value of "+str(lr_max_worker)+" has been set."
+           progress.print(msg_text, LogLevel.WARNING)
 
     # Loop from min_sort_order to max_sort_order
     for sort_order in range(min_sort_order, max_sort_order + 1):
@@ -58,10 +82,27 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name,max_worker=max_worker, log_lakehouse=log_lakehouse)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
+
+        # Check if lakehouse_config option is set to METADATA
+        lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+        if lhconfig == "METADATA":
+            # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+            index_to_remove = None
+            for i, cell in enumerate(nb.cells):
+                if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                    index_to_remove = i
+                    break
+
+            # Remove the found markdown cell and the next cell
+            if index_to_remove is not None:
+                nb.cells.pop(index_to_remove)
+                if index_to_remove < len(nb.cells):
+                    nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
         # Write the notebook to a file
         target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
@@ -85,10 +126,27 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse,notebook_hashcheck=notebook_hashcheck)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
+
+    # Check if lakehouse_config option is set to METADATA
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig == "METADATA":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
     # Find Markdown cell contaning # Executions for Each Run Order Below:
     insertion_point = None
@@ -102,7 +160,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
         # Create a new code cell with the SQL
-        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id)'
+        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id, master_notebook)'
         cell = nbf.v4.new_code_cell(source=code)
         # Add the cell to the notebook
         nb.cells.insert((insertion_point), cell)
@@ -120,7 +178,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -136,6 +194,23 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
+
+    # Check if lakehouse_config option is set to METADATA
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig == "METADATA":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
     # Write the notebook to a file    
     target_file_name = f'metadata_{project_name}_extract.ipynb'
@@ -307,7 +382,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -323,6 +398,23 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
+
+    # Check if lakehouse_config option is set to METADATA
+    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+    if lhconfig == "METADATA":
+        # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+        index_to_remove = None
+        for i, cell in enumerate(nb.cells):
+            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                index_to_remove = i
+                break
+
+        # Remove the found markdown cell and the next cell
+        if index_to_remove is not None:
+            nb.cells.pop(index_to_remove)
+            if index_to_remove < len(nb.cells):
+                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
     
     # Write the notebook to a file    
     target_file_name = f'import_{project_name}_notebook.ipynb'
@@ -371,7 +463,7 @@ def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: Prog
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
@@ -393,6 +485,23 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         mnb.SetTheSqlVariable()
         # always set the config in first code cell
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
+
+        # Check if lakehouse_config option is set to METADATA
+        lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+
+        if lhconfig == "METADATA":
+            # Find the index of the markdown cell containing "THIS IS MARKDOWN"
+            index_to_remove = None
+            for i, cell in enumerate(nb.cells):
+                if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+                    index_to_remove = i
+                    break
+
+            # Remove the found markdown cell and the next cell
+            if index_to_remove is not None:
+                nb.cells.pop(index_to_remove)
+                if index_to_remove < len(nb.cells):
+                    nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
         # Write the notebook to a file
         target_file_name = notebook_file

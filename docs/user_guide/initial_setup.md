@@ -72,8 +72,6 @@ Now that we have pwsh installed, Make sure that you have install the following a
 
     ```powershell
     pip config set global.trusted-host "pypi.org files.pythonhosted.org pypi.python.org"
-    pip install pip-system-certs
-    pip install setuptools
     ```
 
 ## Source Directory & Python Env
@@ -143,6 +141,11 @@ Now lets create and activate our Python environment and install the required pac
     # TBA
 
 
+    ```
+!!!Tip
+    To obtain a specific or the latest version of the framework packages in dbt, you need to specify the framework tags as following (example: for version 0.4.0)
+    ```powershell
+    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb@V0.4.0
     ```
 
 

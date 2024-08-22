@@ -6,6 +6,7 @@ from rich.theme import Theme
 from dbt_wrapper.wrapper import Commands
 from rich import print
 from dbt_wrapper.log_levels import LogLevel
+from dbt_wrapper.hashcheck_levels import HashCheckLevel
 from dbt_wrapper.stage_executor import stage_executor
 
 
@@ -22,14 +23,20 @@ _log_level: LogLevel = None
 if (_log_level is None):
     _log_level = LogLevel.WARNING
 
+#JM issues61 adding _hashcheck_level
+_hashcheck_level: HashCheckLevel = None
+if (_hashcheck_level is None):
+    _hashcheck_level = HashCheckLevel.BYPASS
 
 def docs_options():
     return ["generate", "serve"]
 
-
 def log_levels():
     return ["DEBUG", "INFO", "WARNING", "ERROR"]
 
+#JM issues61 adding _hashcheck_level
+def hashcheck_levels():
+    return ["BYPASS", "WARNING", "ERROR"]
 
 @app.command()
 def docs():
@@ -210,19 +217,57 @@ def run_all(
         typer.Option(
             help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
         ),
-    ] = "WARNING"
+    ] = "WARNING",
+    #JM issues61 adding _hashcheck_level
+    hashcheck_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the hash check level. This controls the verbosity of the output. Allowed values are `BYPASS`, `WARNING`, `ERROR`. Default is `BYPASS`.",
+        ),
+    ] = "BYPASS",
+    notebook_timeout: Annotated[
+        int,
+        typer.Option(
+            help="Use this option to change the default notebook execution timeout setting.",
+        ),
+    ] = 1800
+    ,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="Use this option to provide a dbt resource selection syntax.Default is ``",
+        ),
+    ] = ""
+    ,
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="Use this option to provide a dbt resource exclude syntax.Default is ``",
+        ),
+    ] = ""
+    ,
+    lakehouse_config: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Use this option to set the default lakehouse in code or metadata. Allowed values are `CODE` or `METADATA`. Default is `METADATA`.",
+        ),
+    ] = "METADATA"
 ):
     """
     This command will run all elements of the project. For more granular control you can use the options provided to suppress certain stages or use a different command.
     """    
+    
     _log_level: LogLevel = LogLevel.from_string(log_level)    
+    #JM issues61 adding _hashcheck_level
+    _hashcheck_level: HashCheckLevel = HashCheckLevel.from_string(hashcheck_level)
+
     wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
     se: stage_executor = stage_executor(log_level=_log_level, console=console)
     se.perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, lakehouse_config=lakehouse_config, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs),
     ]
     se.perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
 
@@ -231,155 +276,19 @@ def run_all(
     se.perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
 
     if (build_dbt_project):
-        wrapper_commands.BuildDbtProject(PreInstall=pre_install)
+        wrapper_commands.BuildDbtProject(PreInstall=pre_install, select=select, exclude=exclude)
 
+#JM issues61 adding _hashcheck_level
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, **kwargs),
-        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(**kwargs)
+        lambda **kwargs: wrapper_commands.GeneratePostDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, notebook_hashcheck=_hashcheck_level, lakehouse_config=lakehouse_config, **kwargs),
+        lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs)
     ]
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 
     se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
 
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.RunMasterNotebook], stage_name="Run Master Notebook")
-
-
-@app.command()
-def execute_master_notebook(
-    dbt_project_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_project directory. If left blank it will use the current directory"
-        ),
-    ],
-    dbt_profiles_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
-        ),
-    ] = None,
-    pre_install: Annotated[
-        bool,
-        typer.Option(
-            help="The option to run the dbt adapter using source code and not the installed package."
-        ),
-    ] = False,
-    log_level: Annotated[
-        Optional[str],
-        typer.Option(
-            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
-        ),
-    ] = "WARNING"
-):
-    """
-    This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
-    """    
-    run_all(
-        dbt_project_dir=dbt_project_dir,
-        dbt_profiles_dir=dbt_profiles_dir,
-        clean_target_dir=False,
-        generate_pre_dbt_scripts=False,
-        generate_post_dbt_scripts=False,
-        auto_execute_metadata_extract=False,
-        download_metadata=False,
-        build_dbt_project=False,
-        pre_install=pre_install,
-        upload_notebooks_via_api=False,
-        auto_run_master_notebook=True,
-        log_level=log_level
-    )
-
-
-@app.command()
-def run_all_local(
-    dbt_project_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_project directory. If left blank it will use the current directory"
-        ),
-    ],
-    dbt_profiles_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
-        ),
-    ] = None,
-    pre_install: Annotated[
-        bool,
-        typer.Option(
-            help="The option to run the dbt adapter using source code and not the installed package."
-        ),
-    ] = False,
-    log_level: Annotated[
-        Optional[str],
-        typer.Option(
-            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
-        ),
-    ] = "WARNING"
-):
-    """
-    This command will just execute the final orchestrator notebook in Fabric. Assumes that the notebook has been uploaded.
-    """    
-    run_all(
-        dbt_project_dir=dbt_project_dir,
-        dbt_profiles_dir=dbt_profiles_dir,
-        clean_target_dir=True,
-        generate_pre_dbt_scripts=True,
-        generate_post_dbt_scripts=True,
-        auto_execute_metadata_extract=False,
-        download_metadata=False,
-        build_dbt_project=True,
-        pre_install=pre_install,
-        upload_notebooks_via_api=False,
-        auto_run_master_notebook=False,
-        log_level=log_level
-    )
-
-
-@app.command()
-def build_dbt_project(
-    dbt_project_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_project directory. If left blank it will use the current directory"
-        ),
-    ],
-    dbt_profiles_dir: Annotated[
-        str,
-        typer.Argument(
-            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
-        ),
-    ] = None,
-    pre_install: Annotated[
-        bool,
-        typer.Option(
-            help="The option to run the dbt adapter using source code and not the installed package."
-        ),
-    ] = False,
-    log_level: Annotated[
-        Optional[str],
-        typer.Option(
-            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
-        ),
-    ] = "WARNING"
-):
-    """
-    This command will just build the dbt project. It assumes all other stages have been completed.
-    """    
-    run_all(
-        dbt_project_dir=dbt_project_dir,
-        dbt_profiles_dir=dbt_profiles_dir,
-        clean_target_dir=True,
-        generate_pre_dbt_scripts=False,
-        generate_post_dbt_scripts=False,
-        auto_execute_metadata_extract=False,
-        download_metadata=False,
-        build_dbt_project=True,
-        pre_install=pre_install,
-        upload_notebooks_via_api=False,
-        auto_run_master_notebook=False,
-        log_level=log_level
-    )
+    se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.GetExecutionResults], stage_name="Get Execution Results")
 
 if __name__ == "__main__":
     app()

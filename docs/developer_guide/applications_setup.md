@@ -1,57 +1,143 @@
-# Applications Required for Development (Windows)
+---
+  weight: 2
+---
 
-This section covers the applications required for developing using the dbt framework. The applications are:
+# Environment Setup
+This section outlines the steps required to setup the development environment to use this dbt-adapter as part of a dbt data transformation project.
 
-- python (latest version available)
-- Visual Studio Code
-- GIT for Windows
-- OneLake Explorer (Preview)
+To provide a common, cross-platform set of instructions we will first install Powershell. To facilitate the installation process we will use package managers such as [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) for Windows, [brew](https://brew.sh/) for MacOS and `apt` for Linux.
 
-### Install python
-First you need to install python. This can be done from this link [Download Python | Python.org](https://www.python.org/downloads/) download the latest version and install it. 
+## Core Tools Installation
 
-**NOTE:** Make sure to tick the box on the first window of the installation to Add Python.exe to PATH
+!!!Tip
+    Following core tools can be installed using the standard powershell or in VS Code terminal (powershell)
 
-Use Install now for standard installation.
+=== "Windows"
 
-Once installed, confirm installation by opening the command line. WindowsKey + R then enter “cmd” click OK. 
+    ```powershell
+    # Winget Installs 
+    winget install Microsoft.PowerShell
+    ```
 
-Type the following and you should get a reply similar to the screenshot below.
-```command prompt 
-“python --version”
-```
+=== "MacOS"
 
-![image info](./images/pythonversioncheck.png)
+    ```bash
+    brew install powershell/tap/powershell
+    ```
 
-### Install Visual Studio Code
-Browse to website [Visual Studio Code - Code Editing. Redefined](https://code.visualstudio.com/) and download Visual Studio Code and then open the file.
+=== "Linux"
+    ```bash
+    # TBA
+    ```
 
-Select the standard options and install.
+Next we will install Python and development tools such as vscode.
 
-### Install GIT for Windows
-Browse to website [Git - Downloading Package (git-scm.com)](https://git-scm.com/download/win) and download the latest by clicking “Click here to download” option. Open the file and install following the step examples.
+=== "Windows"
 
-![image info](./images/downloadgitforwindows.png)
+    ```powershell
+    # Winget Installs 
+    winget install Python.Python.3.12
+    winget install -e --id Microsoft.VisualStudioCode
+    winget install --id Git.Git -e --source winget
 
-Select the standard options until you get these next steps.
+    # Python Environment Manager
+    Python -m pip install --user virtualenv
+    ```
 
-This step will ask you about your default git application please change this to Use Visual Studio Code as Git default. 
+=== "MacOS"
 
-![image info](./images/defaulteditor.png)
+    ```bash
+    # Brew Installs
+    brew install python@3.12
+    brew install --cask visual-studio-code
+    brew install git
 
-This step will ask you about your default git console, please select Use Windows default console window.
+    # Python Environment Manager
+    Python -m pip install --user virtualenv
 
-![image info](./images/defaultconsole.png)
 
-The rest of the installation options should be standard unless you need to change them for other reasons.
+    ```
 
-### OneLake Explorer (Preview)
-Browse to website [OneLake Explorer](https://learn.microsoft.com/en-us/fabric/onelake/onelake-file-explorer) and browse down the page to Installation instructions and download OneLake file explorer and then open the file.
+=== "Linux"
+    ```bash
+    # TBA
+    ```
 
-Click install and follow standard install options. 
+## Other tools
+Now that we have pwsh installed, Make sure that you have install the following additional required tools.
 
-Opening up for the first time will require you to login using your Fabric tenant details. You will then be able to access the Lakehouses from your Windows Explorer.
+- Install Azure PowerShell on Windows - Refer [Azure Powershell Doc](https://learn.microsoft.com/en-us/powershell/azure/install-azps-windows?view=azps-12.1.0&tabs=powershell&pivots=windows-psgallery) for windows (You might need to run this in admin mode)
 
-![image info](./images/onelake.png)
+!!! Important
+    Optional packages you may need to install (Only run if you face issues)
+
+    ```powershell
+    pip config set global.trusted-host "pypi.org files.pythonhosted.org pypi.python.org"
+    ```
+
+## Source Directory & Python Env
+Now lets create and activate our Python environment and install the required packages. Be sure to run the following commands from the root directory.
+
+!!! tip
+    When executing the following, it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
+
+
+=== "Windows"
+
+    ```powershell
+
+    # Ensure that you are in the pwsh shell
+    pwsh
+
+    # Create a new source code directory
+    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
+    # Navigate to the new directory
+    cd dbt-fabricsparknb-test
+
+    # Create the Python environment
+    python -m venv .env
+
+    #Optional step to run if activate.ps1 failes due to security policy
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+
+    # Activate the Python environment
+    ./.env/Scripts/Activate.ps1
+
+    ```
+
+
+=== "MacOS"
+
+    ```powershell
+
+    # Ensure that you are in the pwsh shell
+    pwsh
+
+    # Create a new source code directory
+    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
+    # Navigate to the new directory
+    cd dbt-fabricsparknb-test
+
+    # Create the Python environment
+    python -m venv .env
+
+    #Optional step to run if activate.ps1 failes due to security policy
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+
+    # Activate the Python environment
+    ./.env/Scripts/Activate.ps1  
+
+
+    ```
+
+=== "Linux"
+
+    ```powershell
+    # TBA
+    ```
 
 This concludes the required applications.
+
+
+!!! info
+    You are now ready to move to the next step in which you will set up your dbt project. Follow the [Dbt Project Setup](./dbt_setup.md) guide.
