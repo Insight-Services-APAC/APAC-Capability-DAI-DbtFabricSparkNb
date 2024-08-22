@@ -175,7 +175,7 @@ class FabricAPI:
     
     def APIUpsertNotebooks(self, progress: ProgressConsoleWrapper, task_id, dbt_project_dir, workspace_id, notebook_name=None):
         progress.progress.update(task_id=task_id, description="Logging in... Make sure you use `az login` to authenticate before running for the first time")
-        progress.print("Uploading notebooks via API ...", level=LogLevel.INFO)
+        progress.print("Starting notebooks validation and upload via API ...", level=LogLevel.INFO)
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")        
         fc = FabricClientCore(silent=True)
@@ -208,6 +208,11 @@ class FabricAPI:
                         notebook2 = fc.update_notebook_definition(workspace_id, notebookid, definition=notebook_w_content_new)
                         notebook3 = fc.update_item(workspace_id, notebookid, display_name=notebookname, description="Notebook Hash:" + notebookhashvalue)
                         progress.progress.update(task_id=task_id, description="Notebook updated " + notebookname)
+                    else:
+                        progress.print("Update to "  + notebookname + " is not required", level=LogLevel.INFO)
+
+        progress.print("Completed uploading notebooks via API", level=LogLevel.INFO)
+
         progress.progress.update(task_id=task_id, description="Completed uploading notebooks via API")
 
     def GetNotebookIdByName(self, workspace_id, notebook_name):
