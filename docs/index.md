@@ -32,7 +32,10 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 ![alt text](./assets/images/unsupported.png)
 
 - *Unique Tables Across Lakehouses*:  It is recommended to use unique table names across multiple lakehouses. This is because the current dbt framework’s schema template does not support duplicate table names.
+
 - *Column Naming Conventions*: Avoid using special characters such as *#* and *%* in column names within your models.
+
+- *Limitation on service principal*: Service principal authentication is only supported for selective read-only Fabric admin APIs. Due to these limitations, The framework does not support service principal authentication for deployment into cloud service. Please refer to Microsoft documentation for more details on the list of APIs supported. 
 
 ## Getting Started
 

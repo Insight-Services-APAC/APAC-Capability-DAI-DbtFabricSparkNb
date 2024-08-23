@@ -1,1 +1,5 @@
-[{"namespace":"DataflowsStagingLakehouse"},{"namespace":"datalake"},{"namespace":"DataEngineering"},{"namespace":"lakesales"}]
+[
+    {
+        "namespace": "lh_raw"
+    }
+]

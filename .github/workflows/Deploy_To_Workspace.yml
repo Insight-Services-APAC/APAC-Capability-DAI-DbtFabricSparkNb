@@ -1,0 +1,50 @@
+# The below GIT Action is a sample template to deploy projects to cloud services, using Service Account without MFA (Not recommended).
+# Note : Service Principal based deployment is currently not supported , as service principal authentication is only supported for
+# selective read-only Fabric admin APIs. 
+# Diabled until we have an workpace setup for testing
+#          dbt_wrapper run-all testproj2 testproj2
+name: Deploy to Workspace
+on: 
+  push:
+    branches: [ "dev"]
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"        
+        
+    - name: Install dependencies
+      run:  |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      
+    - name: AZ Login
+      run: |
+          az login --user ${{secrets.AUDAIFABRICSERVICEACCOUNTNAME}} --password ${{secrets.AUDAIFABRICSERVICEACCOUNTPWD}} --allow-no-subscriptions
+
+# Move a sample project(testproj2) to the execution directory , Update Project directory if required
+
+    - name: Move directory for dbt execution
+      shell: pwsh
+      run: |
+        Move-Item -Path /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/samples/testproj2 -Destination /home/runner/work/APAC-Capability-DAI-DbtFabricSparkNb/APAC-Capability-DAI-DbtFabricSparkNb/testproj2
+
+    - name: DBT Execution
+      run: |
+        pip install .
+           dbt_wrapper run-all testproj2 testproj2 --no-upload-notebooks-via-api --no-auto-run-master-notebook --no-download-metadata --no-auto-execute-metadata-extract
+
+         
+    - name: AZ Logout
+      run: |
+          az logout
