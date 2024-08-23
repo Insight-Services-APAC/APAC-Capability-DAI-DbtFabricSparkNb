@@ -40,7 +40,10 @@ jobs:
     - name: DBT Execution
       run: |
         pip install .
-          dbt_wrapper run-all testproj2 testproj2
+# Diabled until we have an workpace setup for testing
+#          dbt_wrapper run-all testproj2 testproj2
+          dbt_wrapper run-all testproj2 testproj2 --no-upload-notebooks-via-api --no-auto-run-master-notebook --no-download-metadata --no-auto-execute-metadata-extract
+
          
     - name: AZ Logout
       run: |
