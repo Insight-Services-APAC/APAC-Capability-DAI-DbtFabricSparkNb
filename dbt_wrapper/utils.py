@@ -31,6 +31,7 @@ def GetIncludeDir():
 
 
 def DownloadFile(progress: ProgressConsoleWrapper, task_id, directory_client: DataLakeDirectoryClient, local_path: str, file_name: str):
+    
     file_client = directory_client.get_file_client(file_name)
     file_name_only = file_name.split('/')[-1]  #One drive path
     writepath = str(Path(Path(local_path) / Path(file_name_only)))

@@ -9,6 +9,7 @@ from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.hashcheck_levels import HashCheckLevel
 from dbt_wrapper.stage_executor import stage_executor
 
+
 app = typer.Typer(no_args_is_help=True)
 
 custom_theme = Theme({"info": "dim cyan", "warning": "dark_orange", "danger": "bold red", "error": "bold red", "debug": "khaki1"})
@@ -44,6 +45,104 @@ def docs():
     """
     print(f"Goodbye")
 
+
+@app.command()
+def buildcomparemetadata(  
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    source: Annotated[
+        str,
+        typer.Argument(
+            help="Source environment name from profile.yml"
+        ),
+    ],
+    target: Annotated[
+        str,
+        typer.Argument(
+            help="Target environment name from profile.yml"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None
+    ):
+    """
+    This command will execute the 'build metadata' notebooks in the two specified environments within Fabric. This notebook will create a `comparemetadata` table in their respective environment that will store the Lakehouse schema information.
+    """
+    log_level = "WARNING"
+
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir, source_env=source, target_env=target)
+
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Source], stage_name=f"Run Build Metadata Notebook (Source: {source})")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunBuildMetadataNotebook_Target], stage_name=f"Run Build Metadata Notebook (Target: {target})")
+
+
+    print(f"Goodbye")
+
+
+@app.command()
+def compare(  
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    source: Annotated[
+        str,
+        typer.Argument(
+            help="Source environment name from profile.yml"
+        ),
+    ],
+    target: Annotated[
+        str,
+        typer.Argument(
+            help="Target environment name from profile.yml"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None):
+    """
+    This command will compare two environments Lakehouse's. Generated notebooks will be uploaded to the 'target' 
+    environment configured in the 'profile.yml' file which will contain the sql commands that can be used to 
+    create and alter tables, from one environment to the next.
+    """
+    log_level = "WARNING"
+
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir, source_env=source, target_env=target)
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateCompareNotebook], stage_name="Generate Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadCompareNotebookViaApi], stage_name="Upload Compare Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.RunCompareNotebook], stage_name="Run Compare Notebook")
+
+
+    # #download the metadata
+    se.perform_stage(option=True, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GenerateMissingObjectsNotebook], stage_name="Generate Missing Objects Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.ConvertNotebooksToFabricFormat], stage_name="Convert to Fabric Notebook")
+    se.perform_stage(option=True, action_callables=[wrapper_commands.UploadMissingObjectsNotebookViaApi], stage_name="Upload Missing Objects Notebook to Target Workspace")
+
+
+
+
+    print(f"Goodbye")
 
 @app.command()
 def run_all(
