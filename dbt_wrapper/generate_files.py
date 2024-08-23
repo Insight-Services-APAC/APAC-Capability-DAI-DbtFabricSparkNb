@@ -382,84 +382,84 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
             raise ex
 
 
-def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
-    notebook_dir = f'./{project_root}/target/notebooks/'
+#def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
+ #   notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
-    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+  #  template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
-    env = Environment(loader=FileSystemLoader(template_dir))
+   # env = Environment(loader=FileSystemLoader(template_dir))
 
     # Load the template
-    template = env.get_template('import_notebook.ipynb')
+    #template = env.get_template('import_notebook.ipynb')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name)
+    #rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name)
 
     # Parse the rendered template as a notebook
-    nb = nbf.reads(rendered_template, as_version=4)
+    #nb = nbf.reads(rendered_template, as_version=4)
 
     # Check if lakehouse_config option is set to METADATA
-    lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
+    #lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
 
-    if lhconfig == "METADATA":
+    #if lhconfig == "METADATA":
         # Find the index of the markdown cell containing "THIS IS MARKDOWN"
-        index_to_remove = None
-        for i, cell in enumerate(nb.cells):
-            if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
-                index_to_remove = i
-                break
+    #    index_to_remove = None
+    #    for i, cell in enumerate(nb.cells):
+    #        if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
+    #            index_to_remove = i
+    #            break
 
         # Remove the found markdown cell and the next cell
-        if index_to_remove is not None:
-            nb.cells.pop(index_to_remove)
-            if index_to_remove < len(nb.cells):
-                nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
+   #     if index_to_remove is not None:
+   #         nb.cells.pop(index_to_remove)
+   #         if index_to_remove < len(nb.cells):
+   #             nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
     
     # Write the notebook to a file    
-    target_file_name = f'import_{project_name}_notebook.ipynb'
-    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
-        try:
-            nb_str = nbf.writes(nb)
-            f.write(nb_str)
-            progress.print(f"{target_file_name} created", level=LogLevel.INFO)
-        except Exception as ex:
-            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)            
-            raise ex
+    #target_file_name = f'import_{project_name}_notebook.ipynb'
+    #with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+    #    try:
+    #        nb_str = nbf.writes(nb)
+    ##        f.write(nb_str)
+    #        progress.print(f"{target_file_name} created", level=LogLevel.INFO)
+    #    except Exception as ex:
+    #        progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)            
+    #        raise ex
 
 
-def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: ProgressConsoleWrapper, task_id):
-    notebook_dir = f'./{project_root}/target/pwsh/'
+#def GenerateAzCopyScripts(project_root, workspaceid, lakehouseid, progress: ProgressConsoleWrapper, task_id):
+  #  notebook_dir = f'./{project_root}/target/pwsh/'
 
-    Path(notebook_dir).mkdir(parents=True, exist_ok=True)
+ #   Path(notebook_dir).mkdir(parents=True, exist_ok=True)
     # Define the directory containing the Jinja templates
-    template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
+  #  template_dir = str((mn.GetIncludeDir()) / Path('pwsh/'))    
 
     # Create a Jinja environment
 
-    env = Environment(loader=FileSystemLoader(template_dir))
+   # env = Environment(loader=FileSystemLoader(template_dir))
 
     # Load the template
-    template = env.get_template('upload.ps1')
+    #template = env.get_template('upload.ps1')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
+    #rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with io.open(notebook_dir + 'upload.ps1', 'w') as f:
-        f.write(rendered_template)
-        progress.print("upload.ps1 created", level=LogLevel.INFO)        
+    #with io.open(notebook_dir + 'upload.ps1', 'w') as f:
+   #     f.write(rendered_template)
+   #     progress.print("upload.ps1 created", level=LogLevel.INFO)        
 
         # Load the template
-    template = env.get_template('download.ps1')
+   # template = env.get_template('download.ps1')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
+  #  rendered_template = template.render(project_root=project_root, workspace_id=workspaceid, lakehouse_id=lakehouseid)
 
     # Write the notebook to a file
-    with io.open(notebook_dir + 'download.ps1', 'w') as f:
-        f.write(rendered_template)
-        progress.print("download.ps1 created", level=LogLevel.INFO)        
+  #  with io.open(notebook_dir + 'download.ps1', 'w') as f:
+   #     f.write(rendered_template)
+    #    progress.print("download.ps1 created", level=LogLevel.INFO)        
 
 
 @staticmethod
