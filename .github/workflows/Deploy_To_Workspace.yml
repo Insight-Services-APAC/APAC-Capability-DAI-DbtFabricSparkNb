@@ -6,7 +6,7 @@
 name: Deploy to Workspace
 on: 
   push:
-    branches: [ "dev","feature/Issue130_ServicePrincipalDocUpdate_GitWorkFlow"]
+    branches: [ "dev"]
 
 permissions:
   id-token: write
