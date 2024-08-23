@@ -1,6 +1,8 @@
 # The below GIT Action is a sample template to deploy projects to cloud services, using Service Account without MFA (Not recommended).
 # Note : Service Principal based deployment is currently not supported , as service principal authentication is only supported for
 # selective read-only Fabric admin APIs. 
+# Diabled until we have an workpace setup for testing
+#          dbt_wrapper run-all testproj2 testproj2
 name: Deploy to Workspace
 on: 
   push:
@@ -40,9 +42,7 @@ jobs:
     - name: DBT Execution
       run: |
         pip install .
-# Diabled until we have an workpace setup for testing
-#          dbt_wrapper run-all testproj2 testproj2
-          dbt_wrapper run-all testproj2 testproj2 --no-upload-notebooks-via-api --no-auto-run-master-notebook --no-download-metadata --no-auto-execute-metadata-extract
+           dbt_wrapper run-all testproj2 testproj2 --no-upload-notebooks-via-api --no-auto-run-master-notebook --no-download-metadata --no-auto-execute-metadata-extract
 
          
     - name: AZ Logout
