@@ -52,7 +52,7 @@ def _get_dbt_core_version():
 
 
 package_name = "dbt-fabricsparknb"
-package_version = "1.7.0"
+package_version = "1.7.7"
 dbt_core_version = _get_dbt_core_version()
 print(f"printing version --------- {dbt_core_version}")
 description = """The Apache Spark adapter plugin for dbt"""
@@ -70,7 +70,7 @@ setup(
     include_package_data=True,
     install_requires=[   ##ensure this aligns to requirements.txt in project
         "sqlparse>=0.4.2",
-        "dbt-fabricspark",
+        "dbt-fabricspark==1.7.0rc1",
         "nbformat",
         "types-PyYAML",
         "types-python-dateutil",
