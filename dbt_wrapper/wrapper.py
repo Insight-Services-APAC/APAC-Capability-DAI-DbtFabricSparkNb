@@ -192,7 +192,7 @@ class Commands:
     def RunMetadataExtract(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"metadata_{self.project_name}_extract"
         nb_id = self.fa.GetNotebookIdByName(workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
-        if (1==1):
+        if nb_id is None:
             progress.print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now", level=LogLevel.INFO)
             self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=self.dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
         else: 
