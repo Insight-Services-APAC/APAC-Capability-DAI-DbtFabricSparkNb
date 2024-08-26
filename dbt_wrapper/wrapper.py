@@ -89,7 +89,7 @@ class Commands:
             raise Exception("No target environment setting found in profile.yml")
         
         if self.CheckLakehouseLowercase(name=self.lakehouse) == 1:
-            raise Exception("Error: :The lakehouse name contains should contain lowercase characters only.")
+            raise Exception("Error: :The lakehouse name should only consist of lowercase letters, numbers, and underscores.")
 
       
     def PrintFirstTimeRunningMessage(self):
