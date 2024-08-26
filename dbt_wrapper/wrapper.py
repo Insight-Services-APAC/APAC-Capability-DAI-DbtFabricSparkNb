@@ -15,8 +15,6 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
 from rich.panel import Panel
 
-
-
 class Commands:
     def __init__(self, console):
         self.console = console
@@ -31,6 +29,12 @@ class Commands:
         self.next_env = None
         self.next_env_name = None
     
+    def CheckLakehouseLowercase(self, name):
+        if any(char.isupper() for char in name):
+            return 1
+        else:
+            return 0
+
     def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None):
         if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
             self.console.print(
@@ -84,6 +88,8 @@ class Commands:
         except:
             raise Exception("No target environment setting found in profile.yml")
         
+        if self.CheckLakehouseLowercase(name=self.lakehouse) == 1:
+            raise Exception("Error: :The lakehouse name contains should contain lowercase characters only.")
 
       
     def PrintFirstTimeRunningMessage(self):
