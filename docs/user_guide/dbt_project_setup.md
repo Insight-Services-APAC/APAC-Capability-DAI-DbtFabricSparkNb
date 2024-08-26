@@ -24,7 +24,7 @@ Next we will create a new dbt project and configure it to use the dbt-fabricspar
 
 !!! Important
   
-    The lakehouse name cannot contain ANY uppercase characters.
+    The ==lakehouse name== must not contain any uppercase characters. ==lakehouse names== should only consist of lowercase letters, numbers, and underscores.
 
 
 ```plaintext title="Example URL"

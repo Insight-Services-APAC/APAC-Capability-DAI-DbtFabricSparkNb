@@ -21,7 +21,7 @@ Here we will create a new dbt project and configure it to use the dbt-fabricspar
 
 !!! Important
   
-    The lakehouse name cannot contain ANY uppercase characters.
+    The ==lakehouse name== must not contain any uppercase characters. ==lakehouse names== should only consist of lowercase letters, numbers, and underscores.
 
 
 > https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
