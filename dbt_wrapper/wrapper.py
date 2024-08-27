@@ -62,7 +62,10 @@ class Commands:
         self.profile_info = self.profile[self.config['profile']]
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
-        self.log_lakehouse_check = self.target_info['log_lakehouse']
+
+        if "log_lakehouse" in self.target_info.keys():
+            self.log_lakehouse_check = self.target_info['log_lakehouse']
+
         if "sql_endpoint" in self.target_info.keys():
             self.sql_endpoint = self.target_info['sql_endpoint']
         else: 
