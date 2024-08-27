@@ -62,6 +62,7 @@ class Commands:
         self.profile_info = self.profile[self.config['profile']]
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
+        self.log_lakehouse_check = self.target_info['log_lakehouse']
         if "sql_endpoint" in self.target_info.keys():
             self.sql_endpoint = self.target_info['sql_endpoint']
         else: 
@@ -90,7 +91,9 @@ class Commands:
         
         if self.CheckLakehouseLowercase(name=self.lakehouse) == 1:
             raise Exception("Error: :The lakehouse name should only consist of lowercase letters, numbers, and underscores.")
-
+        
+        if self.CheckLakehouseLowercase(name=self.log_lakehouse_check) == 1:
+            raise Exception("Error: :The log lakehouse name should only consist of lowercase letters, numbers, and underscores.")
       
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "Error!")
