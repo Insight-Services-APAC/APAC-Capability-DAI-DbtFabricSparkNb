@@ -24,7 +24,7 @@ Next we will create a new dbt project and configure it to use the dbt-fabricspar
 
 !!! Important
   
-    The ==lakehouse name== must not contain any uppercase characters. ==Lakehouse names== should only consist of lowercase letters, numbers, and underscores.
+When editing the profiles file the ==lakehouse name== and ==log lakehouse== properties must not contain any uppercase characters. ==Lakehouse names== should only consist of lowercase letters, numbers, and underscores.
 
 
 ```plaintext title="Example URL"
