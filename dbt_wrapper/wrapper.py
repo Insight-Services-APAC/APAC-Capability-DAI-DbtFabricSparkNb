@@ -65,6 +65,8 @@ class Commands:
 
         if "log_lakehouse" in self.target_info.keys():
             self.log_lakehouse_check = self.target_info['log_lakehouse']
+        else:
+            self.log_lakehouse_check = None
 
         if "sql_endpoint" in self.target_info.keys():
             self.sql_endpoint = self.target_info['sql_endpoint']
