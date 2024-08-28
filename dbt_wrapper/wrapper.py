@@ -97,8 +97,9 @@ class Commands:
         if self.CheckLakehouseLowercase(name=self.lakehouse) == 1:
             raise Exception("Error: :The lakehouse name should only consist of lowercase letters, numbers, and underscores.")
         
-        if self.CheckLakehouseLowercase(name=self.log_lakehouse_check) == 1:
-            raise Exception("Error: :The log lakehouse name should only consist of lowercase letters, numbers, and underscores.")
+        if self.log_lakehouse_check is not None:
+            if self.CheckLakehouseLowercase(name=self.log_lakehouse_check) == 1:
+                raise Exception("Error: :The log lakehouse name should only consist of lowercase letters, numbers, and underscores.")
       
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "Error!")
