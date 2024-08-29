@@ -37,6 +37,8 @@ Consequently, to use this adapter, you will need to install the [dbt-fabrickspar
 
 - *Limitation on service principal*: Service principal authentication is only supported for selective read-only Fabric admin APIs. Due to these limitations, The framework does not support service principal authentication for deployment into cloud service. Please refer to Microsoft documentation for more details on the list of APIs supported. 
 
+- In dbt, seeds are CSV files that you can load into your data warehouse. To avoid potential issues, make sure to avoid special characters, spaces in column names, and single quotes in the content of your seed files.
+
 ## Getting Started
 
 
