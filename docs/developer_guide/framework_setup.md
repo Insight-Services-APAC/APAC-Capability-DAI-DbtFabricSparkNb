@@ -19,6 +19,11 @@ Here we will create a new dbt project and configure it to use the dbt-fabricspar
           3. From these properties select copy url and paste it into a text editor. The workspace id is the first GUID in the URL, the lakehouse id is the second GUID in the URL. 
           4. In the example below, the workspace id is `4f0cb887-047a-48a1-98c3-ebdb38c784c2` and the lakehouse id is `aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9`.
 
+!!! Important
+  
+    When editing the profiles file the ==lakehouse name== and ==log lakehouse== properties must not contain any uppercase characters. ==Lakehouse names== should only consist of lowercase letters, numbers, and underscores.
+
+
 > https://onelake.dfs.fabric.microsoft.com/4f0cb887-047a-48a1-98c3-ebdb38c784c2/aa2e5f92-53cc-4ab3-9a54-a6e5b1aeb9a9/Files/notebooks
 
 
