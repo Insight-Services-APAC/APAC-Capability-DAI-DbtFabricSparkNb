@@ -39,6 +39,13 @@ def hashcheck_levels():
     return ["BYPASS", "WARNING", "ERROR"]
 
 @app.command()
+def version():
+    """
+    This command will show the current version of the framework.
+    """
+    print(f"Goodbye")
+
+@app.command()
 def docs():
     """
     This command will generate the documentation for the dbt project.
