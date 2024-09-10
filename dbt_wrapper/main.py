@@ -8,7 +8,7 @@ from rich import print
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.hashcheck_levels import HashCheckLevel
 from dbt_wrapper.stage_executor import stage_executor
-
+from importlib.metadata import version
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -45,6 +45,13 @@ def docs():
     """
     print(f"Goodbye")
 
+@app.command()
+def v():    
+    """
+    This command will return the version of dbt wrapper package
+    """    
+    package_version = Commands.GetPackageVersion(package_name_string)
+    print(f"The version of {package_name_string} is: {package_version}")    
 
 @app.command()
 def buildcomparemetadata(  

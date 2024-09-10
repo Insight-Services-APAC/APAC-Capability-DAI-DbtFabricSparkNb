@@ -14,7 +14,7 @@ from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
 from rich.panel import Panel
-
+from importlib.metadata import version
 
 
 class Commands:
@@ -84,7 +84,12 @@ class Commands:
         except:
             raise Exception("No target environment setting found in profile.yml")
         
-
+    def GetPackageVersion(package_name):
+        try:
+            version = importlib.metadata.version(package_name)
+            return version
+        except (importlib.metadata.PackageNotFoundError, ValueError) as e:
+            return f"Error fetching version: {e}"
       
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "Error!")
