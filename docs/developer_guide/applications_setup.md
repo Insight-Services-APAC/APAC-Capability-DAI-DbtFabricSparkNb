@@ -108,10 +108,7 @@ Now lets create and activate our Python environment and install the required pac
 
 === "MacOS"
 
-    ```powershell
-
-    # Ensure that you are in the pwsh shell
-    pwsh
+    ```bash
 
     # Create a new source code directory
     mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
@@ -121,13 +118,8 @@ Now lets create and activate our Python environment and install the required pac
     # Create the Python environment
     python -m venv .env
 
-    #Optional step to run if activate.ps1 failes due to security policy
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-
     # Activate the Python environment
-    ./.env/Scripts/Activate.ps1  
-
-
+    source .env/bin/activate
     ```
 
 === "Linux"
