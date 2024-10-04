@@ -14,7 +14,7 @@ from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
 from rich.panel import Panel
-
+from time import sleep
 
 
 class Commands:
@@ -32,7 +32,10 @@ class Commands:
         self.next_env_name = None
     
     def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None):
-        if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
+        path = Path(dbt_project_dir.replace("\\", "/"))
+        path_elements = path.parts
+        num_elements = len(path_elements)
+        if num_elements > 1:
             self.console.print(
                 "Warning: :file_folder: The dbt_project_dir provided is nested and not a valid dbt project directory in windows. Copying the dbt_project_dir to the samples_tests directory.",
                 style="warning",
@@ -90,12 +93,12 @@ class Commands:
         print('\033[1;33;48m', "Error!")
         print(f"Directory ./{os.environ['DBT_PROJECT_DIR']}/metaextracts/ does not exist and should have been created automatically.")
 
-    def GeneratePreDbtScripts(self, PreInstall, progress: ProgressConsoleWrapper, task_id, lakehouse_config):        
-        gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
+    def GeneratePreDbtScripts(self, PreInstall, notebook_timeout, progress: ProgressConsoleWrapper, task_id, lakehouse_config):        
+        gf.GenerateMetadataExtract(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, lakehouse_config=lakehouse_config, notebook_timeout=notebook_timeout)
 
         # gf.GenerateNotebookUpload(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
 
-        gf.GenerateUtils(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+        gf.GenerateUtils(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout)
 
         
       #  gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], progress=progress, task_id=task_id)
@@ -107,7 +110,7 @@ class Commands:
             log_lakehouse = self.lakehouse
 
         gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
-        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout,max_worker = self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
         curr_dir = os.getcwd()
@@ -115,6 +118,7 @@ class Commands:
         self.fa.IPYNBtoFabricPYFile(dbt_project_dir=dbt_project_dir, progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], lakehouse_id=self.target_info['lakehouseid'], lakehouse=self.lakehouse, lakehouse_config=lakehouse_config)
     
     def CleanProjectTargetDirectory(self, progress: ProgressConsoleWrapper, task_id):
+        print("Cleaning Project Target Directory")
         if os.path.exists(self.dbt_project_dir + "/target"):
             shutil.rmtree(self.dbt_project_dir + "/target")
         # Generate AzCopy Scripts and Metadata Extract Notebooks
@@ -167,30 +171,47 @@ class Commands:
                     Buildarr.append('--exclude')
                     Buildarr.append(exclude)
 
-                result = subprocess.run(Buildarr, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                # Access the output and error
-                output = result.stdout.decode('utf-8')
-                error = result.stderr.decode('utf-8')
+                try:
+                    result = subprocess.run(Buildarr, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    # Access the output and error
+                    output = result.stdout.decode('utf-8')
+                    error = result.stderr.decode('utf-8')
 
-                self.console.print(f"Output: {output}", style="info")
-                if error:
-                    self.console.print(f"Error: {error}", style="error")
+                    self.console.print(f"Output: {output}", style="info")
+                    
+                    if error:
+                        self.console.print(f"Error: {error}", style="error")
+                
+                except subprocess.CalledProcessError as e:
+                    #try reading the dbt log file
+                    if os.path.exists(self.dbt_project_dir + "/logs/dbt.log"):
+                        with open(self.dbt_project_dir + "/logs/dbt.log", 'r') as f:
+                            self.console.print("DBT has thrown an error. Here is the Log File:" + "\n", style="error")
+                            self.console.print(f.read(), style="error")
+                    else:
+                        self.console.print(f"Error: {e.stderr.decode('utf-8')}")
+                    raise e
+                
         print(Panel.fit("[blue]End of dbt build >>>>>>>>>>>>>>>>>>>>>>>[/blue]"))
 
     def DownloadMetadata(self, progress: ProgressConsoleWrapper, task_id):
         progress.print("Downloading Metadata", level=LogLevel.INFO)
         curr_dir = os.getcwd()
         dbt_project_dir = str(Path(Path(curr_dir) / Path(self.dbt_project_dir)))
-        mn.DownloadMetaFiles(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspacename=self.target_info['workspaceid'], datapath=self.target_info['lakehouseid'] + "/Files/MetaExtracts/")
+        try:
+            mn.DownloadMetaFiles(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspacename=self.target_info['workspaceid'], datapath=self.target_info['lakehouseid'] + "/Files/metaextracts/")
+        except Exception as e:
+            progress.print(f"Error downloading meta extracts: Workspacename: {self.target_info['workspaceid']}, DataPath: {self.target_info['lakehouseid'] + '/Files/metaextracts/'}", level=LogLevel.ERROR)
+            raise e
 
     def RunMetadataExtract(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"metadata_{self.project_name}_extract"
         nb_id = self.fa.GetNotebookIdByName(workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
-        if nb_id is None:
-            progress.print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now", level=LogLevel.INFO)
-            self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=self.dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
-        else: 
-            progress.print("Metadata Extract Notebook Found in Workspace.", level=LogLevel.INFO)            
+        # if nb_id is None:
+        #    progress.print("Metadata Extract Notebook Not Found in Workspace. Uploading Notebook Now", level=LogLevel.INFO)
+        self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=self.dbt_project_dir, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+        #else: 
+        #    progress.print("Metadata Extract Notebook Found in Workspace.", level=LogLevel.INFO)            
         progress.print("Running Metadata Extract", LogLevel.INFO)
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=f"metadata_{self.project_name}_extract")
 
@@ -199,7 +220,31 @@ class Commands:
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
 
     def GetExecutionResults(self, progress: ProgressConsoleWrapper, task_id):
-        if self.sql_endpoint is not None:
+        if self.sql_endpoint is not None:           
+            _fas = fas.FabricApiSql(console=self.console, server=self.sql_endpoint, database=self.lakehouse)
+            
+            # loop every 10 seconds until you have waited 1 minute
+            i = 0
+            while i < 60:
+                remaining = 60 - i
+                progress.progress.update(task_id=task_id, description=f"Waiting for data lake to update before checking for execution Results. {remaining} seconds remaining. ", level=LogLevel.INFO)
+                i += 10
+                sleep(10)
+           
+            sql = f"""
+                Select  SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)) type, status, count(a.notebook) notebooks
+                from {self.lakehouse}.dbo.execution_log a 
+                join 
+                (
+                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
+                from {self.lakehouse}.dbo.execution_log  
+                group by batch_id 
+                order by start_time desc
+                ) b on a.batch_id = b.batch_id
+                group by SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)), status
+            """
+            _fas.ExecuteSQL(sql=sql, title="Summary", progress=progress, task_id=task_id)
+
             sql = f"""
                 Select a.notebook, replace(CONVERT(varchar(20), DATEADD(second, a.start_time, '1970/01/01 00:00:00'),126), 'T',' ') start_time, status, error
                 from {self.lakehouse}.dbo.execution_log a 
@@ -212,12 +257,11 @@ class Commands:
                 ) b on a.batch_id = b.batch_id
                 where a.status = 'error'
             """
-            _fas = fas.FabricApiSql(console=self.console, server=self.sql_endpoint, database=self.lakehouse)
-            _fas.ExecuteSQL(sql=sql, progress=progress, task_id=task_id)
+            _fas.ExecuteSQL(sql=sql, title="Error Details", progress=progress, task_id=task_id)
+
         else: 
             progress.print("SQL Endpoint not found in profile. Skipping Execution Results", level=LogLevel.WARNING)
-            
-            
+
     def RunBuildMetadataNotebook_Source(self, progress: ProgressConsoleWrapper, task_id):
         nb_name = f"util_BuildMetadata"
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
@@ -230,11 +274,11 @@ class Commands:
         nb_name = f'compare_{self.config['name']}_{self.current_env_name}_to_{self.next_env_name}_notebook'
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
 
-    def GenerateMissingObjectsNotebook(self, progress: ProgressConsoleWrapper, task_id):        
-        gf.GenerateMissingObjectsNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, source_env=self.current_env_name, target_env=self.next_env_name)
+    def GenerateMissingObjectsNotebook(self, notebook_timeout, progress: ProgressConsoleWrapper, task_id):        
+        gf.GenerateMissingObjectsNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, source_env=self.current_env_name, target_env=self.next_env_name, notebook_timeout=notebook_timeout)
 
-    def GenerateCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):
-        gf.GenerateCompareNotebook(self.dbt_project_dir, self.current_env_name, self.current_env['workspaceid'], self.current_env['lakehouseid'], self.next_env_name, self.next_env['workspaceid'], self.next_env['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id)
+    def GenerateCompareNotebook(self, notebook_timeout, progress: ProgressConsoleWrapper, task_id):
+        gf.GenerateCompareNotebook(self.dbt_project_dir, self.current_env_name, self.current_env['workspaceid'], self.current_env['lakehouseid'], self.next_env_name, self.next_env['workspaceid'], self.next_env['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout)
 
     def UploadMissingObjectsNotebookViaApi(self, progress: ProgressConsoleWrapper, task_id):
         curr_dir = os.getcwd()

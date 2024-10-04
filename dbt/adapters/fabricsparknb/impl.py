@@ -198,10 +198,15 @@ class SparkAdapter(SQLAdapter):
     def _get_relation_information(self, row: agate.Row) -> RelationInfo:
         """relation info was fetched with SHOW TABLES EXTENDED"""
         try:
-            _schema, name, _, information = row
+            _schema = row['namespace']
+            name = row['tableName']
+            information = row['information']
         except ValueError:
+            msg:str = ""
+            for r in row:
+                    msg += str(r) + "; "
             raise dbt.exceptions.DbtRuntimeError(
-                f'Invalid value from "show tables extended ...", got {len(row)} values, expected 4'
+                f'Invalid value from "show tables extended ...", got {len(row)} values, expected 4 {msg}'
             )
 
         return _schema, name, information

@@ -44,9 +44,10 @@ def DownloadFile(progress: ProgressConsoleWrapper, task_id, directory_client: Da
 
 
 def DownloadFiles(progress: ProgressConsoleWrapper, task_id, file_system_client: FileSystemClient, directory_name: str, local_notebook_path: str):
-    progress.progress.update(task_id=task_id, description="Listing metaextract files on one drive...")
-    paths = file_system_client.get_paths(path=directory_name)
+    progress.progress.update(task_id=task_id, description=f"Listing metaextract files for path {directory_name}")
+    paths = file_system_client.get_paths(path=directory_name)    
     for path in paths:
+        progress.progress.print(f"Found file: {path.name}")
         if (path.name[-5:] == ".json"):
             DownloadFile(progress, task_id, file_system_client, local_notebook_path, path.name)
             
@@ -58,9 +59,13 @@ def DownloadMetaFiles(progress: ProgressConsoleWrapper, task_id, dbt_project_dir
     account_name = "onelake"  # always this
     account_url = f"https://{account_name}.dfs.fabric.microsoft.com"
     local_notebook_path = str(Path(Path(dbt_project_dir) / Path('metaextracts')))
-    token_credential = DefaultAzureCredential()
-    service_client = DataLakeServiceClient(account_url, credential=token_credential)
-    file_system_client = service_client.get_file_system_client(workspacename)
-    DownloadFiles(progress, task_id, file_system_client, datapath, local_notebook_path)
-    progress.progress.update(task_id=task_id, description="Completed download of meta extracts")
- 
+    try:
+        token_credential = DefaultAzureCredential()
+        service_client = DataLakeServiceClient(account_url, credential=token_credential)
+        file_system_client = service_client.get_file_system_client(workspacename)    
+        DownloadFiles(progress, task_id, file_system_client, datapath, local_notebook_path)
+        progress.progress.update(task_id=task_id, description="Completed download of meta extracts")
+    except Exception as e:
+        progress.progress.print(f"Error downloading meta extracts: Workspacename: {workspacename}, DataPath: {datapath}, LocalPath: {local_notebook_path}")
+        raise e
+

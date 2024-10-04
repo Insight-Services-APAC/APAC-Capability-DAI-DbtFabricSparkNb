@@ -266,7 +266,7 @@ def run_all(
     se.perform_stage(option=clean_target_dir, action_callables=[wrapper_commands.CleanProjectTargetDirectory], stage_name="Clean Target")
 
     action_callables = [
-        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, lakehouse_config=lakehouse_config, **kwargs),
+        lambda **kwargs: wrapper_commands.GeneratePreDbtScripts(PreInstall=pre_install, notebook_timeout=notebook_timeout, lakehouse_config=lakehouse_config, **kwargs),
         lambda **kwargs: wrapper_commands.ConvertNotebooksToFabricFormat(lakehouse_config=lakehouse_config, **kwargs),
     ]
     se.perform_stage(option=generate_pre_dbt_scripts, action_callables=action_callables, stage_name="Generate Pre-DBT Scripts")
@@ -289,6 +289,73 @@ def run_all(
 
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.RunMasterNotebook], stage_name="Run Master Notebook")
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.GetExecutionResults], stage_name="Get Execution Results")
+
+
+@app.command()
+def download_metadata(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None,    
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
+):
+    """
+    This command will run just the metadata download.
+    """    
+    
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+    
+    se.perform_stage(option=download_metadata, action_callables=[wrapper_commands.DownloadMetadata], stage_name="Download Metadata")
+
+
+@app.command()
+def get_execution_results(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory. If left blank it will use the current directory"
+        ),
+    ],
+    dbt_profiles_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_profile directory. If left blank it will use the users home directory followed by .dbt."
+        ),
+    ] = None,    
+    log_level: Annotated[
+        Optional[str],
+        typer.Option(
+            help="The option to set the log level. This controls the verbosity of the output. Allowed values are `DEBUG`, `INFO`, `WARNING`, `ERROR`. Default is `WARNING`.",
+        ),
+    ] = "WARNING"
+):
+    """
+    This command will run just the extract of the last execution results.
+    """    
+    
+    _log_level: LogLevel = LogLevel.from_string(log_level)    
+    
+    wrapper_commands.GetDbtConfigs(dbt_project_dir=dbt_project_dir, dbt_profiles_dir=dbt_profiles_dir)
+    se: stage_executor = stage_executor(log_level=_log_level, console=console)
+    
+    se.perform_stage(option=True, action_callables=[wrapper_commands.GetExecutionResults], stage_name="Get Execution Results")
+
 
 if __name__ == "__main__":
     app()

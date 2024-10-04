@@ -10,6 +10,10 @@ def ListRelations(profile):
         # Load JSON data from file
         data = json.load(file)
 
+    table = agate.Table.from_object(data)
+
+    return table
+
     for row in data:
         # Access the 'information' field
         information = row.get('information', None)
@@ -39,9 +43,7 @@ def ListRelations(profile):
         #row.update(parsed_data)
         #row.pop('information')
     # Convert the data to an Agate table
-    table = agate.Table.from_object(data)    
-
-    return table
+    
 
 
 @staticmethod
@@ -80,13 +82,13 @@ def ListSchema(profile, schema):
     with io.open(profile.project_root + '/metaextracts/ListSchemas.json', 'r') as file:
         # Load JSON data from file
         data = json.load(file)
-   
+    
     table = agate.Table.from_object(data)    
 
     #transforming Database/schema name to lower case
     schema = schema.lower()   
     
     # Filter the table
-    filtered_table = table.where(lambda row: row['namespace'] == schema)
+    filtered_table = table.where(lambda row: str(row['namespace']).lower() == schema)
 
     return filtered_table

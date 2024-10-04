@@ -12,7 +12,7 @@ class FabricApiSql:
         self.server = server
         self.database = database    
 
-    def ExecuteSQL(self, sql, progress: ProgressConsoleWrapper, task_id):
+    def ExecuteSQL(self, sql, title, progress: ProgressConsoleWrapper, task_id):
         credential = AzureCliCredential()  # use your authentication mechanism of choice
         sql_endpoint = f"{self.server}.datawarehouse.fabric.microsoft.com"  # copy and paste the SQL endpoint from any of the Lakehouses or Warehouses in your Fabric Workspace
      
@@ -33,7 +33,7 @@ class FabricApiSql:
         rows = cursor.fetchall()
         
         # Create a table
-        table = Table(title="Results")
+        table = Table(title=title)
 
         # Add columns to the table
         for column in cursor.description:

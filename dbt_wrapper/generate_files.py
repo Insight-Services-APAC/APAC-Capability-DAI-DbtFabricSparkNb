@@ -82,7 +82,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         template = env.get_template('master_notebook_x.ipynb')
 
         # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name,max_worker=max_worker, log_lakehouse=log_lakehouse)
+        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name, notebook_timeout=notebook_timeout, max_worker=max_worker, log_lakehouse=log_lakehouse)
 
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
@@ -126,7 +126,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     MetaHashes = Catalog.GetMetaHashes(project_root)    
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse,notebook_hashcheck=notebook_hashcheck)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -178,7 +178,7 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             raise ex
 
 
-def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
+def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, notebook_timeout, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -190,7 +190,7 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
     template = env.get_template('metadata_extract.ipynb')
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, lakehouse_name=lakehouse_name)
+    rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root, notebook_timeout=notebook_timeout, lakehouse_name=lakehouse_name)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -222,8 +222,9 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
         except Exception as ex:
             progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
-        
-def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+
+
+def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, notebook_timeout, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -237,7 +238,7 @@ def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, projec
     createddate = datetime.now()
 
     # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, createddate=createddate)
+    rendered_template = template.render(lakehouse_name=lakehouse_name, createddate=createddate, notebook_timeout=notebook_timeout)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -253,7 +254,8 @@ def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, projec
             progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
 
-def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, target_env, target_workspaceid, target_lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id):
+
+def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, target_env, target_workspaceid, target_lakehouseid, lakehouse_name, project_name, notebook_timeout, progress: ProgressConsoleWrapper, task_id):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
@@ -270,7 +272,7 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
     rendered_template = template.render(workspace_id=workspaceid, lakehouse_id=lakehouseid, project_root=project_root
                                         , lakehouse_name=lakehouse_name, target_workspace_id=target_workspaceid, target_lakehouse_id=target_lakehouseid
                                         , source_env=source_env, target_env=target_env, createddate=createddate
-                                        ,project_name=project_name)
+                                        , project_name=project_name, notebook_timeout=notebook_timeout)
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -287,7 +289,7 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
             raise ex
         
 
-def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, source_env, target_env):
+def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, notebook_timeout, progress: ProgressConsoleWrapper, task_id, source_env, target_env):
     notebook_dir = f'./{project_root}/target/notebooks/'
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
