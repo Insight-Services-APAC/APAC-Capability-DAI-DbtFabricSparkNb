@@ -485,8 +485,12 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         # Gather the Spark SQL from the notebook and set the sql variable
         mnb.GatherSql()
         mnb.SetTheSqlVariable()
+        mnb.SetThePythonPreScript(project_root, notebook_file, lakehouse_name)
         # always set the config in first code cell
-        mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
+        import re
+
+        # Use re.sub to replace the placeholder with optional spaces
+        mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
 
         # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
