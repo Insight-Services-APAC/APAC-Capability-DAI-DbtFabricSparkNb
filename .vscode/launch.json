@@ -4,12 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
-            "name": "Python Debugger: Current File",
+            "name": "Python Debugger: Run Simple Test",
             "type": "debugpy",
             "request": "launch",
             "program": "./test_pre_install.py",
-            "args": ["run-all",  "--pre-install", "--no-build-dbt-project",  "--no-upload-notebooks-via-api", "--no-generate-post-dbt-scripts", "--log-level", "warning",  "samples/testproj2"],
+            "args": ["run-all",  "--pre-install",  "--no-upload-notebooks-via-api", "--no-generate-post-dbt-scripts", "--no-auto-execute-metadata-extract", "--no-auto-run-master-notebook", "--no-download-metadata", "--no-clean-target-dir", "--log-level", "warning",  "samples/testproj2"],
             "console": "integratedTerminal"
         }
     ]

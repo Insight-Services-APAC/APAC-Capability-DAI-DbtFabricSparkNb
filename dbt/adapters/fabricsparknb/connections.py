@@ -1,23 +1,20 @@
-from colorama import init
-import dbt.adapters.fabricspark
-import dbt.utils
 import dbt.adapters
 import dbt.adapters.fabricsparknb.mock as mock
-import dbt.adapters.fabricspark.connections as fs_connections
+import dbt.adapters.fabricsparknb.connections as fs_connections
 from contextlib import contextmanager
 import os
 import dbt.exceptions
 
 from dbt.adapters.sql import SQLConnectionManager
-from dbt.contracts.connection import ConnectionState, AdapterResponse
-from dbt.events import AdapterLogger
-from dbt.events.functions import fire_event
-from dbt.events.types import ConnectionUsed, SQLQuery, SQLQueryStatus
+from dbt.adapters.contracts.connection import ConnectionState, AdapterResponse
+from dbt.adapters.events.logging import AdapterLogger
+from dbt_common.events.functions import fire_event
+from dbt.adapters.events.types import ConnectionUsed, SQLQuery, SQLQueryStatus
 from dbt.utils import DECIMALS
 from dbt.adapters.fabricsparknb.livysession import LivySessionConnectionWrapper, LivySessionManager
 
-from dbt.contracts.connection import Connection
-from dbt.dataclass_schema import StrEnum
+from dbt.adapters.contracts.connection import Connection
+from dbt_common.dataclass_schema import StrEnum
 from typing import Any, Optional, Union, Tuple, List, Generator, Iterable, Sequence
 from abc import ABC, abstractmethod
 import time
@@ -76,12 +73,62 @@ class SparkConnectionWrapper(ABC):
         pass
 
 
-class SparkConnectionManager(fs_connections.SparkConnectionManager):
+class SparkConnectionManager(SQLConnectionManager):
     TYPE = "fabricsparknb"
     connection_managers = {}
     spark_version = None
     
+    @contextmanager
+    def exception_handler(self, sql: str) -> Generator[None, None, None]:
+        try:
+            yield
 
+        except Exception as exc:
+            logger.debug("Error while running:\n{}".format(sql))
+            logger.debug(exc)
+            if len(exc.args) == 0:
+                raise
+
+            thrift_resp = exc.args[0]
+            if hasattr(thrift_resp, "status"):
+                msg = thrift_resp.status.errorMessage
+                raise dbt.exceptions.DbtRuntimeError(msg)
+            else:
+                raise dbt.exceptions.DbtRuntimeError(str(exc))
+
+    def cancel(self, connection: Connection) -> None:
+        connection.handle.cancel()
+
+    @classmethod
+    def get_response(cls, cursor: Any) -> AdapterResponse:
+        # https://github.com/dbt-labs/dbt-spark/issues/142
+        message = "OK"
+        return AdapterResponse(_message=message)
+
+    # No transactions on Spark....
+    def add_begin_query(self, *args: Any, **kwargs: Any) -> None:
+        logger.debug("NotImplemented: add_begin_query")
+
+    def add_commit_query(self, *args: Any, **kwargs: Any) -> None:
+        logger.debug("NotImplemented: add_commit_query")
+
+    def commit(self, *args: Any, **kwargs: Any) -> None:
+        logger.debug("NotImplemented: commit")
+
+    def rollback(self, *args: Any, **kwargs: Any) -> None:
+        logger.debug("NotImplemented: rollback")
+
+    @classmethod
+    def validate_creds(cls, creds: Any, required: Iterable[str]) -> None:
+        method = creds.method
+
+        for key in required:
+            if not hasattr(creds, key):
+                raise dbt.exceptions.DbtProfileError(
+                    "The config '{}' is required when using the {} method"
+                    " to connect to Spark".format(key, method)
+                )
+            
     @classmethod
     def open(cls, connection: Connection) -> Connection:        
         """Need to override the SparkConnectionManager class to use fabric-sparknb instead of fabric-spark"""
@@ -149,9 +196,6 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
         connection.handle = handle
         connection.state = ConnectionState.OPEN
         return connection
-
-
-    
 
     @classmethod
     def release(self) -> None:
@@ -282,6 +326,7 @@ class SparkConnectionManager(fs_connections.SparkConnectionManager):
             )
 
             return connection, cursor
+
         
 def _is_retryable_error(exc: Exception) -> str:
     message = str(exc).lower()

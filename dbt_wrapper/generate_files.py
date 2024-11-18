@@ -9,7 +9,7 @@ from pathlib import Path
 from dbt.contracts.graph.manifest import Manifest
 import dbt_wrapper.utils as mn
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
-from dbt.clients.system import load_file_contents
+from dbt_common.clients.system import load_file_contents
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 import fnmatch

@@ -11,7 +11,7 @@ import datetime as dt
 from types import TracebackType
 from typing import Any
 import dbt.exceptions
-from dbt.events import AdapterLogger
+from dbt.adapters.events.logging import AdapterLogger
 from dbt.utils import DECIMALS
 from azure.core.credentials import AccessToken
 from azure.identity import AzureCliCredential, ClientSecretCredential
@@ -134,54 +134,7 @@ class LivySession:
     def create_session(self, data) -> str:
         self.session_id = "0"
         return self.session_id
-        # Create sessions
-        response = None
-        try:
-            response = requests.post(
-                self.connect_url + "/sessions",
-                data=json.dumps(data),
-                headers=get_headers(self.credential, True),
-            )
-            if response.status_code == 200:
-                logger.debug("Initiated Livy Session...")
-            response.raise_for_status()
-        except requests.exceptions.ConnectionError as c_err:
-            print("Connection Error :", c_err)
-        except requests.exceptions.HTTPError as h_err:
-            print("Http Error: ", h_err)
-        except requests.exceptions.Timeout as t_err:
-            print("Timeout Error: ", t_err)
-        except requests.exceptions.RequestException as a_err:
-            print("Authorization Error: ", a_err)
-
-        if response is None:
-            raise Exception("Invalid response from livy server")
-
-        self.session_id = None
-        try:
-            self.session_id = str(response.json()["id"])
-        except requests.exceptions.JSONDecodeError as json_err:
-            raise Exception("Json decode error to get session_id") from json_err
-
-        # Wait for started state
-        while True:
-            res = requests.get(
-                self.connect_url + "/sessions/" + self.session_id,
-                headers=get_headers(self.credential, False),
-            ).json()
-            if res["state"] == "starting" or res["state"] == "not_started":
-                # logger.debug("Polling Session creation status - ", self.connect_url + '/sessions/' + self.session_id )
-                time.sleep(DEFAULT_POLL_WAIT)
-            elif res["livyInfo"]["currentState"] == "idle":
-                logger.debug(f"New livy session id is: {self.session_id}, {res}")
-                self.is_new_session_required = False
-                break
-            elif res["livyInfo"]["currentState"] == "dead":
-                print("ERROR, cannot create a livy session")
-                raise dbt.exceptions.FailedToConnectException("failed to connect")
-                return
-        return self.session_id
-
+       
     def delete_session(self) -> None:
         logger.debug(f"Closing the livy session: {self.session_id}")
 
@@ -200,13 +153,7 @@ class LivySession:
             logger.error(f"Unable to close the livy session {self.session_id}, error: {ex}")
 
     def is_valid_session(self) -> bool:
-        return True
-        res = requests.get(
-            self.connect_url + "/sessions/" + self.session_id,
-            headers=get_headers(self.credential, False),
-        ).json()
-
-        return res["livyInfo"]["currentState"] == "idle"
+        return True       
 
     @staticmethod
     def execute(sql: str, *parameters: Any) -> None:

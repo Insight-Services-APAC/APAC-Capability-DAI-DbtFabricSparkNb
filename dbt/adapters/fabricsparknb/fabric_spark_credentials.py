@@ -1,4 +1,4 @@
-from dbt.adapters.base import Credentials
+from dbt.adapters.contracts.connection import Credentials
 from typing import Any, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 import dbt.exceptions
