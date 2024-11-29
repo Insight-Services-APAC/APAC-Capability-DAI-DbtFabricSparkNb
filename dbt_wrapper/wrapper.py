@@ -15,8 +15,6 @@ from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
 from rich.panel import Panel
 
-
-
 class Commands:
     def __init__(self, console):
         self.console = console
@@ -31,6 +29,12 @@ class Commands:
         self.next_env = None
         self.next_env_name = None
     
+    def CheckLakehouseLowercase(self, name):
+        if any(char.isupper() for char in name):
+            return 1
+        else:
+            return 0
+
     def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None):
         if len(dbt_project_dir.replace("\\", "/").split("/")) > 1:
             self.console.print(
@@ -58,6 +62,12 @@ class Commands:
         self.profile_info = self.profile[self.config['profile']]
         self.target_info = self.profile_info['outputs'][self.profile_info['target']]
         self.lakehouse = self.target_info['lakehouse']
+
+        if "log_lakehouse" in self.target_info.keys():
+            self.log_lakehouse_check = self.target_info['log_lakehouse']
+        else:
+            self.log_lakehouse_check = None
+
         if "sql_endpoint" in self.target_info.keys():
             self.sql_endpoint = self.target_info['sql_endpoint']
         else: 
@@ -84,7 +94,12 @@ class Commands:
         except:
             raise Exception("No target environment setting found in profile.yml")
         
-
+        if self.CheckLakehouseLowercase(name=self.lakehouse) == 1:
+            raise Exception("Error: :The lakehouse name should only consist of lowercase letters, numbers, and underscores.")
+        
+        if self.log_lakehouse_check is not None:
+            if self.CheckLakehouseLowercase(name=self.log_lakehouse_check) == 1:
+                raise Exception("Error: :The log lakehouse name should only consist of lowercase letters, numbers, and underscores.")
       
     def PrintFirstTimeRunningMessage(self):
         print('\033[1;33;48m', "Error!")
