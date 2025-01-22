@@ -1,5 +1,6 @@
 sqlparse>=0.4.2 
-dbt-fabricspark==1.7.0rc1
+dbt-fabricspark
+dbt-databricks
 nbformat
 types-PyYAML
 types-python-dateutil

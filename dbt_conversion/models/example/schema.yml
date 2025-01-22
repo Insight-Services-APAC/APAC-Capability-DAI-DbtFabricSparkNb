@@ -1,0 +1,35 @@
+
+version: 2
+
+models:
+  - name: innings
+    description: "innings details"
+    columns:
+      - name: Team
+        description: "Team Batting"
+      - name: innings_id
+        description: "innings id"
+      - name: MatchOver
+        description: "Over number"
+      - name: delivery_id
+        description: delivery within the over
+      - name: Delivery
+        description: over and delivery combination
+      - name: bowler
+        description: "Current bowler delivering ball"
+      - name: batter
+        description: "batter facing the bowler"
+      - name: non_striker
+        description: "Batter at non striker end"
+      - name: batter_runs
+        description: "runs scored by batter"
+      - name: extras_byes
+        description: "Byes runs scored"
+      - name: extras_wides
+        description: "Wide runs scored"
+      - name: extras_legbyes
+        description: "Legbyes runs scored"
+      - name: extras_noballs
+        description: "No-ball runs scored"
+      - name: filenumber
+        description: "source file name"
