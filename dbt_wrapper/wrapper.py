@@ -271,7 +271,7 @@ class Commands:
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.next_env['workspaceid'], notebook_name=nb_name)
 
     def RunCompareNotebook(self, progress: ProgressConsoleWrapper, task_id):
-        nb_name = f'compare_{self.config['name']}_{self.current_env_name}_to_{self.next_env_name}_notebook'
+        nb_name = f"compare_{self.config['name']}_{self.current_env_name}_to_{self.next_env_name}_notebook"
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
 
     def GenerateMissingObjectsNotebook(self, notebook_timeout, progress: ProgressConsoleWrapper, task_id):        
