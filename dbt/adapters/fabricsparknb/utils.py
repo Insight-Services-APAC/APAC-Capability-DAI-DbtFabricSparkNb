@@ -11,7 +11,7 @@ import dbt.config as dbtconfig
 import json
 from dbt.contracts.graph.manifest import Manifest
 import dbt.adapters.fabricsparknb.catalog as Catalog
-from dbt.clients.system import load_file_contents
+from dbt_common.clients.system import load_file_contents
 from dbt.adapters.fabricsparknb.notebook import ModelNotebook
 import dbt.adapters.fabricsparknb.notebook as mn
 from pathlib import Path
