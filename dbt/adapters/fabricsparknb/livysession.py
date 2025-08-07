@@ -428,7 +428,9 @@ class LivyCursor:
         mnb.AddCell(cell)
         # mnb.GatherSql()
         # mnb.SetTheSqlVariable()
-
+        for cell in mnb.nb.cells:
+            if 'id' in cell:
+                del cell['id']
         # Write the notebook to a file
         with io.open(file=filename, mode='w', encoding='utf-8') as f:
             try:

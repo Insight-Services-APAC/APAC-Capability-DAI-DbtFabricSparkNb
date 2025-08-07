@@ -1,0 +1,125 @@
+# dbt_wrapper Pipeline Configuration
+version: '1.0'
+
+# Default options applied to all workflows unless overridden
+defaults:
+  log_level: WARNING
+  notebook_timeout: 1800
+  lakehouse_config: METADATA
+
+# Environment-specific configurations
+environments:
+  development:
+    workspace_id: ${DBT_FABRIC_WORKSPACE_ID_DEV}
+    lakehouse_id: ${DBT_FABRIC_LAKEHOUSE_ID_DEV}
+    
+  staging:
+    workspace_id: ${DBT_FABRIC_WORKSPACE_ID_STAGING}
+    lakehouse_id: ${DBT_FABRIC_LAKEHOUSE_ID_STAGING}
+    
+  production:
+    workspace_id: ${DBT_FABRIC_WORKSPACE_ID_PROD}
+    lakehouse_id: ${DBT_FABRIC_LAKEHOUSE_ID_PROD}
+
+# Workflow definitions
+workflows:
+  # Development workflow - for local development
+  dev:
+    description: Quick iteration workflow for local development
+    stages:
+      - clean
+      - pre-scripts
+      - metadata-extract
+      - build
+      - post-scripts
+    options:
+      log_level: INFO
+      hashcheck_level: WARNING
+      upload_notebooks: false
+      auto_run_master: false
+  
+  # Full deployment workflow
+  deploy:
+    description: Complete deployment pipeline with upload and execution
+    stages:
+      - clean
+      - pre-scripts
+      - metadata-extract
+      - metadata-download
+      - build
+      - post-scripts
+      - upload
+      - execute
+      - results
+    options:
+      log_level: WARNING
+      hashcheck_level: ERROR
+      upload_notebooks: true
+      auto_run_master: true
+  
+  # CI/CD workflow for automated testing
+  ci:
+    description: Continuous integration pipeline
+    stages:
+      - clean
+      - metadata-extract
+      - build
+      - validate
+    options:
+      log_level: INFO
+      hashcheck_level: ERROR
+      notebook_timeout: 900
+      upload_notebooks: false
+      auto_run_master: false
+  
+  # Production deployment with specific environment
+  production:
+    description: Production deployment workflow
+    environment: production
+    stages:
+      - clean
+      - pre-scripts
+      - metadata-extract
+      - metadata-download
+      - build
+      - post-scripts
+      - upload
+      - execute
+      - results
+    options:
+      log_level: ERROR
+      hashcheck_level: ERROR
+      notebook_timeout: 3600
+      upload_notebooks: true
+      auto_run_master: true
+  
+  # Quick test without cleaning or uploading
+  quick-test:
+    description: Quick test without cleaning or uploading
+    stages:
+      - metadata-download
+      - build
+    options:
+      log_level: DEBUG
+      hashcheck_level: BYPASS
+      
+  # Metadata refresh only
+  metadata-refresh:
+    description: Refresh metadata from Fabric lakehouses
+    stages:
+      - metadata-extract
+      - metadata-download
+    options:
+      log_level: INFO
+      
+  # Upload and execute only (after local build)
+  upload-execute:
+    description: Upload notebooks and execute in Fabric
+    stages:
+      - upload
+      - execute
+      - results
+    options:
+      log_level: WARNING
+      upload_notebooks: true
+      auto_run_master: true

@@ -10,14 +10,15 @@ This is the dbt-fabricsparknb adapter, an Insight version of the dbt adapter for
 
 ### Setup and Installation
 ```bash
+# IMPORTANT: Use uv for package management (not pip)
 # Install the package in development mode with all dependencies
-pip install -e . -r requirements.txt
+uv pip install -e . -r requirements.txt
 
 # Install development dependencies from pyproject.toml
-pip install -e ".[dev]"
+uv pip install -e ".[dev]"
 
 # Install documentation dependencies
-pip install -e ".[docs]"
+uv pip install -e ".[docs]"
 
 # Run pre-commit install after setup
 pre-commit install
@@ -150,5 +151,6 @@ dbt_wrapper generatecatalog <dbt_project_dir> [dbt_profiles_dir]
 - GitHub Actions workflows handle testing and deployment
 
 ## Debugging and Testing Tips
+- **IMPORTANT**: Always activate the virtual environment first: `source .venv/bin/activate`
 - When running the `dbt_wrapper` command in a development environment (non pip installed) you need to run it from the root directory of the project an use the command `python -m dbt_wrapper.main` instead of just `dbt_wrapper`.
 - Use `python -m dbt_wrapper.main --help` to see available commands and options.

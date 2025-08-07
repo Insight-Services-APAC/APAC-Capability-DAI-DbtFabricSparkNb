@@ -21,8 +21,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
+    "dbt-fabricspark @ git+https://github.com/microsoft/dbt-fabricspark.git@7fbc5837701b1350886dbdf461e23aa50a306904",
+    "dbt-adapters",
+    "dbt-spark",
     "sqlparse>=0.4.2",
-    "nbformat",
+    "nbformat==5.10.4",
     "types-PyYAML",
     "types-python-dateutil",
     "msfabricpysdkcore==0.2.8",

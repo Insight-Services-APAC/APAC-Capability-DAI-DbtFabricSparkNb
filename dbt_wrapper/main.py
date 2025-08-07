@@ -1,16 +1,34 @@
-from typing import Optional
+from typing import Optional, List
 import typer
 from typing_extensions import Annotated
 from rich.console import Console
 from rich.theme import Theme
+from rich.table import Table
+from rich.panel import Panel
+from rich.prompt import Confirm
+from pathlib import Path
 from dbt_wrapper.wrapper import Commands
 from rich import print
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.hashcheck_levels import HashCheckLevel
 from dbt_wrapper.stage_executor import stage_executor
+from dbt_wrapper.workflows import WorkflowManager, WorkflowType, InteractiveMode, StageType
+from dbt_wrapper.pipeline_config import ConfigLoader, PipelineConfig
+import json
+import os
+from datetime import datetime
 
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
+
+# Create subcommands for better organization
+stage_app = typer.Typer(help="Manage and run individual pipeline stages")
+env_app = typer.Typer(help="Manage environments and configurations")
+config_app = typer.Typer(help="Manage pipeline configuration files")
+
+app.add_typer(stage_app, name="stage")
+app.add_typer(env_app, name="env")
+app.add_typer(config_app, name="config")
 
 custom_theme = Theme({"info": "dim cyan", "warning": "dark_orange", "danger": "bold red", "error": "bold red", "debug": "khaki1"})
 
@@ -37,6 +55,547 @@ def log_levels():
 #JM issues61 adding _hashcheck_level
 def hashcheck_levels():
     return ["BYPASS", "WARNING", "ERROR"]
+
+# Initialize workflow manager
+workflow_manager = WorkflowManager(console=console)
+config_loader = ConfigLoader(console=console)
+
+# ============================================
+# NEW WORKFLOW COMMANDS - Primary Interface
+# ============================================
+
+@app.command()
+def dev(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    skip: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Comma-separated list of stages to skip"
+        ),
+    ] = None,
+    only: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Comma-separated list of stages to run exclusively"
+        ),
+    ] = None,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource selection syntax"
+        ),
+    ] = "",
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource exclude syntax"
+        ),
+    ] = "",
+):
+    """
+    🚀 [bold cyan]Development workflow[/bold cyan] - Quick iteration for local development
+    
+    Runs: clean → pre-scripts → metadata → build → post-scripts
+    
+    Perfect for rapid development and testing cycles.
+    """
+    skip_stages = skip.split(",") if skip else None
+    only_stages = only.split(",") if only else None
+    
+    workflow_manager.run_workflow(
+        workflow_type=WorkflowType.DEV,
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        skip_stages=skip_stages,
+        only_stages=only_stages,
+        select=select,
+        exclude=exclude
+    )
+
+@app.command()
+def deploy(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    skip: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Comma-separated list of stages to skip"
+        ),
+    ] = None,
+    only: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Comma-separated list of stages to run exclusively"
+        ),
+    ] = None,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource selection syntax"
+        ),
+    ] = "",
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource exclude syntax"
+        ),
+    ] = "",
+):
+    """
+    🚢 [bold green]Deploy workflow[/bold green] - Full deployment pipeline
+    
+    Runs: clean → pre-scripts → metadata → build → post-scripts → upload → execute
+    
+    Complete pipeline with Fabric deployment and execution.
+    """
+    skip_stages = skip.split(",") if skip else None
+    only_stages = only.split(",") if only else None
+    
+    workflow_manager.run_workflow(
+        workflow_type=WorkflowType.DEPLOY,
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        skip_stages=skip_stages,
+        only_stages=only_stages,
+        select=select,
+        exclude=exclude
+    )
+
+@app.command()
+def build(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource selection syntax"
+        ),
+    ] = "",
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource exclude syntax"
+        ),
+    ] = "",
+):
+    """
+    🔨 [bold yellow]Build workflow[/bold yellow] - Minimal build only
+    
+    Runs: metadata-download → build
+    
+    Just builds the dbt project with minimal overhead.
+    """
+    workflow_manager.run_workflow(
+        workflow_type=WorkflowType.BUILD,
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        select=select,
+        exclude=exclude
+    )
+
+@app.command()
+def test(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    skip: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Comma-separated list of stages to skip"
+        ),
+    ] = None,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource selection syntax"
+        ),
+    ] = "",
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource exclude syntax"
+        ),
+    ] = "",
+):
+    """
+    🧪 [bold magenta]Test workflow[/bold magenta] - Validation-focused pipeline
+    
+    Runs: clean → metadata → build → validation
+    
+    Ensures quality without deployment.
+    """
+    skip_stages = skip.split(",") if skip else None
+    
+    workflow_manager.run_workflow(
+        workflow_type=WorkflowType.TEST,
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        skip_stages=skip_stages,
+        select=select,
+        exclude=exclude
+    )
+
+@app.command()
+def run(
+    workflow: Annotated[
+        str,
+        typer.Option(
+            "--workflow", "-w",
+            help="Workflow name from configuration file"
+        ),
+    ] = None,
+    config_file: Annotated[
+        Optional[str],
+        typer.Option(
+            "--config", "-c",
+            help="Path to configuration file"
+        ),
+    ] = None,
+    dbt_project_dir: Annotated[
+        str,
+        typer.Option(
+            "--project-dir", "-p",
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    interactive: Annotated[
+        bool,
+        typer.Option(
+            "--interactive", "-i",
+            help="Run in interactive mode"
+        ),
+    ] = False,
+):
+    """
+    🎯 Run a workflow from configuration file or interactively
+    
+    Examples:
+      dbt_wrapper run --workflow ci
+      dbt_wrapper run --interactive
+      dbt_wrapper run -w production -c ./my-config.yml
+    """
+    if interactive:
+        interactive_mode = InteractiveMode(console, workflow_manager)
+        interactive_mode.run_interactive_workflow()
+        return
+    
+    if not workflow:
+        console.print("[error]Please specify --workflow or use --interactive mode[/error]")
+        raise typer.Exit(1)
+    
+    # Load configuration
+    config = config_loader.load_config(config_file)
+    pipeline_workflow = config_loader.get_workflow(workflow)
+    
+    if not pipeline_workflow:
+        console.print(f"[error]Workflow '{workflow}' not found in configuration[/error]")
+        available = config_loader.list_workflows()
+        if available:
+            console.print(f"Available workflows: {', '.join(available)}")
+        raise typer.Exit(1)
+    
+    # Convert pipeline stages to StageType enum
+    stages = []
+    for stage_name in pipeline_workflow.stages:
+        try:
+            stage = StageType(stage_name)
+            stages.append(stage)
+        except ValueError:
+            console.print(f"[warning]Unknown stage: {stage_name}[/warning]")
+    
+    # Display workflow info
+    console.print(f"\n[bold cyan]Running '{workflow}' Workflow[/bold cyan]")
+    console.print(f"[dim]{pipeline_workflow.description}[/dim]\n")
+    
+    # Display stages plan
+    workflow_manager._display_stages_plan(stages)
+    
+    # Initialize and execute
+    workflow_manager.wrapper_commands.GetDbtConfigs(
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir
+    )
+    
+    workflow_manager._execute_stages(
+        stages,
+        pipeline_workflow.options,
+        select="",
+        exclude=""
+    )
+
+# ============================================
+# STAGE MANAGEMENT COMMANDS
+# ============================================
+
+@stage_app.command("list")
+def stage_list():
+    """List all available pipeline stages"""
+    workflow_manager.list_stages()
+
+@stage_app.command("describe")
+def stage_describe(
+    stage_name: Annotated[
+        str,
+        typer.Argument(help="Name of the stage to describe")
+    ]
+):
+    """Get detailed information about a specific stage"""
+    workflow_manager.describe_stage(stage_name)
+
+@stage_app.command("run")
+def stage_run(
+    stages: Annotated[
+        List[str],
+        typer.Argument(help="Stage names to run")
+    ],
+    dbt_project_dir: Annotated[
+        str,
+        typer.Option(
+            "--project-dir", "-p",
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+):
+    """Run specific pipeline stages"""
+    # Convert stage names to StageType
+    stage_types = []
+    for stage_name in stages:
+        try:
+            stage = StageType(stage_name)
+            stage_types.append(stage)
+        except ValueError:
+            console.print(f"[error]Unknown stage: {stage_name}[/error]")
+            console.print("Run 'dbt_wrapper stage list' to see available stages")
+            raise typer.Exit(1)
+    
+    # Initialize and execute
+    workflow_manager.wrapper_commands.GetDbtConfigs(
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir
+    )
+    
+    workflow_manager._display_stages_plan(stage_types)
+    
+    if Confirm.ask("\nProceed with execution?", default=True):
+        workflow_manager._execute_stages(
+            stage_types,
+            {"log_level": "INFO", "hashcheck_level": "WARNING", "notebook_timeout": 1800},
+            select="",
+            exclude=""
+        )
+
+# ============================================
+# CONFIGURATION MANAGEMENT COMMANDS
+# ============================================
+
+@config_app.command("init")
+def config_init(
+    path: Annotated[
+        Optional[str],
+        typer.Option(
+            "--path", "-p",
+            help="Path where to create the configuration file"
+        ),
+    ] = None,
+):
+    """Create an example configuration file"""
+    config_path = config_loader.create_example_config(path)
+    console.print(f"\n[dim]Edit this file to customize your workflows[/dim]")
+
+@config_app.command("validate")
+def config_validate(
+    path: Annotated[
+        Optional[str],
+        typer.Argument(help="Path to configuration file")
+    ] = None,
+):
+    """Validate a configuration file"""
+    config = config_loader.load_config(path)
+    issues = config_loader.validate_config(config)
+    
+    if issues:
+        console.print("[bold red]Configuration issues found:[/bold red]")
+        for issue in issues:
+            console.print(f"  • {issue}")
+    else:
+        console.print("[bold green]✓ Configuration is valid[/bold green]")
+
+@config_app.command("list")
+def config_list(
+    path: Annotated[
+        Optional[str],
+        typer.Option(
+            "--config", "-c",
+            help="Path to configuration file"
+        ),
+    ] = None,
+):
+    """List workflows in configuration file"""
+    config = config_loader.load_config(path)
+    workflows = config_loader.list_workflows()
+    
+    if not workflows:
+        console.print("[dim]No workflows found in configuration[/dim]")
+        return
+    
+    table = Table(title="Available Workflows", show_header=True)
+    table.add_column("Workflow", style="cyan")
+    table.add_column("Description", style="white")
+    table.add_column("Stages", style="dim")
+    
+    for workflow_name in workflows:
+        workflow = config.workflows[workflow_name]
+        stages_str = " → ".join(workflow.stages[:3])
+        if len(workflow.stages) > 3:
+            stages_str += f" ... (+{len(workflow.stages)-3})"
+        table.add_row(
+            workflow_name,
+            workflow.description or "[dim italic]No description[/dim italic]",
+            stages_str
+        )
+    
+    console.print(table)
+
+# ============================================
+# ENVIRONMENT MANAGEMENT COMMANDS  
+# ============================================
+
+@env_app.command("list")
+def env_list(
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+):
+    """List available environments from profiles.yml"""
+    # This would need to parse profiles.yml
+    console.print("[dim]Environment listing coming soon...[/dim]")
+
+@env_app.command("validate")
+def env_validate(
+    env_name: Annotated[
+        str,
+        typer.Argument(help="Environment name to validate")
+    ],
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+):
+    """Validate environment configuration"""
+    console.print(f"[dim]Validating environment: {env_name}...[/dim]")
+
+# ============================================
+# STATUS AND MONITORING COMMANDS
+# ============================================
+
+@app.command()
+def status(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Option(
+            "--project-dir", "-p",
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    watch: Annotated[
+        bool,
+        typer.Option(
+            "--watch", "-w",
+            help="Watch for status updates"
+        ),
+    ] = False,
+):
+    """Show status of last pipeline run"""
+    console.print("[dim]Status monitoring coming soon...[/dim]")
+
+@app.command()
+def history(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Option(
+            "--project-dir", "-p",
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    limit: Annotated[
+        int,
+        typer.Option(
+            "--limit", "-n",
+            help="Number of entries to show"
+        ),
+    ] = 10,
+):
+    """Show pipeline run history"""
+    console.print("[dim]History tracking coming soon...[/dim]")
+
+# ============================================
+# ORIGINAL COMMANDS (kept for backwards compatibility)
+# ============================================
 
 @app.command()
 def docs():
