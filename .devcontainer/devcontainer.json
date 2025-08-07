@@ -1,0 +1,34 @@
+{
+  "name": "Bitnami Spark Dev Container",
+  "build": {
+    "dockerfile": "spark.dockerfile",
+    "context": "."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        }
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "ms-python.vscode-python-envs",
+        "bierner.emojisense",
+        "Oracle.mysql-shell-for-vs-code",
+        "ms-ossdata.vscode-pgsql",
+        "samuelcolvin.jinjahtml"
+      ]
+  }
+},
+"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
+"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+"remoteUser": "root"
+
+}
