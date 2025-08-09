@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(time python:*)",
+      "Bash(python:*)",
+      "Bash(source:*)"
+    ],
+    "deny": []
+  }
+}

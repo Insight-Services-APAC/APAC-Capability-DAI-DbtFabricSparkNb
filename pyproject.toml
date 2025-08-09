@@ -23,7 +23,7 @@ classifiers = [
 dependencies = [
     "dbt-fabricspark @ git+https://github.com/microsoft/dbt-fabricspark.git@7fbc5837701b1350886dbdf461e23aa50a306904",
     "dbt-adapters",
-    "dbt-spark",
+    "dbt-spark== 1.9.3",
     "sqlparse>=0.4.2",
     "nbformat==5.10.4",
     "types-PyYAML",

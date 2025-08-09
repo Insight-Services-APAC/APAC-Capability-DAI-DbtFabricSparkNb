@@ -282,7 +282,7 @@ class SparkConnectionManager(SQLConnectionManager):
         bindings: Optional[Any] = None,
         abridge_sql_log: bool = False,
     ) -> Tuple[Connection, Any]:
-        
+        # logger.debug(f"Adding query: {sql}")
         if (sql.__contains__('/*FABRICSPARKNB_ALERT:')):
             raise dbt.exceptions.DbtRuntimeError(sql)            
 

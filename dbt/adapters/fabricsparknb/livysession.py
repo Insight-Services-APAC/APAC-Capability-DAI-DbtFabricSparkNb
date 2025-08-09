@@ -356,8 +356,7 @@ class LivyCursor:
         ------
         https://github.com/mkleehammer/pyodbc/wiki/Cursor#executesql-parameters
         """
-        # print(sql)
-
+        # logger.warning(f"Executing SQL: {sql}")
         sql = sql % parameters
 
         # Extract the comments from the SQL

@@ -48,6 +48,7 @@ TABLE_OR_VIEW_NOT_FOUND_MESSAGES = (
 @dataclass
 class SparkConfig(AdapterConfig):
     file_format: str = "parquet"
+    project_root: Optional[str] = None
     location_root: Optional[str] = None
     partition_by: Optional[Union[List[str], str]] = None
     clustered_by: Optional[Union[List[str], str]] = None
@@ -191,19 +192,17 @@ class SparkAdapter(SQLAdapter):
             rel_type: RelationType = (
                 RelationType.View if "Type: VIEW" in information else RelationType.Table
             )
-            is_delta: bool = "Provider: delta" in information
-            is_hudi: bool = "Provider: hudi" in information
-            is_iceberg: bool = "Provider: iceberg" in information
-
+            is_delta: bool = "Provider: delta" in information            
+            #logger.warning(f"Creating relation for {_schema}.{name} of type {rel_type} with delta: {is_delta}")
             relation: BaseRelation = self.Relation.create(
                 schema=_schema,
                 identifier=name,
                 type=rel_type,
                 information=information,
-                is_delta=is_delta,
-                is_iceberg=is_iceberg,
-                is_hudi=is_hudi,
+                is_delta=is_delta
             )
+            # relation.type = RelationType.Table
+
             relations.append(relation)
 
         return relations
@@ -251,12 +250,18 @@ class SparkAdapter(SQLAdapter):
 
 
     def get_relation(self, database: str, schema: str, identifier: str) -> Optional[BaseRelation]:
+        print("get relation triggered")
         if not self.Relation.get_default_include_policy().database:
             database = None  # type: ignore
-
+        from dbt.adapters.base.relation import BaseRelation
         #return super().get_relation(database, schema, identifier)
-    
-        relations_list = self.list_relations(database, schema)
+        schema_relation = BaseRelation.create(
+            database=database,
+            schema=schema,
+            identifier=identifier
+        )
+
+        relations_list = self.list_relations_without_caching(schema_relation)
 
         matches = self._make_match(relations_list, database, schema, identifier)
 
@@ -440,6 +445,7 @@ class SparkAdapter(SQLAdapter):
         :return: A tuple of the query status and results (empty if fetch=False).
         :rtype: Tuple[AdapterResponse, agate.Table]
         """
+        # logger.warning(f"Executing SQL: {sql}")
         # Convert self.config to a JSON string
         project_root = (self.config.project_root).replace('\\', '/')
 
