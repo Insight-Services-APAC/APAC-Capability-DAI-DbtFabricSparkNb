@@ -35,9 +35,9 @@ dependencies = [
     "requests==2.32.4",
     "typer>=0.16.0",
     "setuptools>=80.9.0",
-    "azure-storage-file-datalake",
+    "azure-storage-file-datalake==12.21.0",
     "pip-system-certs",
-    "pyodbc",
+    "pyodbc>=5.2.0",
     "lazy-import>=0.2.2"
 ]
 
