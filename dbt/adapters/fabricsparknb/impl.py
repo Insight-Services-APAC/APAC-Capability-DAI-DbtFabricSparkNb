@@ -1,30 +1,31 @@
-import dbt.adapters.fabricsparknb.catalog as catalog
-from dbt.adapters.base.connections import AdapterResponse
+import json
 import re
 from concurrent.futures import Future
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Union, Tuple, Callable, Set
-from dbt.adapters.base.relation import InformationSchema
-from dbt.contracts.graph.manifest import Manifest
-from typing_extensions import TypeAlias
+from multiprocessing.context import SpawnContext
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Union
+
 import agate
-import dbt
-import dbt.exceptions
-from dbt.adapters.base import AdapterConfig
-from dbt.adapters.base.impl import catch_as_completed, ConstraintSupport
-from dbt.adapters.sql import SQLAdapter
-from dbt.adapters.fabricsparknb.connections import SparkConnectionManager
-from dbt.adapters.fabricspark.relation import SparkRelation
-from dbt.adapters.fabricspark.column import SparkColumn
-from dbt.adapters.base import BaseRelation
 from dbt_common.clients.agate_helper import DEFAULT_TYPE_TESTER
-from dbt.contracts.graph.nodes import ConstraintType
+from dbt_common.utils import AttrDict, executor
+from typing_extensions import TypeAlias
+
+import dbt
+import dbt.adapters.fabricsparknb.catalog as catalog
+import dbt.adapters.fabricsparknb.livysession as livysession
+import dbt.exceptions
+from dbt.adapters.base import AdapterConfig, BaseRelation
+from dbt.adapters.base.connections import AdapterResponse
+from dbt.adapters.base.impl import ConstraintSupport, catch_as_completed
+from dbt.adapters.base.relation import InformationSchema
 from dbt.adapters.contracts.relation import RelationType
 from dbt.adapters.events.logging import AdapterLogger
-from dbt_common.utils import executor, AttrDict
-from multiprocessing.context import SpawnContext
-import dbt.adapters.fabricsparknb.livysession as livysession
-import json
+from dbt.adapters.fabricspark.column import FabricSparkColumn
+from dbt.adapters.fabricspark.relation import FabricSparkRelation
+from dbt.adapters.fabricsparknb.connections import SparkConnectionManager
+from dbt.adapters.sql import SQLAdapter
+from dbt.contracts.graph.manifest import Manifest
+from dbt.contracts.graph.nodes import ConstraintType
 
 logger = AdapterLogger("fabricsparknb")
 
@@ -47,6 +48,7 @@ TABLE_OR_VIEW_NOT_FOUND_MESSAGES = (
 @dataclass
 class SparkConfig(AdapterConfig):
     file_format: str = "parquet"
+    project_root: Optional[str] = None
     location_root: Optional[str] = None
     partition_by: Optional[Union[List[str], str]] = None
     clustered_by: Optional[Union[List[str], str]] = None
@@ -97,9 +99,9 @@ class SparkAdapter(SQLAdapter):
         ConstraintType.foreign_key: ConstraintSupport.NOT_ENFORCED,
     }
 
-    Relation: TypeAlias = SparkRelation
+    Relation: TypeAlias = FabricSparkRelation
     RelationInfo = Tuple[str, str, str]
-    Column: TypeAlias = SparkColumn
+    Column: TypeAlias = FabricSparkColumn
     ConnectionManager: TypeAlias = SparkConnectionManager
     AdapterSpecificConfigs: TypeAlias = SparkConfig
 
@@ -190,19 +192,17 @@ class SparkAdapter(SQLAdapter):
             rel_type: RelationType = (
                 RelationType.View if "Type: VIEW" in information else RelationType.Table
             )
-            is_delta: bool = "Provider: delta" in information
-            is_hudi: bool = "Provider: hudi" in information
-            is_iceberg: bool = "Provider: iceberg" in information
-
+            is_delta: bool = "Provider: delta" in information            
+            #logger.warning(f"Creating relation for {_schema}.{name} of type {rel_type} with delta: {is_delta}")
             relation: BaseRelation = self.Relation.create(
                 schema=_schema,
                 identifier=name,
                 type=rel_type,
                 information=information,
-                is_delta=is_delta,
-                is_iceberg=is_iceberg,
-                is_hudi=is_hudi,
+                is_delta=is_delta
             )
+            # relation.type = RelationType.Table
+
             relations.append(relation)
 
         return relations
@@ -250,12 +250,18 @@ class SparkAdapter(SQLAdapter):
 
 
     def get_relation(self, database: str, schema: str, identifier: str) -> Optional[BaseRelation]:
+        print("get relation triggered")
         if not self.Relation.get_default_include_policy().database:
             database = None  # type: ignore
-
+        from dbt.adapters.base.relation import BaseRelation
         #return super().get_relation(database, schema, identifier)
-    
-        relations_list = self.list_relations(database, schema)
+        schema_relation = BaseRelation.create(
+            database=database,
+            schema=schema,
+            identifier=identifier
+        )
+
+        relations_list = self.list_relations_without_caching(schema_relation)
 
         matches = self._make_match(relations_list, database, schema, identifier)
 
@@ -274,7 +280,7 @@ class SparkAdapter(SQLAdapter):
 
     def parse_describe_extended(
         self, relation: BaseRelation, raw_rows: AttrDict
-    ) -> List[SparkColumn]:
+    ) -> List[FabricSparkColumn]:
         # Convert the Row to a dict
         dict_rows = [dict(zip(row._keys, row._values)) for row in raw_rows]
         # Find the separator between the rows and the metadata provided
@@ -286,9 +292,9 @@ class SparkAdapter(SQLAdapter):
         metadata = {col["col_name"]: col["data_type"] for col in raw_rows[pos + 1 :]}
 
         raw_table_stats = metadata.get(KEY_TABLE_STATISTICS)
-        table_stats = SparkColumn.convert_table_stats(raw_table_stats)
+        table_stats = FabricSparkColumn.convert_table_stats(raw_table_stats)
         return [
-            SparkColumn(
+            FabricSparkColumn(
                 table_database=None,
                 table_schema=relation.schema,
                 table_name=relation.name,
@@ -311,7 +317,7 @@ class SparkAdapter(SQLAdapter):
             pos += 1
         return pos
 
-    def get_columns_in_relation(self, relation: BaseRelation) -> List[SparkColumn]:
+    def get_columns_in_relation(self, relation: BaseRelation) -> List[FabricSparkColumn]:
         
         columns = []        
         try:
@@ -331,7 +337,7 @@ class SparkAdapter(SQLAdapter):
         columns = [x for x in columns if x.name not in self.HUDI_METADATA_COLUMNS]
         return columns
 
-    def parse_columns_from_information(self, relation: BaseRelation) -> List[SparkColumn]:
+    def parse_columns_from_information(self, relation: BaseRelation) -> List[FabricSparkColumn]:
         if hasattr(relation, "information"):
             information = relation.information or ""
         else:
@@ -342,10 +348,10 @@ class SparkAdapter(SQLAdapter):
         columns = []
         stats_match = re.findall(self.INFORMATION_STATISTICS_REGEX, information)
         raw_table_stats = stats_match[0] if stats_match else None
-        table_stats = SparkColumn.convert_table_stats(raw_table_stats)
+        table_stats = FabricSparkColumn.convert_table_stats(raw_table_stats)
         for match_num, match in enumerate(matches):
             column_name, column_type, nullable = match.groups()
-            column = SparkColumn(
+            column = FabricSparkColumn(
                 table_database=None,
                 table_schema=relation.schema,
                 table_name=relation.table,
@@ -370,7 +376,7 @@ class SparkAdapter(SQLAdapter):
             raise e
 
         for column in columns:
-            # convert SparkColumns into catalog dicts
+            # convert FabricSparkColumns into catalog dicts
             as_dict = column.to_column_dict()
             as_dict["column_name"] = as_dict.pop("column", None)
             as_dict["column_type"] = as_dict.pop("dtype")
@@ -439,6 +445,7 @@ class SparkAdapter(SQLAdapter):
         :return: A tuple of the query status and results (empty if fetch=False).
         :rtype: Tuple[AdapterResponse, agate.Table]
         """
+        # logger.warning(f"Executing SQL: {sql}")
         # Convert self.config to a JSON string
         project_root = (self.config.project_root).replace('\\', '/')
 

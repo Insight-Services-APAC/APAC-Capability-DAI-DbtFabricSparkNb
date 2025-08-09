@@ -14,17 +14,39 @@ As a team of data specialists we have been working with dbt for a number of year
 ## How does it work?
 Dbt-FabricSparkNb works by leverging the power of the dbt-core, and the [dbt-fabrickspark](https://github.com/microsoft/dbt-fabricspark) apater to create a new adapter. As such, it can be described as a "child apater" of [dbt-fabrickspark](https://github.com/microsoft/dbt-fabricspark). 
 
-The adapter inherits all of the functionality of the [dbt-fabrickspark](https://github.com/microsoft/dbt-fabricspark) adapter and simply extends it to meet the unique requirements of our project.
+The adapter inherits all of the functionality of the [dbt-fabrickspark](https://github.com/microsoft/dbt-fabricspark) adapter and extends it with a powerful **workflow-based CLI** that makes it much easier to use.
+
+### New Intuitive CLI
+The latest version features a completely redesigned command-line interface:
+
+```bash
+# Choose the workflow that matches your intent
+dbt_wrapper dev my_project      # 🚀 Development workflow  
+dbt_wrapper deploy my_project   # 🚢 Full deployment
+dbt_wrapper build my_project    # 🔨 Build only
+dbt_wrapper test my_project     # 🧪 Testing workflow
+```
+
+Instead of complex flag combinations, you now have simple, purpose-driven commands that are easy to understand and use.
 
 Consequently, to use this adapter, you will need to install the [dbt-fabrickspark](https://github.com/microsoft/dbt-fabricspark) adapter and then install the [dbt-fabricksparknb](https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb) adapter.
 
 ## Key Features
 
+### Core Capabilities
 - [x] Support for SAAS only lakehouse architecture (No PAAS components requried)
 - [x] Support for lightweight, disconnected local development workflow
 - [x] Fully featured with modern data transformation capabilities such as data lineage, data catalog, data quality checks and templated data transformation activities
 - [x] Opensource and free to use
 - [x] Extensible and customisable
+
+### New CLI Features
+- [x] **Intuitive workflow commands** - `dev`, `deploy`, `build`, `test` match your intent
+- [x] **Configuration as code** - YAML-based workflow definitions
+- [x] **Interactive mode** - Guided workflow selection for new users
+- [x] **Flexible stage control** - Skip or run only specific pipeline stages
+- [x] **Environment management** - Easy switching between dev/staging/production
+- [x] **Backwards compatibility** - Old `run-all` commands still work
 
 ## Limitations and best practices
 - *Limitation on Schema supported lakehouse*: Our DBT framework does not yet support schemas in Data lake. So please do not tick "Lakehouse schemas (Public Preview)" when creating the lakehouse in your workspace for now.

@@ -8,6 +8,7 @@ __pycache__
 build/
 env*/
 .env*/
+.venv/
 dbt_env/
 dist/
 *.egg-info

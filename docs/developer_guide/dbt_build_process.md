@@ -11,7 +11,9 @@
 # Dbt Build Process
 
 ## Dbt Build Process & Dbt_Wrapper
-The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called `dbt_wrapper` and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal.
+The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called `dbt_wrapper` and is a python script that is run from the command line.
+
+The new version provides **intuitive, workflow-based commands** that make development much more efficient.
 
 !!! Important
   
@@ -29,21 +31,40 @@ The dbt-fabricksparknb package includes a console application that will allow yo
 !!! Note
     Make sure that you have activated your python virtual environment before running this code. 
 
+## Development Environment Commands
+
+For development (non-pip installed), run from the root directory:
+
 ```powershell
-python test_pre_install.py run-all --help
+# View all available commands
+python -m dbt_wrapper.main --help
 ```
 
-To build your dbt project and publish your notebook to your Fabric workspace you can run the command below:
+### Quick Development Workflows
 
 !!! Note
     Be sure to replace ==my_project== with the name of your dbt project folder. 
 
+#### 🚀 Development Workflow
+Perfect for rapid iteration during development:
 ```powershell
-python test_pre_install.py run-all --pre-install my_project 
+python -m dbt_wrapper.main dev my_project
 ```
+*Runs: clean → pre-scripts → metadata → build → post-scripts*
 
-The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
-![notebooks](../assets/images/dbt_wrapper_output.png)
+#### 🔨 Build Only
+For quick builds without full setup:
+```powershell
+python -m dbt_wrapper.main build my_project
+```
+*Runs: metadata-download → build*
+
+#### 🚢 Deploy Workflow  
+Complete deployment when ready for Fabric:
+```powershell
+python -m dbt_wrapper.main deploy my_project
+```
+*Runs: clean → pre-scripts → metadata → build → post-scripts → upload → execute*
 
 !!!Tip
     - You can view the execution results of the master notebook directly in the console. To enable this, manually add the `sql_endpoint` of your default lakehouse in your `profile.yml`. (You can find the `sql_endpoint` value in your SQL connection string from the Fabric lakehouse.) 
@@ -55,34 +76,93 @@ The command above will carry out all of the necessary "stages" required to fully
     ![alt text](./../assets/images/console_output.png)
 
 
-## Toggling Build Stages Off and On
-There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the dbt_wrapper application. To view all of the options available to you run the command below:
+## Advanced Development Usage
+
+### Stage Management for Developers
+View and control individual stages:
 ```powershell
-python test_pre_install.py run-all --help
+# List all available stages
+python -m dbt_wrapper.main stage list
+
+# Get details about a specific stage
+python -m dbt_wrapper.main stage describe build
+
+# Run specific stages only
+python -m dbt_wrapper.main stage run clean metadata-extract build
 ```
 
-For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
+### Customizing Development Workflows
+Skip stages you don't need during development:
 ```powershell
-python test_pre_install.py run-all my_project --no-upload-notebooks-via-api  
+# Skip upload during development
+python -m dbt_wrapper.main deploy my_project --skip upload,execute
+
+# Run only specific stages
+python -m dbt_wrapper.main deploy my_project --only build,post-scripts
 ```
 
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. 
-For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
-!!!note
-    you can change the int value to anything you want as long as it's not larger than 7 days in seconds
-
+### Configuration-Based Development
+Create custom workflows for your development needs:
 ```powershell
-python test_pre_install.py run-all --pre-install --notebook-timeout=2100 my_project
+# Initialize a configuration file
+python -m dbt_wrapper.main config init
+
+# List available workflows
+python -m dbt_wrapper.main config list
+
+# Run a custom workflow
+python -m dbt_wrapper.main run --workflow development
 ```
-The default lakehouse is set in the metadata of each notebook that gets created. You can override this and include a cell with the magic command %%configure to set the default lakehouse for the notebooks using this wrapper command when building:
 
+### Development Options
+
+#### Notebook Timeout Configuration
+Increase timeout for long-running development processes:
 ```powershell
-dbt_wrapper run-all my_project --lakehouse-config="CODE"
+python -m dbt_wrapper.main deploy my_project --notebook-timeout 3600
 ```
 
-Review all of the commands available to you by running using the help option as shown below:
+!!! note
+    Timeout value can be anything up to 7 days in seconds
+
+#### Lakehouse Configuration Control
+Choose how lakehouse is configured in notebooks:
 ```powershell
-python test_pre_install.py --help
+# Use code-based configuration (adds %%configure cell)
+python -m dbt_wrapper.main dev my_project --lakehouse-config CODE
+
+# Use metadata-based configuration (default)
+python -m dbt_wrapper.main dev my_project --lakehouse-config METADATA
+```
+
+#### dbt Resource Selection
+Use standard dbt selection for focused development:
+```powershell
+# Work on specific models
+python -m dbt_wrapper.main dev my_project --select models/staging
+
+# Exclude certain models during development
+python -m dbt_wrapper.main dev my_project --exclude tag:external
+```
+
+### Interactive Development Mode
+For guided workflow selection:
+```powershell
+python -m dbt_wrapper.main run --interactive
+```
+
+### Legacy Support
+The old command structure is still supported but deprecated:
+```powershell
+python test_pre_install.py run-all my_project --pre-install  # Still works
+```
+
+!!! warning "Migration Recommended"
+    Migrate to the new workflow commands for better development experience. The new commands are more intuitive and provide better control.
+
+Review all commands available:
+```powershell
+python -m dbt_wrapper.main --help
 ```
 
 !!! Info

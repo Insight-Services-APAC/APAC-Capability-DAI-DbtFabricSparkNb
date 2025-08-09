@@ -9,7 +9,9 @@
 ---
 
 ## Dbt Build Process & Dbt_Wrapper
-The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called `dbt_wrapper` and is a python script that is run from the command line. You can invoke the application and view information about it by running the following command in a terminal.
+The dbt-fabricksparknb package includes a console application that will allow you to build your dbt project and generate a series of notebooks that can be run in a Fabric workspace. This application is called `dbt_wrapper` and is a python script that is run from the command line.
+
+The new version of `dbt_wrapper` provides **intuitive, workflow-based commands** that make it much easier to understand and use. Instead of complex flag combinations, you now choose workflows that match your intent.
 
 !!! Important
   
@@ -19,27 +21,46 @@ The dbt-fabricksparknb package includes a console application that will allow yo
     az login --tenant 73738727-cfc1-4875-90c2-2a7a1149ed3d --allow-no-subscriptions
     ```
 
-
 !!! Note
     Make sure that you have activated your python virtual environment before running this code. 
 
+## Quick Start - Choose Your Workflow
+
+View all available commands:
 ```powershell
 dbt_wrapper --help
 ```
 
-To build your dbt project and publish your notebook to your Fabric workspace you can run the command below:
-
-!!! note
-    Be sure to replace ==my_project== with the name of your dbt project folder
-
-
+### 🚀 Development Workflow
+Perfect for rapid development and testing cycles:
 ```powershell
-dbt_wrapper run-all my_project
+dbt_wrapper dev my_project
 ```
+*Runs: clean → pre-scripts → metadata → build → post-scripts*
 
-The command above will carry out all of the necessary "stages" required to fully build your dbt project and generate the notebooks that can be run in a Fabric workspace. When run successfully your should see output similar to the image below.
+### 🚢 Deploy Workflow  
+Complete deployment pipeline with Fabric upload and execution:
+```powershell
+dbt_wrapper deploy my_project
+```
+*Runs: clean → pre-scripts → metadata → build → post-scripts → upload → execute*
 
-![alt text](./../assets/images/dbt_wrapper_run_all.png)
+### 🔨 Build Only
+Minimal workflow - just builds the dbt project:
+```powershell
+dbt_wrapper build my_project
+```
+*Runs: metadata-download → build*
+
+### 🧪 Test Workflow
+Validation-focused pipeline without deployment:
+```powershell
+dbt_wrapper test my_project
+```
+*Runs: clean → metadata → build → validation*
+
+!!! tip "New in this version"
+    The new workflow-based commands are much more intuitive than the old `run-all` command with its many flags. Each workflow is designed for a specific use case.
 
 
 !!!Tip
@@ -52,37 +73,92 @@ The command above will carry out all of the necessary "stages" required to fully
     ![alt text](./../assets/images/console_output.png)
 
 
-## Toggling Build Stages Off and On 
+## Advanced Usage
 
-There are times when you may not wish to run ALL of the build steps. In such circumstances you can toggle off specific stages by using the options built in to the `dbt_wrapper` application. To view all of the options available to you run the command below:
+### Customizing Workflows
 
+#### Skip Specific Stages
+You can skip stages you don't need:
 ```powershell
-dbt_wrapper run-all --help
+# Skip upload for local development
+dbt_wrapper deploy my_project --skip upload,execute
+
+# Run only specific stages
+dbt_wrapper deploy my_project --only build,post-scripts
 ```
 
-For example, should you wish to run all stages except for the upload of the generated notebooks to your Fabric workspace you can run the command below:
-
+#### Stage Management
+For granular control, use the stage commands:
 ```powershell
-dbt_wrapper run-all my_project --no-upload-notebooks-via-api  
-```
-Alternatively, you might want to make use of some additional "helper" commands that we have included in the application. For example, Notebooks are defaulted to the timeout of 1800 seconds. You can increase that by passing a timeout configuration when building the project. 
-!!!note
-    you can change the int value to anything you want as long as it's not larger than 7 days in seconds
+# List all available stages
+dbt_wrapper stage list
 
-```powershell
-dbt_wrapper run-all my_project --notebook-timeout=2100
-```
-The default lakehouse is set in the metadata of each notebook that gets created. You can override this and include a cell with the magic command %%configure to set the default lakehouse for the notebooks using this wrapper command when building:
+# Get details about a specific stage
+dbt_wrapper stage describe build
 
-```powershell
-dbt_wrapper run-all my_project --lakehouse-config="CODE"
+# Run specific stages only
+dbt_wrapper stage run clean metadata-extract build
 ```
 
-Review all of the commands available to you by running using the help option as shown below:
+### Configuration File Approach
+Create a `.dbt-wrapper.yml` file to define custom workflows:
 
 ```powershell
-dbt_wrapper --help
+# Initialize a configuration file
+dbt_wrapper config init
+
+# List workflows from config
+dbt_wrapper config list
+
+# Run a configured workflow
+dbt_wrapper run --workflow my-custom-workflow
 ```
+
+### Interactive Mode
+For guided execution:
+```powershell
+dbt_wrapper run --interactive
+```
+
+### Common Options
+
+#### Notebook Timeout
+Notebooks default to 1800 seconds timeout. You can change this:
+```powershell
+dbt_wrapper deploy my_project --notebook-timeout 3600
+```
+
+!!! note
+    Timeout value can be anything up to 7 days in seconds
+
+#### Lakehouse Configuration
+Control how lakehouse is set in notebook metadata:
+```powershell
+# Use code-based lakehouse configuration (adds %%configure cell)
+dbt_wrapper deploy my_project --lakehouse-config CODE
+
+# Use metadata-based configuration (default)
+dbt_wrapper deploy my_project --lakehouse-config METADATA
+```
+
+#### dbt Resource Selection
+Use standard dbt selection syntax:
+```powershell
+# Select specific models
+dbt_wrapper dev my_project --select tag:daily
+
+# Exclude certain models  
+dbt_wrapper dev my_project --exclude tag:hourly
+```
+
+### Legacy Command Support
+The old `run-all` command is still supported for backwards compatibility:
+```powershell
+dbt_wrapper run-all my_project  # Still works, but deprecated
+```
+
+!!! warning "Migration Recommended"
+    We recommend migrating to the new workflow commands. See the [Migration Guide](migration_guide.md) for help transitioning from old commands.
 
 !!! Info
     You are now ready to move to the next step in which you gain an understanding of the various kinds of notebooks generated by the adapter. Follow the [Understanding the Generated Notebooks](./generated_notebooks.md) guide.

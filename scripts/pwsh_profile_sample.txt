@@ -1,0 +1,31 @@
+Import-Module posh-git
+Import-Module -Name Terminal-Icons
+
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle ListView
+
+Import-Module PSReadLine
+Set-PSReadLineKeyHandler -Chord Tab -Function MenuComplete
+$scriptblock = {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    $Env:_TYPER_COMPLETE = "complete_powershell"
+    $Env:_TYPER_COMPLETE_ARGS = $commandAst.ToString()
+    $Env:_TYPER_COMPLETE_WORD_TO_COMPLETE = $wordToComplete
+    typer | ForEach-Object {
+        $commandArray = $_ -Split ":::"
+        $command = $commandArray[0]
+        $helpString = $commandArray[1]
+        [System.Management.Automation.CompletionResult]::new(
+            $command, $command, 'ParameterValue', $helpString)
+    }
+    $Env:_TYPER_COMPLETE = ""
+    $Env:_TYPER_COMPLETE_ARGS = ""
+    $Env:_TYPER_COMPLETE_WORD_TO_COMPLETE = ""
+}
+Register-ArgumentCompleter -Native -CommandName typer -ScriptBlock $scriptblock
+
+oh-my-posh init pwsh | Invoke-Expression
+$env:NVM_DIR="$HOME/.nvm"
+$env:PATH += ":$env:NVM_DIR"
+$cmd = "source " + $env:NVM_DIR + "/nvm.sh"
+bash -c $cmd

@@ -12,6 +12,14 @@
             "program": "./test_pre_install.py",
             "args": ["run-all",  "--pre-install",  "--no-upload-notebooks-via-api", "--no-generate-post-dbt-scripts", "--no-auto-execute-metadata-extract", "--no-auto-run-master-notebook", "--no-download-metadata", "--no-clean-target-dir", "--log-level", "warning",  "samples/testproj2"],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: dbt_wrapper build",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "dbt_wrapper.main",
+            "args": ["build", "./samples_tests"],
+            "console": "integratedTerminal"
         }
     ]
 }
