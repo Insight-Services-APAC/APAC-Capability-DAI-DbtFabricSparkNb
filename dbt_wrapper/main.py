@@ -227,6 +227,50 @@ def build(
         exclude=exclude
     )
 
+
+@app.command()
+def build_local(
+    dbt_project_dir: Annotated[
+        str,
+        typer.Argument(
+            help="The path to the dbt_project directory"
+        ),
+    ] = ".",
+    dbt_profiles_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            "--profiles-dir",
+            help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    select: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource selection syntax"
+        ),
+    ] = "",
+    exclude: Annotated[
+        str,
+        typer.Option(
+            help="dbt resource exclude syntax"
+        ),
+    ] = "",
+):
+    """
+    🔨 [bold yellow]Build workflow[/bold yellow] - Minimal build only
+    
+    Runs: metadata-download → build
+    
+    Just builds the dbt project with minimal overhead.
+    """
+    workflow_manager.run_workflow(
+        workflow_type=WorkflowType.BUILD_LOCAL,
+        dbt_project_dir=dbt_project_dir,
+        dbt_profiles_dir=dbt_profiles_dir,
+        select=select,
+        exclude=exclude
+    )
+
 @app.command()
 def test(
     dbt_project_dir: Annotated[

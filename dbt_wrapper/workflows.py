@@ -22,6 +22,7 @@ class WorkflowType(str, Enum):
     DEV = "dev"
     DEPLOY = "deploy"
     BUILD = "build"
+    BUILD_LOCAL = "build-local"
     TEST = "test"
     CI = "ci"
     PRODUCTION = "production"
@@ -74,8 +75,9 @@ class WorkflowManager:
                 ],
                 options={
                     "log_level": "INFO",
-                    "hashcheck_level": "WARNING",
+                    "hashcheck_level": "BYPASS",
                     "notebook_timeout": 1800,
+                    "lakehouse_config": "CODE",
                     "upload_notebooks": False,
                     "auto_run_master": False,
                 }
@@ -96,7 +98,8 @@ class WorkflowManager:
                 ],
                 options={
                     "log_level": "WARNING",
-                    "hashcheck_level": "ERROR",
+                    "hashcheck_level": "BYPASS",
+                    "lakehouse_config": "CODE",
                     "notebook_timeout": 1800,
                     "upload_notebooks": True,
                     "auto_run_master": True,
@@ -112,6 +115,23 @@ class WorkflowManager:
                 options={
                     "log_level": "WARNING",
                     "hashcheck_level": "BYPASS",
+                    "lakehouse_config": "CODE",
+                    "notebook_timeout": 1800,
+                    "upload_notebooks": False,
+                    "auto_run_master": False,
+                }
+            ),
+            WorkflowType.BUILD_LOCAL: WorkflowConfig(
+                name="Build Only",
+                description="Minimal workflow - just build the dbt project",
+                stages=[
+                    StageType.BUILD,
+                    StageType.POST_SCRIPTS,
+                ],
+                options={
+                    "log_level": "WARNING",
+                    "hashcheck_level": "BYPASS",
+                    "lakehouse_config": "CODE",
                     "notebook_timeout": 1800,
                     "upload_notebooks": False,
                     "auto_run_master": False,
@@ -131,7 +151,8 @@ class WorkflowManager:
                 ],
                 options={
                     "log_level": "INFO",
-                    "hashcheck_level": "ERROR",
+                    "hashcheck_level": "BYPASS",
+                    "lakehouse_config": "CODE",
                     "notebook_timeout": 1800,
                     "upload_notebooks": False,
                     "auto_run_master": False,
@@ -148,7 +169,8 @@ class WorkflowManager:
                 ],
                 options={
                     "log_level": "INFO",
-                    "hashcheck_level": "ERROR",
+                    "hashcheck_level": "BYPASS",
+                    "lakehouse_config": "CODE",
                     "notebook_timeout": 900,
                     "upload_notebooks": False,
                     "auto_run_master": False,
@@ -254,9 +276,14 @@ class WorkflowManager:
         log_level = LogLevel.from_string(options.get("log_level", "WARNING"))
         hashcheck_level = HashCheckLevel.from_string(options.get("hashcheck_level", "BYPASS"))
         notebook_timeout = options.get("notebook_timeout", 1800)
-        
+        lakehouse_config = options.get("lakehouse_config", "CODE")
+
+        # Prepare extra kwargs to pass through
+        reserved_keys = {"log_level", "hashcheck_level", "notebook_timeout", "upload_notebooks", "auto_run_master"}
+        extra_kwargs = {k: v for k, v in options.items() if k not in reserved_keys}
+
         se = stage_executor(log_level=log_level, console=self.console)
-        
+
         # Map stages to execution functions
         stage_map = {
             StageType.CLEAN: lambda: se.perform_stage(
@@ -270,11 +297,11 @@ class WorkflowManager:
                     lambda **kwargs: self.wrapper_commands.GeneratePreDbtScripts(
                         PreInstall=pre_install,
                         notebook_timeout=notebook_timeout,
-                        lakehouse_config="METADATA",
+                        lakehouse_config=lakehouse_config,
                         **kwargs
                     ),
                     lambda **kwargs: self.wrapper_commands.ConvertNotebooksToFabricFormat(
-                        lakehouse_config="METADATA",
+                        lakehouse_config=lakehouse_config,
                         **kwargs
                     ),
                 ],
@@ -302,11 +329,11 @@ class WorkflowManager:
                         PreInstall=pre_install,
                         notebook_timeout=notebook_timeout,
                         notebook_hashcheck=hashcheck_level,
-                        lakehouse_config="METADATA",
+                        lakehouse_config=lakehouse_config,
                         **kwargs
                     ),
                     lambda **kwargs: self.wrapper_commands.ConvertNotebooksToFabricFormat(
-                        lakehouse_config="METADATA",
+                        lakehouse_config=lakehouse_config,
                         **kwargs
                     ),
                 ],
@@ -328,7 +355,7 @@ class WorkflowManager:
                 stage_name="Get Execution Results"
             ),
         }
-        
+
         # Execute each stage
         for stage in stages:
             if stage in stage_map:
@@ -496,7 +523,7 @@ class InteractiveMode:
                     stages=stages,
                     options={
                         "log_level": "INFO",
-                        "hashcheck_level": "WARNING",
+                        "hashcheck_level": "BYPASS",
                         "notebook_timeout": 1800,
                         "upload_notebooks": StageType.UPLOAD in stages,
                         "auto_run_master": StageType.EXECUTE in stages,
