@@ -192,8 +192,8 @@ class SparkAdapter(SQLAdapter):
             rel_type: RelationType = (
                 RelationType.View if "Type: VIEW" in information else RelationType.Table
             )
-            is_delta: bool = "Provider: delta" in information            
-            #logger.warning(f"Creating relation for {_schema}.{name} of type {rel_type} with delta: {is_delta}")
+            is_delta: bool = "Provider: delta" in information
+            #logger.info(f"Creating relation for {_schema}.{name} of type {rel_type} with delta: {is_delta}")
             relation: BaseRelation = self.Relation.create(
                 schema=_schema,
                 identifier=name,
@@ -210,7 +210,7 @@ class SparkAdapter(SQLAdapter):
     def list_relations_without_caching(self, schema_relation: BaseRelation) -> List[BaseRelation]:
         """Distinct Spark compute engines may not support the same SQL featureset. Thus, we must
         try different methods to fetch relation information."""
-
+        # logger.info("list_relations_without_caching triggered")
         kwargs = {"schema_relation": schema_relation}
 
         try:
@@ -240,17 +240,17 @@ class SparkAdapter(SQLAdapter):
                     )
                 except dbt.exceptions.DbtRuntimeError as e:
                     description = "Error while retrieving information about"
-                    logger.debug(f"{description} {schema_relation}: {e.msg}")
+                    raise Exception(f"{description} {schema_relation}: {e.msg}")
                     return []
             else:
-                logger.debug(
+                raise Exception(
                     f"Error while retrieving information about {schema_relation}: {errmsg}"
                 )
                 return []
 
 
     def get_relation(self, database: str, schema: str, identifier: str) -> Optional[BaseRelation]:
-        print("get relation triggered")
+        # print("get relation triggered")
         if not self.Relation.get_default_include_policy().database:
             database = None  # type: ignore
         from dbt.adapters.base.relation import BaseRelation
@@ -262,7 +262,6 @@ class SparkAdapter(SQLAdapter):
         )
 
         relations_list = self.list_relations_without_caching(schema_relation)
-
         matches = self._make_match(relations_list, database, schema, identifier)
 
         if len(matches) > 1:

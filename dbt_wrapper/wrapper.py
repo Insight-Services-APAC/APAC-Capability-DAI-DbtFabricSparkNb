@@ -9,7 +9,6 @@ import subprocess
 import dbt_wrapper.utils as mn
 import dbt_wrapper.generate_files as gf
 from dbt_wrapper.fabric_api import FabricAPI as fa
-import dbt_wrapper.fabric_sql as fas
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
 from rich import print
@@ -220,6 +219,7 @@ class Commands:
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
 
     def GetExecutionResults(self, progress: ProgressConsoleWrapper, task_id):
+        import dbt_wrapper.fabric_sql as fas
         if self.sql_endpoint is not None:           
             _fas = fas.FabricApiSql(console=self.console, server=self.sql_endpoint, database=self.lakehouse)
             

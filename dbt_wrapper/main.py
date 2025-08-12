@@ -316,6 +316,12 @@ def run(
             help="Run in interactive mode"
         ),
     ] = False,
+    pre_install: Annotated[
+        bool,
+        typer.Option(
+            help="The option to run the dbt adapter using source code and not the installed package."
+        ),
+    ] = False
 ):
     """
     🎯 Run a workflow from configuration file or interactively
@@ -371,7 +377,8 @@ def run(
         stages,
         pipeline_workflow.options,
         select="",
-        exclude=""
+        exclude="",
+        pre_install=pre_install
     )
 
 # ============================================
@@ -413,8 +420,21 @@ def stage_run(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    pre_install: Annotated[
+        bool,
+        typer.Option(
+            help="The option to run the dbt adapter using source code and not the installed package."
+        ),
+    ] = False,
+    option: Annotated[
+        List[str],
+        typer.Option(
+            "--option",
+            help="Additional key=value options to pass to the stage executor. Can be specified multiple times."
+        ),
+    ] = [],
 ):
-    """Run specific pipeline stages"""
+    """Run specific pipeline stages with additional options"""
     # Convert stage names to StageType
     stage_types = []
     for stage_name in stages:
@@ -425,21 +445,31 @@ def stage_run(
             console.print(f"[error]Unknown stage: {stage_name}[/error]")
             console.print("Run 'dbt_wrapper stage list' to see available stages")
             raise typer.Exit(1)
-    
+
+    # Parse additional options into a dictionary
+    options_dict = {"log_level": "INFO", "hashcheck_level": "BYPASS", "notebook_timeout": 1800}
+    for opt in option:
+        if "=" in opt:
+            k, v = opt.split("=", 1)
+            options_dict[k.strip()] = v.strip()
+        else:
+            console.print(f"[warning]Ignoring option '{opt}' (expected key=value format)[/warning]")
+
     # Initialize and execute
     workflow_manager.wrapper_commands.GetDbtConfigs(
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir
     )
-    
+
     workflow_manager._display_stages_plan(stage_types)
-    
+
     if Confirm.ask("\nProceed with execution?", default=True):
         workflow_manager._execute_stages(
             stage_types,
-            {"log_level": "INFO", "hashcheck_level": "WARNING", "notebook_timeout": 1800},
+            options_dict,
             select="",
-            exclude=""
+            exclude="",
+            pre_install=pre_install
         )
 
 # ============================================

@@ -165,7 +165,9 @@ class WorkflowManager:
         only_stages: Optional[List[str]] = None,
         select: str = "",
         exclude: str = "",
-        **override_options
+        pre_install: bool = False,
+        **override_options,
+        
     ):
         """Execute a predefined workflow"""
         workflow = self.predefined_workflows.get(workflow_type)
@@ -197,7 +199,7 @@ class WorkflowManager:
         )
         
         # Execute stages
-        self._execute_stages(stages_to_run, options, select, exclude)
+        self._execute_stages(stages_to_run, options, select, exclude, pre_install)
     
     def _filter_stages(
         self,
@@ -245,7 +247,8 @@ class WorkflowManager:
         stages: List[StageType],
         options: Dict[str, Any],
         select: str,
-        exclude: str
+        exclude: str,
+        pre_install: bool 
     ):
         """Execute the workflow stages"""
         log_level = LogLevel.from_string(options.get("log_level", "WARNING"))
@@ -265,7 +268,7 @@ class WorkflowManager:
                 option=True,
                 action_callables=[
                     lambda **kwargs: self.wrapper_commands.GeneratePreDbtScripts(
-                        PreInstall=False,
+                        PreInstall=pre_install,
                         notebook_timeout=notebook_timeout,
                         lakehouse_config="METADATA",
                         **kwargs
@@ -288,7 +291,7 @@ class WorkflowManager:
                 stage_name="Download Metadata"
             ),
             StageType.BUILD: lambda: self.wrapper_commands.BuildDbtProject(
-                PreInstall=False,
+                PreInstall=pre_install,
                 select=select,
                 exclude=exclude
             ),
@@ -296,7 +299,7 @@ class WorkflowManager:
                 option=True,
                 action_callables=[
                     lambda **kwargs: self.wrapper_commands.GeneratePostDbtScripts(
-                        PreInstall=False,
+                        PreInstall=pre_install,
                         notebook_timeout=notebook_timeout,
                         notebook_hashcheck=hashcheck_level,
                         lakehouse_config="METADATA",
