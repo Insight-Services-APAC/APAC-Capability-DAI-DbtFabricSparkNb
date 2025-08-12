@@ -18,7 +18,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "dbt_wrapper.main",
-            "args": ["build", "./samples_tests"],
+            "args": ["stage", "run", "build", "--pre-install", "--project-dir", "./samples_tests"],
             "console": "integratedTerminal"
         }
     ]
