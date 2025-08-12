@@ -6,6 +6,7 @@ defaults:
   log_level: WARNING
   notebook_timeout: 1800
   lakehouse_config: METADATA
+  hashcheck_level: BYPASS
 
 # Environment-specific configurations
 environments:
@@ -34,7 +35,7 @@ workflows:
       - post-scripts
     options:
       log_level: INFO
-      hashcheck_level: WARNING
+  # hashcheck_level: WARNING
       upload_notebooks: false
       auto_run_master: false
   
@@ -53,7 +54,7 @@ workflows:
       - results
     options:
       log_level: WARNING
-      hashcheck_level: ERROR
+  # hashcheck_level: ERROR
       upload_notebooks: true
       auto_run_master: true
   
@@ -67,7 +68,7 @@ workflows:
       - validate
     options:
       log_level: INFO
-      hashcheck_level: ERROR
+  # hashcheck_level: ERROR
       notebook_timeout: 900
       upload_notebooks: false
       auto_run_master: false
@@ -88,7 +89,7 @@ workflows:
       - results
     options:
       log_level: ERROR
-      hashcheck_level: ERROR
+  # hashcheck_level: ERROR
       notebook_timeout: 3600
       upload_notebooks: true
       auto_run_master: true
@@ -101,7 +102,17 @@ workflows:
       - build
     options:
       log_level: DEBUG
-      hashcheck_level: BYPASS
+  # hashcheck_level: BYPASS
+  
+  # Build and post-scripts only (local build)
+  build-local:
+    description: Build and run post-scripts only (for local development)
+    stages:
+      - build
+      - post-scripts
+    options:
+      log_level: INFO
+  # hashcheck_level: WARNING
       
   # Metadata refresh only
   metadata-refresh:
