@@ -46,7 +46,8 @@ The new workflow-based commands offer several advantages:
 | Old Workflow | New Workflow | Benefits |
 |--------------|--------------|----------|
 | Local development | `dbt_wrapper dev` | Purpose-built for development |
-| Quick build only | `dbt_wrapper build` | Minimal overhead |
+| Quick build only | `dbt_wrapper build` | Minimal with metadata |
+| Local build only | `dbt_wrapper build-local` | Build without metadata operations |
 | Testing/validation | `dbt_wrapper test` | Validation-focused |
 | Full deployment | `dbt_wrapper deploy` | Complete pipeline |
 

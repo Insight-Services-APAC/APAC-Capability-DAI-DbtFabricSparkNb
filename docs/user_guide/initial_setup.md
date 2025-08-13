@@ -77,70 +77,86 @@ Now that we have pwsh installed, Make sure that you have install the following a
 ## Source Directory & Python Env
 Now lets create and activate our Python environment and install the required packages.
 
+!!! important
+    Python 3.12 or higher is required. The adapter uses `uv` as the preferred package manager for faster and more reliable dependency resolution.
+
 !!! tip
-    When executing the following, it can take a few minutes to complete on some machines. Occasionally pip may get stuck and in such cases break the execution using ctrl-c and run the same pip again. 
+    When executing the following, it can take a few minutes to complete on some machines. We recommend using `uv` for faster installation.
 
 
-=== "Windows"
+=== "Windows (Recommended with uv)"
 
     ```powershell
-
     # Ensure that you are in the pwsh shell
     pwsh
 
-    # Create a new source code directory
-    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
-    # Navigate to the new directory
-    cd dbt-fabricsparknb-test
+    # Install uv package manager (if not already installed)
+    pip install uv
+
+    # Clone the repository
+    git clone https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb.git
+    cd APAC-Capability-DAI-DbtFabricSparkNb
 
     # Create the Python environment
-    python -m venv .env
+    python -m venv .venv
 
-    #Optional step to run if activate.ps1 failes due to security policy
+    # Optional step if activation fails due to security policy
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
  
     # Activate the Python environment
-    ./.env/Scripts/Activate.ps1
+    ./.venv/Scripts/Activate.ps1
 
-    # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    # Install using uv (recommended)
+    uv pip install -e . -r requirements.txt
 
+    # Or install from PyPI directly
+    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
     ```
-
 
 === "MacOS"
 
-    ```powershell
+    ```bash
+    # Install uv package manager (if not already installed)
+    pip install uv
 
-    # Ensure that you are in the pwsh shell
-    pwsh
-
-    # Create a new source code directory
-    mkdir dbt-fabricsparknb-test #Note that the name of the directory is arbitrary... call it whatever you like
-    # Navigate to the new directory
-    cd dbt-fabricsparknb-test
+    # Clone the repository
+    git clone https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb.git
+    cd APAC-Capability-DAI-DbtFabricSparkNb
 
     # Create the Python environment
-    python -m venv .env
-
-    #Optional step to run if activate.ps1 failes due to security policy
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+    python3.12 -m venv .venv
     
     # Activate the Python environment
-    ./.env/Scripts/Activate.ps1  
+    source .venv/bin/activate
 
-    # Install the dbt-fabricsparknb package from the repository
-    pip install --upgrade --force-reinstall git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
+    # Install using uv (recommended)
+    uv pip install -e . -r requirements.txt
 
+    # Or install from PyPI directly
+    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
     ```
 
 === "Linux"
 
-    ```powershell
+    ```bash
+    # Install uv package manager (if not already installed)
+    pip install uv
 
-    # TBA
+    # Clone the repository
+    git clone https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb.git
+    cd APAC-Capability-DAI-DbtFabricSparkNb
 
+    # Create the Python environment
+    python3.12 -m venv .venv
+    
+    # Activate the Python environment
+    source .venv/bin/activate
 
+    # Install using uv (recommended)
+    uv pip install -e . -r requirements.txt
+
+    # Or install from PyPI directly
+    pip install --upgrade git+https://github.com/Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb
     ```
 !!!Tip
     To obtain a specific or the latest version of the framework packages in dbt, you need to specify the framework tags as following (example: for version 0.4.0)

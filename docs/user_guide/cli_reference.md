@@ -17,7 +17,8 @@ The `dbt_wrapper` command-line interface provides intuitive, workflow-based comm
 |---------|---------|----------|
 | `dbt_wrapper dev` | Development workflow | Local development and testing |
 | `dbt_wrapper deploy` | Full deployment | Complete Fabric deployment |
-| `dbt_wrapper build` | Build only | Minimal build without deployment |
+| `dbt_wrapper build` | Build only | Minimal build with metadata download |
+| `dbt_wrapper build-local` | Local build only | Build without metadata download |
 | `dbt_wrapper test` | Test workflow | Validation without deployment |
 | `dbt_wrapper run` | Custom workflow | Run configured workflows |
 
@@ -95,7 +96,7 @@ dbt_wrapper deploy my_project --notebook-timeout 3600
 ```
 
 ### `dbt_wrapper build`
-🔨 **Build workflow** - Minimal build with just the essentials.
+🔨 **Build workflow** - Minimal build with metadata download.
 
 **Usage:**
 ```bash
@@ -116,6 +117,33 @@ dbt_wrapper build my_project
 dbt_wrapper build my_project --select models/staging
 ```
 
+### `dbt_wrapper build-local`
+🔨 **Build-local workflow** - Local build without metadata operations.
+
+**Usage:**
+```bash
+dbt_wrapper build-local [PROJECT_DIR] [OPTIONS]
+```
+
+**What it runs:**
+```
+build → post-scripts
+```
+
+**Options:**
+- `--profiles-dir PATH` - Path to dbt profiles directory
+- `--select SELECTOR` - dbt resource selection syntax
+- `--exclude SELECTOR` - dbt resource exclude syntax
+
+**Examples:**
+```bash
+# Local build without metadata
+dbt_wrapper build-local my_project
+
+# Build specific models locally
+dbt_wrapper build-local my_project --select models/staging
+```
+
 ### `dbt_wrapper test`
 🧪 **Test workflow** - Validation-focused pipeline without deployment.
 
@@ -126,7 +154,7 @@ dbt_wrapper test [PROJECT_DIR] [OPTIONS]
 
 **What it runs:**
 ```
-clean → metadata-extract → metadata-download → build → validation
+clean → pre-scripts → metadata-extract → metadata-download → build → post-scripts → validation
 ```
 
 **Examples:**

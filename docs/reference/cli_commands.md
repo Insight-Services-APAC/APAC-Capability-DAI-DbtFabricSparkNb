@@ -101,7 +101,7 @@ dbt_wrapper deploy my_project --skip execute,results
 
 ### `dbt_wrapper build`
 
-🔨 **Build workflow** - Minimal build only
+🔨 **Build workflow** - Minimal build with metadata
 
 **Usage:**
 ```bash
@@ -111,7 +111,7 @@ dbt_wrapper build [OPTIONS] [DBT_PROJECT_DIR]
 **Description:**
 Runs: metadata-download → build
 
-Just builds the dbt project with minimal overhead.
+Builds the dbt project with metadata download.
 
 **Arguments:**
 - `[DBT_PROJECT_DIR]` - The path to the dbt_project directory [default: .]
@@ -131,6 +131,38 @@ dbt_wrapper build my_project
 dbt_wrapper build my_project --select models/staging
 ```
 
+### `dbt_wrapper build-local`
+
+🔨 **Build-local workflow** - Local build without metadata
+
+**Usage:**
+```bash
+dbt_wrapper build-local [OPTIONS] [DBT_PROJECT_DIR]
+```
+
+**Description:**
+Runs: build → post-scripts
+
+Builds the dbt project locally without metadata operations.
+
+**Arguments:**
+- `[DBT_PROJECT_DIR]` - The path to the dbt_project directory [default: .]
+
+**Options:**
+- `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--select TEXT` - dbt resource selection syntax [default: ""]
+- `--exclude TEXT` - dbt resource exclude syntax [default: ""]
+- `--help` - Show this message and exit
+
+**Examples:**
+```bash
+# Local build
+dbt_wrapper build-local my_project
+
+# Build specific models locally
+dbt_wrapper build-local my_project --select models/staging
+```
+
 ### `dbt_wrapper test`
 
 🧪 **Test workflow** - Validation-focused pipeline
@@ -141,7 +173,7 @@ dbt_wrapper test [OPTIONS] [DBT_PROJECT_DIR]
 ```
 
 **Description:**
-Runs: clean → metadata-extract → metadata-download → build → validation
+Runs: clean → pre-scripts → metadata-extract → metadata-download → build → post-scripts → validation
 
 Ensures quality without deployment.
 
