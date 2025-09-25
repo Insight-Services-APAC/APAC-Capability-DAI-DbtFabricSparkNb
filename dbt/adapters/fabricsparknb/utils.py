@@ -267,6 +267,9 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
         mnb.SetThePythonPreScript()
         # always set the config in first code cell
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
+        mnb.nb.cells[4].source = mnb.nb.cells[4].source.replace("{{ notebook_timeout }}", 1800)
+
+        print(f"Setting notebook timeout")
 
         # Write the notebook to a file
         target_file_name = notebook_file
