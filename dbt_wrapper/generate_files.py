@@ -490,7 +490,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config, notebook_timeout):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
@@ -516,6 +516,7 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
 
         # Use re.sub to replace the placeholder with optional spaces
         mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
+        mnb.nb.cells[7].source = re.sub(r"\{\{\s* notebook_timeout \s*\}\}", str(notebook_timeout), mnb.nb.cells[7].source)
 
         # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
