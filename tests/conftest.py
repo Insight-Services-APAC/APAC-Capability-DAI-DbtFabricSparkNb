@@ -30,7 +30,7 @@ def dbt_profile_target(request):
 
 def _all_profiles_base():
     return {
-        "type": "fabricspark",
+        "type": "fabricsparknb",
         "method": "livy",
         "connect_retries": 2,
         "connect_timeout":10,

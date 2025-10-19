@@ -26,6 +26,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
     manifest = GetManifest(progress)
+
+    print(GetDAG(manifest, progress))
+
     nodes_copy = SortManifest(nodes_orig=manifest.nodes, progress=progress)
 
     notebook_files = []
@@ -564,6 +567,33 @@ def GetManifest(progress: ProgressConsoleWrapper):
     # Convert the dictionary into a Manifest object
     manifest = Manifest.from_dict(data)
     return manifest
+
+@staticmethod
+def GetDAG(manifest: Manifest, progress: ProgressConsoleWrapper):
+    dag = {"activities": []}
+
+    for node_id, node in manifest.nodes.items():
+        progress.print(f"Processing node: {node_id}",  level=LogLevel.INFO)
+        if node.resource_type.name.lower() != 'model' and node.resource_type.name.lower() != 'seed' and node.resource_type.name.lower() != 'test':
+            progress.print(f"Skipping non-model node: {node_id} of type {node.resource_type.name}",  level=LogLevel.INFO)
+            continue  # Skip non-model nodes
+        activity = {}
+        activity['name'] = node_id
+        activity['path'] = f"{node.unique_id}.ipynb"
+        activity['timeoutPerCellInSeconds'] = 300  # Default timeout, can be customized
+        activity['args'] = {}  # Add any necessary arguments here
+        activity['retry'] = 1
+        activity['retryIntervalInSeconds'] = 10
+        
+
+        # Add dependencies if they exist
+        if node.resource_type.name.lower() != 'seed':
+            if node.depends_on.nodes:
+                activity['dependencies'] = list(node.depends_on.nodes)
+
+        dag['activities'].append(activity)
+
+    return dag
 
 
 @staticmethod

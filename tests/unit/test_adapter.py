@@ -4,7 +4,8 @@ from unittest import mock
 import dbt.flags as flags
 from dbt.exceptions import DbtRuntimeError
 from agate import Row
-from dbt.adapters.fabricspark import SparkAdapter, SparkRelation
+from dbt.adapters.fabricsparknb import SparkAdapter
+from dbt.adapters.fabricspark import SparkRelation
 from .utils import config_from_parts_or_dicts
 
 
@@ -30,7 +31,7 @@ class TestSparkAdapter(unittest.TestCase):
             {
                 "outputs": {
                     "test": {
-                        "type": "fabricspark",
+                        "type": "fabricsparknb",
                         "method": "livy",
                         "authentication": "CLI",
                         "schema": "dbtsparktest",
@@ -55,12 +56,12 @@ class TestSparkAdapter(unittest.TestCase):
         def fabric_spark_livy_connect(configuration):
             self.assertEqual(configuration.method, "livy")
             # self.assertEqual(configuration.schema, "dbtsparktest")
-            self.assertEqual(configuration.type, "fabricspark")
+            self.assertEqual(configuration.type, "fabricsparknb")
             # self.assertEqual(configuration["spark.driver.memory"], "4g")
 
         # with mock.patch.object(hive, 'connect', new=hive_http_connect):
         with mock.patch(
-            "dbt.adapters.fabricspark.livysession.LivySessionConnectionWrapper",
+            "dbt.adapters.fabricsparknb.livysession.LivySessionConnectionWrapper",
             new=fabric_spark_livy_connect,
         ):
             connection = adapter.acquire_connection("dummy")
