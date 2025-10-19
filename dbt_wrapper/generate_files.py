@@ -105,9 +105,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
                     nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
         # Remove 'id' from all cells
-        #for cell in nb.cells:
-        #    if 'id' in cell:
-        #        del cell['id']
+        for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
 
         # Write the notebook to a file
         target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
@@ -173,9 +173,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
     
     
     # Remove 'id' from all cells
-    #for cell in nb.cells:
-    #    if 'id' in cell:
-    #        del cell['id']
+    for cell in nb.cells:
+        if 'id' in cell:
+            del cell['id']
 
     # Write the notebook to a file
     target_file_name = f'master_{project_name}_notebook.ipynb'
@@ -224,9 +224,9 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
                 nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
     # Remove 'id' from all cells
-    #for cell in nb.cells:
-    #    if 'id' in cell:
-    #        del cell['id']
+    for cell in nb.cells:
+        if 'id' in cell:
+            del cell['id']
 
     # Write the notebook to a file    
     target_file_name = f'metadata_{project_name}_extract.ipynb'
@@ -259,9 +259,9 @@ def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, projec
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
     # Remove 'id' from all cells
-    #for cell in nb.cells:
-    #    if 'id' in cell:
-    #        del cell['id']
+    for cell in nb.cells:
+        if 'id' in cell:
+            del cell['id']
     # Write the notebook to a file    
     target_file_name = f'util_BuildMetadata.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -296,9 +296,9 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
     # Remove 'id' from all cells
-    #for cell in nb.cells:
-    #    if 'id' in cell:
-    #        del cell['id']
+    for cell in nb.cells:
+        if 'id' in cell:
+            del cell['id']
     # Write the notebook to a file    
     target_file_name = f'compare_{project_name}_{source_env}_to_{target_env}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -393,9 +393,9 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
     nb['cells'] = cells
     # Remove 'id' from all cells
-    #for cell in nb.cells:
-    #    if 'id' in cell:
-    #        del cell['id']
+    for cell in nb.cells:
+        if 'id' in cell:
+            del cell['id']
     # Write the notebook to a file    
     #target_file_name = f'missing_objects_{project_name}_notebook.ipynb'
     target_file_name = f"missing_objects_{project_name}_notebook_{source_env}_to_{target_env}.ipynb"
@@ -534,9 +534,9 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
                 if index_to_remove < len(nb.cells):
                     nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
         # Remove 'id' from all cells
-        #for cell in nb.cells:
-        #    if 'id' in cell:
-        #        del cell['id']
+        for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
         # Write the notebook to a file
         target_file_name = notebook_file
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:

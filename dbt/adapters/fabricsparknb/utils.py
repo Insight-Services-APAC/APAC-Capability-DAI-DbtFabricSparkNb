@@ -93,9 +93,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         # Parse the rendered template as a notebook
         nb = nbf.reads(rendered_template, as_version=4)
 
-        #for cell in nb.cells:
-        #    if 'id' in cell:
-        #        del cell['id']
+        for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
 
         # Write the notebook to a file
         target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
@@ -143,9 +143,9 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
         nb.cells.insert((insertion_point), cell)
         insertion_point += 1
 
-    #for cell in nb.cells:
-    #        if 'id' in cell:
-    #            del cell['id']
+    for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
 
     # Write the notebook to a file
     target_file_name = f'master_{project_name}_notebook.ipynb'
@@ -175,9 +175,9 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
-    #for cell in nb.cells:
-    #        if 'id' in cell:
-    #            del cell['id']
+    for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
     # Write the notebook to a file    
     target_file_name = f'metadata_{project_name}_extract.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -206,9 +206,9 @@ def GenerateNotebookUpload(project_root, workspaceid, lakehouseid, lakehouse_nam
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
-    #for cell in nb.cells:
-    #        if 'id' in cell:
-    #            del cell['id']
+    for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
     # Write the notebook to a file    
     target_file_name = f'import_{project_name}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -279,9 +279,9 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
         mnb.SetThePythonPreScript()
         # always set the config in first code cell
         mnb.nb.cells[1].source = mnb.nb.cells[1].source.replace("{{lakehouse_name}}", lakehouse_name)
-        #for cell in mnb.nb.cells:
-        #    if 'id' in cell:
-        #        del cell['id']
+        for cell in mnb.nb.cells:
+            if 'id' in cell:
+                del cell['id']
         # Write the notebook to a file
         target_file_name = notebook_file
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -292,6 +292,7 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name):
             except Exception as ex:
                 print(f"Error updating: {target_file_name}")
                 raise ex
+
 
 
 @staticmethod

@@ -10,6 +10,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any
 from urllib import response
+import uuid
 
 import nbformat as nbf
 import requests
@@ -135,7 +136,7 @@ class LivySession:
         return True
 
     def create_session(self, data) -> str:
-        self.session_id = "0"
+        self.session_id = str(uuid.uuid4())
         return self.session_id
        
     def delete_session(self) -> None:
@@ -386,11 +387,13 @@ class LivyCursor:
 
         project_root = merged_json['project_root'].replace("\\", "/")
         notebook_dir = Path(project_root) / Path("target") / Path("notebooks")
+        sql_dir = Path(project_root) / Path("target") / Path("sql")
         # Use the node_id as the filename
         filename = str(Path(notebook_dir) / Path(f'{node_id}.ipynb'))
 
         # Create the directory if it does not exist
         os.makedirs(notebook_dir, exist_ok=True)
+        os.makedirs(sql_dir, exist_ok=True)
 
         # If the notebook exists, read it, otherwise create a new one
         if node_id in self.executed:
@@ -427,9 +430,10 @@ class LivyCursor:
         mnb.AddCell(cell)
         # mnb.GatherSql()
         # mnb.SetTheSqlVariable()
-        #for cell in mnb.nb.cells:
-        #    if 'id' in cell:
-        #        del cell['id']
+        for cell in mnb.nb.cells:
+            if 'id' in cell:
+                del cell['id']
+        
         # Write the notebook to a file
         with io.open(file=filename, mode='w', encoding='utf-8') as f:
             try:
@@ -454,8 +458,44 @@ class LivyCursor:
         else:
             self._rows = []
             self._schema = []
-
+        
         self.executed.append(node_id)
+        # write the sql to a file
+        filename_sql = str(Path(sql_dir) / Path(f'{node_id}.json'))
+        file_sql_contents = json.dumps(
+            {
+                "node_id": node_id,
+                "non-sql-comments": json.dumps(merged_json),
+                "session_id": self.session_id,
+                "sql": [remainder_without_blank_lines]
+            },
+            indent=4
+        )
+        #check if file exists
+        if os.path.exists(filename_sql):
+            # Get session_id
+            with io.open(file=filename_sql, mode='r', encoding='utf-8') as f:
+                try:
+                    data = json.load(f)
+                    file_session_id = data.get("session_id")
+                    if self.session_id != file_session_id:
+                        # delete the file and re-create it
+                        with io.open(file=filename_sql, mode='w', encoding='utf-8') as f:
+                            f.write(file_sql_contents)
+                    else:
+                        # append to the existing sql array
+                        with io.open(file=filename_sql, mode='r+', encoding='utf-8') as f:
+                            data = json.load(f)
+                            data["sql"].append(remainder_without_blank_lines)
+                            f.seek(0)
+                            f.write(json.dumps(data, indent=4))
+                            f.truncate()
+                except Exception as ex:
+                    print("Error reading SQL file")
+                    raise ex
+        else:
+            with io.open(file=filename_sql, mode='w', encoding='utf-8') as f:
+                f.write(file_sql_contents)
 
         return
 

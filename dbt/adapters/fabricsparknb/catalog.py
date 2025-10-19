@@ -5,6 +5,10 @@ import agate
 
 @staticmethod
 def ListRelations(profile):
+    
+    # Switch between ListRelations from a JSON file and connection to the database here
+
+    
     # Open the file
     with io.open(profile.project_root + '/metaextracts/ListRelations.json', 'r') as file:
         # Load JSON data from file
