@@ -108,7 +108,7 @@ class Commands:
         except KeyError:
             log_lakehouse = self.lakehouse
 
-        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config,notebook_timeout=notebook_timeout)
         gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
