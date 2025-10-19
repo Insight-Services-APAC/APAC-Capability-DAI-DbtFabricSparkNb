@@ -108,7 +108,7 @@ class Commands:
         except KeyError:
             log_lakehouse = self.lakehouse
 
-        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config,notebook_timeout=notebook_timeout)
         gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
@@ -130,6 +130,19 @@ class Commands:
         dbt_project_dir = os.path.join(curr_dir, self.dbt_project_dir)
         self.fa.APIUpsertNotebooks(progress=progress, task_id=task_id, dbt_project_dir=dbt_project_dir, workspace_id=self.target_info['workspaceid'])
 
+    def ClearDbtLog(self):
+        """Clear the dbt log file before running dbt to avoid confusion from previous runs."""
+        dbt_log_path = os.path.join(self.dbt_project_dir, "logs", "dbt.log")
+        if os.path.exists(dbt_log_path):
+            try:
+                # Clear the log file by opening it in write mode and immediately closing it
+                with open(dbt_log_path, 'w'):
+                    pass  # This truncates the file to 0 bytes
+                self.console.print(f"Cleared dbt log file: {dbt_log_path}", style="info")
+            except Exception as e:
+                # If clearing fails, just log it but don't stop execution
+                self.console.print(f"Warning: Could not clear dbt log file {dbt_log_path}: {e}", style="warning")
+
     def BuildDbtProject(self, PreInstall=False, select="", exclude=""):
         print(Panel.fit("[blue]<<<<<<<<<<<<<<<<<<<<<<< Start of dbt build[/blue]"))
         # Check if PreInstall is True
@@ -143,6 +156,9 @@ class Commands:
         elif len(os.listdir(self.dbt_project_dir + "/metaextracts")) == 0:
             self.PrintFirstTimeRunningMessage()
         else:
+            # Clear dbt log before running dbt to avoid confusion from previous runs
+            self.ClearDbtLog()
+            
             if (PreInstall is True):
                 # make sure we are using the installed dbt version
                 utilpath = Path(get_paths()['purelib']) / Path('dbt/tests/util.py')
