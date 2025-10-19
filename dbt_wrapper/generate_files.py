@@ -589,7 +589,8 @@ def GetDAG(manifest: Manifest, progress: ProgressConsoleWrapper):
         # Add dependencies if they exist
         if node.resource_type.name.lower() != 'seed':
             if node.depends_on.nodes:
-                activity['dependencies'] = list(node.depends_on.nodes)
+                # Only include dependencies that are also in the manifest nodes
+                activity['dependencies'] = [dep for dep in node.depends_on.nodes if dep in manifest.nodes]
 
         dag['activities'].append(activity)
 
