@@ -37,7 +37,8 @@ class StageType(str, Enum):
     METADATA_DOWNLOAD = "metadata-download"
     BUILD = "build"
     POST_SCRIPTS = "post-scripts"
-    UPLOAD = "upload"
+    UPLOAD_ARTIFACTS = "upload-artifacts"
+    UPLOAD_NOTEBOOKS = "upload-notebooks"
     EXECUTE = "execute"
     VALIDATE = "validate"
     RESULTS = "results"
@@ -92,7 +93,8 @@ class WorkflowManager:
                     StageType.METADATA_DOWNLOAD,
                     StageType.BUILD,
                     StageType.POST_SCRIPTS,
-                    StageType.UPLOAD,
+                    StageType.UPLOAD_ARTIFACTS,
+                    StageType.UPLOAD_NOTEBOOKS,
                     StageType.EXECUTE,
                     StageType.RESULTS,
                 ],
@@ -249,7 +251,8 @@ class WorkflowManager:
             StageType.METADATA_DOWNLOAD: "Download metadata locally",
             StageType.BUILD: "Build dbt project",
             StageType.POST_SCRIPTS: "Generate post-dbt scripts",
-            StageType.UPLOAD: "Upload notebooks to Fabric",
+            StageType.UPLOAD_ARTIFACTS: "Upload artifacts to lakehouse",
+            StageType.UPLOAD_NOTEBOOKS: "Upload notebooks to workspace",
             StageType.EXECUTE: "Execute master notebook",
             StageType.VALIDATE: "Run validation checks",
             StageType.RESULTS: "Retrieve execution results",
@@ -339,6 +342,11 @@ class WorkflowManager:
                 ],
                 stage_name="Generate Post-DBT Scripts"
             ),
+            StageType.UPLOAD_ARTIFACTS: lambda: se.perform_stage(
+                option=True,
+                action_callables=[self.wrapper_commands.UploadArtifacts],
+                stage_name="Upload Artifacts to Lakehouse"
+            ),
             StageType.UPLOAD: lambda: se.perform_stage(
                 option=options.get("upload_notebooks", False),
                 action_callables=[self.wrapper_commands.AutoUploadNotebooksViaApi],
@@ -375,7 +383,8 @@ class WorkflowManager:
             (StageType.METADATA_DOWNLOAD, "Download metadata locally", "deploy, build, test"),
             (StageType.BUILD, "Build dbt project", "all workflows"),
             (StageType.POST_SCRIPTS, "Generate post-dbt scripts", "dev, deploy, test"),
-            (StageType.UPLOAD, "Upload notebooks to Fabric", "deploy"),
+            (StageType.UPLOAD_ARTIFACTS, "Upload artifacts to lakehouse", "deploy"),
+            (StageType.UPLOAD_NOTEBOOKS, "Upload notebooks to workspace", "deploy"),
             (StageType.EXECUTE, "Execute master notebook", "deploy"),
             (StageType.VALIDATE, "Run validation checks", "test, ci"),
             (StageType.RESULTS, "Retrieve execution results", "deploy"),

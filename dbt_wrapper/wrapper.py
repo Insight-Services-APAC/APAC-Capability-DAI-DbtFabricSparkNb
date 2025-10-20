@@ -1,19 +1,21 @@
-import shutil
+import importlib.util
 import os
-import dbt.config as dbtconfig
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 from sysconfig import get_paths
-import importlib.util
-import sys
-import subprocess
-import dbt_wrapper.utils as mn
+from time import sleep
+
+import dbt.config as dbtconfig
+from rich import print
+from rich.panel import Panel
+
 import dbt_wrapper.generate_files as gf
+import dbt_wrapper.utils as mn
 from dbt_wrapper.fabric_api import FabricAPI as fa
 from dbt_wrapper.log_levels import LogLevel
 from dbt_wrapper.stage_executor import ProgressConsoleWrapper
-from rich import print
-from rich.panel import Panel
-from time import sleep
 
 
 class Commands:
@@ -102,14 +104,16 @@ class Commands:
         
       #  gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], progress=progress, task_id=task_id)
     
-    def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None, notebook_timeout=None, log_lakehouse=None, notebook_hashcheck=None, lakehouse_config=None): 
-        try:
-            log_lakehouse = self.target_info['log_lakehouse']
-        except KeyError:
-            log_lakehouse = self.lakehouse
+    def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None, notebook_timeout=None, log_lakehouse=None, notebook_hashcheck=None, lakehouse_config=None):
+        log_lakehouse = self.target_info.get('log_lakehouse', self.lakehouse)
+        cell_timeout = self.target_info.get('cell_timeout', 7200)
+        spark_config_conf = self.target_info.get('spark_config', {}).get('conf', {})
+        dag_timeout = self.target_info.get('dag_timeout', 10800)
 
-        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config,notebook_timeout=notebook_timeout)
-        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
+        gf.GenerateMasterNotebookUtils(self.dbt_project_dir, progress=progress, task_id=task_id)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, dag_timeout=dag_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config, cell_timeout=cell_timeout, spark_config_conf=spark_config_conf)
+    
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
         curr_dir = os.getcwd()
@@ -124,6 +128,29 @@ class Commands:
         
         if not os.path.exists(self.dbt_project_dir + "/target/notebooks"):
             os.makedirs(self.dbt_project_dir + "/target/notebooks")
+
+    def UploadArtifacts(self, progress: ProgressConsoleWrapper, task_id):
+        """Upload runtime artifacts (manifest.json) to lakehouse for notebook execution"""
+        import dbt_wrapper.utils as mn
+
+        # Validate manifest exists
+        manifest_path = f'./{self.dbt_project_dir}/target/manifest.json'
+        if not os.path.exists(manifest_path):
+            raise Exception(f"Manifest not found at {manifest_path}. Run 'build' stage first.")
+
+        progress.print("Uploading manifest.json to lakehouse", level=LogLevel.INFO)
+
+        # Upload manifest to lakehouse
+        mn.UploadFileToLakehouse(
+            progress=progress,
+            task_id=task_id,
+            workspacename=self.target_info['workspaceid'],
+            lakehouse_id=self.target_info['lakehouseid'],
+            local_file_path=manifest_path,
+            remote_path='MetaExtracts/manifest.json'
+        )
+
+        progress.print("Manifest uploaded successfully", level=LogLevel.INFO)
 
     def AutoUploadNotebooksViaApi(self, progress: ProgressConsoleWrapper, task_id):
         curr_dir = os.getcwd()

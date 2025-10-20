@@ -919,6 +919,7 @@ def run_all(
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 
     se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
+    se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.UploadArtifacts], stage_name="Upload Artifacts like the manifest.json and run_results.json")
 
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.RunMasterNotebook], stage_name="Run Master Notebook")
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.GetExecutionResults], stage_name="Get Execution Results")
