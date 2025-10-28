@@ -515,8 +515,16 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         import re
 
         # Use re.sub to replace the placeholder with optional spaces
-        mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
-        mnb.nb.cells[7].source = re.sub(r"\{\{\s* notebook_timeout \s*\}\}", str(notebook_timeout), mnb.nb.cells[7].source)
+        # Check if notebook has enough cells before accessing them
+        if len(mnb.nb.cells) > 1:
+            mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
+        else:
+            progress.print(f"Warning: Notebook {notebook_file} has insufficient cells (expected at least 2 cells for lakehouse_name replacement)", level=LogLevel.WARNING)
+        
+        if len(mnb.nb.cells) > 7:
+            mnb.nb.cells[7].source = re.sub(r"\{\{\s* notebook_timeout \s*\}\}", str(notebook_timeout), mnb.nb.cells[7].source)
+        else:
+            progress.print(f"Warning: Notebook {notebook_file} has insufficient cells (expected at least 8 cells for notebook_timeout replacement)", level=LogLevel.WARNING)
 
         # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
