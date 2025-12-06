@@ -46,6 +46,7 @@ clean → pre-scripts → metadata-extract → build → post-scripts
 
 **Options:**
 - `--profiles-dir PATH` - Path to dbt profiles directory
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--skip STAGES` - Comma-separated list of stages to skip
 - `--only STAGES` - Run only these stages
 - `--select SELECTOR` - dbt resource selection syntax
@@ -80,7 +81,12 @@ clean → pre-scripts → metadata-extract → metadata-download → build → p
 ```
 
 **Options:**
-- Same as `dev` command plus deployment-specific options
+- `--profiles-dir PATH` - Path to dbt profiles directory
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
+- `--skip STAGES` - Comma-separated list of stages to skip
+- `--only STAGES` - Run only these stages
+- `--select SELECTOR` - dbt resource selection syntax
+- `--exclude SELECTOR` - dbt resource exclude syntax
 
 **Examples:**
 ```bash
@@ -107,6 +113,12 @@ dbt_wrapper build [PROJECT_DIR] [OPTIONS]
 metadata-download → build
 ```
 
+**Options:**
+- `--profiles-dir PATH` - Path to dbt profiles directory
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
+- `--select SELECTOR` - dbt resource selection syntax
+- `--exclude SELECTOR` - dbt resource exclude syntax
+
 **Examples:**
 ```bash
 # Quick build
@@ -128,6 +140,13 @@ dbt_wrapper test [PROJECT_DIR] [OPTIONS]
 ```
 clean → metadata-extract → metadata-download → build → validation
 ```
+
+**Options:**
+- `--profiles-dir PATH` - Path to dbt profiles directory
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
+- `--skip STAGES` - Comma-separated list of stages to skip
+- `--select SELECTOR` - dbt resource selection syntax
+- `--exclude SELECTOR` - dbt resource exclude syntax
 
 **Examples:**
 ```bash
@@ -152,6 +171,7 @@ dbt_wrapper run [OPTIONS]
 - `--interactive` - Run in interactive mode
 - `--project-dir PATH` - dbt project directory
 - `--profiles-dir PATH` - dbt profiles directory
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 
 **Examples:**
 ```bash
@@ -301,6 +321,7 @@ Available for most workflow commands:
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--profiles-dir PATH` | dbt profiles directory | `~/.dbt/` |
+| `--target, -t TEXT` | dbt target to use | profiles.yml default |
 | `--select SELECTOR` | dbt resource selection | (none) |
 | `--exclude SELECTOR` | dbt resource exclusion | (none) |
 | `--notebook-timeout SECONDS` | Notebook execution timeout | 1800 |

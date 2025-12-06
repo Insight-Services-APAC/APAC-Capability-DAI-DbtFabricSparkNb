@@ -269,7 +269,7 @@ workflows:
 ## Integration with profiles.yml
 
 ### profiles.yml Structure
-Your dbt profiles.yml handles connection details:
+Your dbt profiles.yml handles connection details and execution settings:
 
 ```yaml
 # ~/.dbt/profiles.yml
@@ -280,17 +280,44 @@ my-fabric-project:
       workspaceid: 'dev-workspace-guid'
       lakehouseid: 'dev-lakehouse-guid'
       lakehouse: datalake_dev
-      # ... other connection settings
-    
+      threads: 10
+      # Execution timeout settings
+      cell_timeout: 7200        # Individual cell timeout in seconds (default: 7200)
+      dag_timeout: 10800        # Overall DAG execution timeout in seconds (default: 10800)
+      # Optional: Spark configuration
+      spark_config:
+        conf:
+          spark.sql.shuffle.partitions: 200
+          spark.executor.memory: 4g
+      # Optional: Separate logging lakehouse
+      log_lakehouse: datalake_logs_dev
+
     production:
       type: fabricsparknb
       workspaceid: 'prod-workspace-guid'
       lakehouseid: 'prod-lakehouse-guid'
       lakehouse: datalake_prod
-      # ... other connection settings
-  
+      threads: 20
+      cell_timeout: 7200
+      dag_timeout: 21600        # Longer timeout for production
+      spark_config:
+        conf:
+          spark.sql.shuffle.partitions: 400
+          spark.executor.memory: 8g
+      log_lakehouse: datalake_logs_prod
+
   target: dev  # Default environment
 ```
+
+### profiles.yml Execution Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `threads` | Max concurrent notebook executions | 5 |
+| `cell_timeout` | Timeout for individual cells in seconds | 7200 |
+| `dag_timeout` | Overall DAG execution timeout in seconds | 10800 |
+| `log_lakehouse` | Lakehouse for execution logs | Same as `lakehouse` |
+| `spark_config.conf` | Spark configuration key-value pairs | (none) |
 
 ### How They Work Together
 
