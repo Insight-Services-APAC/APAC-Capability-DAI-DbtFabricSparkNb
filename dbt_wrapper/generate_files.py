@@ -16,122 +16,79 @@ import fnmatch
 from datetime import datetime
 
 @staticmethod
-def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, notebook_timeout, max_worker, log_lakehouse, notebook_hashcheck, lakehouse_config):
+def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_name, project_name, progress: ProgressConsoleWrapper, task_id, dag_timeout, max_worker, log_lakehouse, notebook_hashcheck, lakehouse_config, cell_timeout=90, spark_config_conf=None):
     # If log lakehouse is None use lakehouse as default
     if log_lakehouse is None:
         log_lakehouse = lakehouse_name
-    
-    # Iterate through the notebooks directory and create a list of notebook files
-    notebook_dir = f'./{project_root}/target/notebooks/'
-    notebook_files_str = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb') and 'master_notebook' not in f]
 
-    manifest = GetManifest(progress)
-    nodes_copy = SortManifest(nodes_orig=manifest.nodes, progress=progress)
-
-    notebook_files = []
-    # Add sort_order attribute to each file object
-    for file in notebook_files_str:
-        notebook_file = {}
-        matching_node = next((node for node in nodes_copy.values() if node.unique_id == file), None)
-        if matching_node:
-            notebook_file['name'] = file
-            notebook_file['sort_order'] = matching_node.sort_order
-            notebook_files.append(notebook_file)
-   
-    if len(notebook_files) == 0:
-        print("No notebooks found.Try checking your model configs and model specification args")
-        exit(1)
-    
-    # Find the minimum and maximum sort_order
-    min_sort_order = min(file['sort_order'] for file in notebook_files)
-    max_sort_order = max(file['sort_order'] for file in notebook_files)
-
-    # Validate and set max worker (thread) property 
+    # Validate and set max worker (concurrency) property
     lr_max_worker = 5 # Default value (low Range)
     hr_max_worker = 20
 
     match max_worker:
         case _ if max_worker < lr_max_worker:
             max_worker = lr_max_worker
-            msg_text = "Max worker (thread) property is lesser than the default value, default thread value of "+str(lr_max_worker)+" has been set."
+            msg_text = "Max worker (concurrency) property is lesser than the default value, default value of "+str(lr_max_worker)+" has been set."
             progress.print(msg_text, LogLevel.WARNING)
         case _ if max_worker >= lr_max_worker and max_worker < hr_max_worker:
             pass
         case _ if max_worker >= hr_max_worker:
-            msg_text = "Max worker (thread) property is high !!\nPlease update thread property in profile.yml, if this is not expected."
+            msg_text = "Max worker (concurrency) property is high !!\nPlease update thread property in profile.yml, if this is not expected."
             progress.print(msg_text, LogLevel.WARNING)
         case _:
            max_worker = lr_max_worker
-           msg_text = "Max worker (thread) property value is not set, default thread value of "+str(lr_max_worker)+" has been set."
+           msg_text = "Max worker (concurrency) property value is not set, default value of "+str(lr_max_worker)+" has been set."
            progress.print(msg_text, LogLevel.WARNING)
 
-    # Loop from min_sort_order to max_sort_order
-    for sort_order in range(min_sort_order, max_sort_order + 1):
-        # Get the files with the current sort_order
-        files_with_current_sort_order = [file for file in notebook_files if file['sort_order'] == sort_order]
-        file_str_with_current_sort_order = [file['name'] for file in notebook_files if file['sort_order'] == sort_order]
-        # Do something with the files...
+    # Ensure directories exist for notebook generation
+    metaextracts_dir = f'./{project_root}/metaextracts/'
+    os.makedirs(metaextracts_dir, exist_ok=True)
 
-        # Define the directory containing the Jinja templates
-        template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+    notebook_dir = f'./{project_root}/target/notebooks/'
 
-        # Create a Jinja environment
-        env = Environment(loader=FileSystemLoader(template_dir))
+    # Note: Manifest upload moved to separate 'upload-artifacts' stage
 
-        # Load the template
-        template = env.get_template('master_notebook_x.ipynb')
-
-        # Render the template with the notebook_file variable
-        rendered_template = template.render(notebook_files=file_str_with_current_sort_order, run_order=sort_order, lakehouse_name=lakehouse_name, project_name=project_name, notebook_timeout=notebook_timeout, max_worker=max_worker, log_lakehouse=log_lakehouse)
-
-        # Parse the rendered template as a notebook
-        nb = nbf.reads(rendered_template, as_version=4)
-
-        # Check if lakehouse_config option is set to METADATA
-        lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
-
-        if lhconfig == "METADATA":
-            # Find the index of the markdown cell containing "THIS IS MARKDOWN"
-            index_to_remove = None
-            for i, cell in enumerate(nb.cells):
-                if cell.cell_type == 'markdown' and fnmatch.fnmatch(cell.source, '*(Attach Default Lakehouse Markdown Cell)*'):
-                    index_to_remove = i
-                    break
-
-            # Remove the found markdown cell and the next cell
-            if index_to_remove is not None:
-                nb.cells.pop(index_to_remove)
-                if index_to_remove < len(nb.cells):
-                    nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
-
-        # Remove 'id' from all cells
-        for cell in nb.cells:
-            if 'id' in cell:
-                del cell['id']
-
-        # Write the notebook to a file
-        target_file_name = f'master_{project_name}_notebook_{sort_order}.ipynb'
-        with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:            
-            try:
-                nb_str = nbf.writes(nb)
-                f.write(nb_str)
-                progress.print(f"{target_file_name} created", level=LogLevel.INFO)
-            except Exception as ex:
-                progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
-                raise ex
-            
     # Define the directory containing the Jinja templates
     template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
 
     # Create a Jinja environment
     env = Environment(loader=FileSystemLoader(template_dir))
 
+    # Add custom filter for notebook JSON formatting
+    def notebook_json(value, indent_spaces=6):
+        """Format dict as indented JSON for notebook cell source strings.
+        Handles escaping quotes and newlines for notebook JSON context."""
+        if not value:
+            return None
+        # Create pretty JSON
+        json_str = json.dumps(value, indent=2)
+        # Add base indentation to all lines except first
+        lines = json_str.split('\n')
+        indented = [lines[0]] + [' ' * indent_spaces + line for line in lines[1:]]
+        formatted = '\n'.join(indented)
+        # Escape for notebook JSON string context
+        return formatted.replace('"', '\\"').replace('\n', '\\n')
+
+    env.filters['notebook_json'] = notebook_json
+
     # Load the template
     template = env.get_template('master_notebook.ipynb')
 
-    MetaHashes = Catalog.GetMetaHashes(project_root)    
-    # Render the template with the notebook_file variable
-    rendered_template = template.render(lakehouse_name=lakehouse_name, hashes=MetaHashes, project_name=project_name, notebook_timeout=notebook_timeout, log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck)
+    MetaHashes = Catalog.GetMetaHashes(project_root)
+
+    # Render the template with variables for the master notebook
+    # DAG is now built at runtime from manifest, not pre-computed
+    rendered_template = template.render(
+        lakehouse_name=lakehouse_name,
+        hashes=MetaHashes,
+        project_name=project_name,
+        dag_timeout=dag_timeout,
+        log_lakehouse=log_lakehouse,
+        notebook_hashcheck=notebook_hashcheck,
+        max_worker=max_worker,
+        cell_timeout=cell_timeout,
+        spark_config_conf=spark_config_conf
+    )
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
@@ -153,29 +110,8 @@ def GenerateMasterNotebook(project_root, workspaceid, lakehouseid, lakehouse_nam
             if index_to_remove < len(nb.cells):
                 nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
-    # Find Markdown cell contaning # Executions for Each Run Order Below:
-    insertion_point = None
-    for i, cell in enumerate(nb.cells):
-        if cell.cell_type == 'markdown' and cell.source.startswith('# Executions for Each Run Order Below:'):
-            insertion_point = i + 1
-            break
-    
-    for sort_order in range(min_sort_order, max_sort_order + 1):
-        cell = nbf.v4.new_markdown_cell(source=f"## Run Order {sort_order}")
-        nb.cells.insert((insertion_point), cell)
-        insertion_point += 1
-        # Create a new code cell with the SQL
-        code = f'call_child_notebook("master_{project_name}_notebook_' + str(sort_order) + '", new_batch_id, master_notebook)'
-        cell = nbf.v4.new_code_cell(source=code)
-        # Add the cell to the notebook
-        nb.cells.insert((insertion_point), cell)
-        insertion_point += 1
-    
-    
-    # Remove 'id' from all cells
-    for cell in nb.cells:
-        if 'id' in cell:
-            del cell['id']
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
 
     # Write the notebook to a file
     target_file_name = f'master_{project_name}_notebook.ipynb'
@@ -223,12 +159,10 @@ def GenerateMetadataExtract(project_root, workspaceid, lakehouseid, lakehouse_na
             if index_to_remove < len(nb.cells):
                 nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
 
-    # Remove 'id' from all cells
-    for cell in nb.cells:
-        if 'id' in cell:
-            del cell['id']
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
 
-    # Write the notebook to a file    
+    # Write the notebook to a file
     target_file_name = f'metadata_{project_name}_extract.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
@@ -258,17 +192,46 @@ def GenerateUtils(project_root, workspaceid, lakehouseid, lakehouse_name, projec
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
-    # Remove 'id' from all cells
-    for cell in nb.cells:
-        if 'id' in cell:
-            del cell['id']
-    # Write the notebook to a file    
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
+    # Write the notebook to a file
     target_file_name = f'util_BuildMetadata.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
             nb_str = nbf.writes(nb)
             f.write(nb_str)
-            progress.print(f"{target_file_name} created", level=LogLevel.INFO)            
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)
+        except Exception as ex:
+            progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
+            raise ex
+
+
+def GenerateMasterNotebookUtils(project_root, progress: ProgressConsoleWrapper, task_id):
+    """Generate master_notebook_utils.ipynb containing shared utility functions."""
+    notebook_dir = f'./{project_root}/target/notebooks/'
+    # Define the directory containing the Jinja templates
+    template_dir = str((mn.GetIncludeDir()) / Path('notebooks/'))
+
+    # Create a Jinja environment
+    env = Environment(loader=FileSystemLoader(template_dir))
+
+    # Load the template
+    template = env.get_template('master_notebook_utils.ipynb')
+
+    # Render the template (no variables needed - static utilities)
+    rendered_template = template.render()
+
+    # Parse the rendered template as a notebook
+    nb = nbf.reads(rendered_template, as_version=4)
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
+    # Write the notebook to a file
+    target_file_name = 'master_notebook_utils.ipynb'
+    with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
+        try:
+            nb_str = nbf.writes(nb)
+            f.write(nb_str)
+            progress.print(f"{target_file_name} created", level=LogLevel.INFO)
         except Exception as ex:
             progress.print(f"Error creating: {target_file_name}", level=LogLevel.ERROR)
             raise ex
@@ -295,11 +258,9 @@ def GenerateCompareNotebook(project_root, source_env, workspaceid, lakehouseid, 
 
     # Parse the rendered template as a notebook
     nb = nbf.reads(rendered_template, as_version=4)
-    # Remove 'id' from all cells
-    for cell in nb.cells:
-        if 'id' in cell:
-            del cell['id']
-    # Write the notebook to a file    
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
+    # Write the notebook to a file
     target_file_name = f'compare_{project_name}_{source_env}_to_{target_env}_notebook.ipynb'
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
         try:
@@ -392,11 +353,9 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
             cells.append(cell)
 
     nb['cells'] = cells
-    # Remove 'id' from all cells
-    for cell in nb.cells:
-        if 'id' in cell:
-            del cell['id']
-    # Write the notebook to a file    
+    # Normalize notebook to ensure all cells have IDs
+    nb = nbf.v4.upgrade(nb)
+    # Write the notebook to a file
     #target_file_name = f'missing_objects_{project_name}_notebook.ipynb'
     target_file_name = f"missing_objects_{project_name}_notebook_{source_env}_to_{target_env}.ipynb"
     with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:
@@ -490,7 +449,7 @@ def GenerateMissingObjectsNotebook(project_root, workspaceid, lakehouseid, lakeh
 
 
 @staticmethod
-def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config, notebook_timeout):
+def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: ProgressConsoleWrapper, task_id, lakehouse_config):
     # Iterate through the notebooks directory and create a list of notebook files
     notebook_dir = f'./{project_root}/target/notebooks/'
     notebook_files = [f for f in os.listdir(Path(notebook_dir)) if f.endswith('.ipynb')]
@@ -515,16 +474,7 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
         import re
 
         # Use re.sub to replace the placeholder with optional spaces
-        # Check if notebook has enough cells before accessing them
-        if len(mnb.nb.cells) > 1:
-            mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
-        else:
-            progress.print(f"Warning: Notebook {notebook_file} has insufficient cells (expected at least 2 cells for lakehouse_name replacement)", level=LogLevel.WARNING)
-        
-        if len(mnb.nb.cells) > 7:
-            mnb.nb.cells[7].source = re.sub(r"\{\{\s* notebook_timeout \s*\}\}", str(notebook_timeout), mnb.nb.cells[7].source)
-        else:
-            progress.print(f"Warning: Notebook {notebook_file} has insufficient cells (expected at least 8 cells for notebook_timeout replacement)", level=LogLevel.WARNING)
+        mnb.nb.cells[1].source = re.sub(r"\{\{\s*lakehouse_name\s*\}\}", lakehouse_name, mnb.nb.cells[1].source)
 
         # Check if lakehouse_config option is set to METADATA
         lhconfig = lakehouse_config  # Assuming highcon is a boolean variable
@@ -542,10 +492,8 @@ def SetSqlVariableForAllNotebooks(project_root, lakehouse_name, progress: Progre
                 nb.cells.pop(index_to_remove)
                 if index_to_remove < len(nb.cells):
                     nb.cells.pop(index_to_remove)  # Remove the next cell if it exists
-        # Remove 'id' from all cells
-        for cell in nb.cells:
-            if 'id' in cell:
-                del cell['id']
+        # Normalize notebook to ensure all cells have IDs
+        nb = nbf.v4.upgrade(nb)
         # Write the notebook to a file
         target_file_name = notebook_file
         with io.open(file=notebook_dir + target_file_name, mode='w', encoding='utf-8') as f:

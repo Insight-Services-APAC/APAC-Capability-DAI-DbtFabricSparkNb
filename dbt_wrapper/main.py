@@ -79,6 +79,13 @@ def dev(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
+        ),
+    ] = None,
     skip: Annotated[
         Optional[str],
         typer.Option(
@@ -106,18 +113,19 @@ def dev(
 ):
     """
     🚀 [bold cyan]Development workflow[/bold cyan] - Quick iteration for local development
-    
+
     Runs: clean → pre-scripts → metadata → build → post-scripts
-    
+
     Perfect for rapid development and testing cycles.
     """
     skip_stages = skip.split(",") if skip else None
     only_stages = only.split(",") if only else None
-    
+
     workflow_manager.run_workflow(
         workflow_type=WorkflowType.DEV,
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target,
         skip_stages=skip_stages,
         only_stages=only_stages,
         select=select,
@@ -137,6 +145,13 @@ def deploy(
         typer.Option(
             "--profiles-dir",
             help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
         ),
     ] = None,
     skip: Annotated[
@@ -166,18 +181,19 @@ def deploy(
 ):
     """
     🚢 [bold green]Deploy workflow[/bold green] - Full deployment pipeline
-    
+
     Runs: clean → pre-scripts → metadata → build → post-scripts → upload → execute
-    
+
     Complete pipeline with Fabric deployment and execution.
     """
     skip_stages = skip.split(",") if skip else None
     only_stages = only.split(",") if only else None
-    
+
     workflow_manager.run_workflow(
         workflow_type=WorkflowType.DEPLOY,
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target,
         skip_stages=skip_stages,
         only_stages=only_stages,
         select=select,
@@ -199,6 +215,13 @@ def build(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
+        ),
+    ] = None,
     select: Annotated[
         str,
         typer.Option(
@@ -214,15 +237,16 @@ def build(
 ):
     """
     🔨 [bold yellow]Build workflow[/bold yellow] - Minimal build only
-    
+
     Runs: metadata-download → build
-    
+
     Just builds the dbt project with minimal overhead.
     """
     workflow_manager.run_workflow(
         workflow_type=WorkflowType.BUILD,
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target,
         select=select,
         exclude=exclude
     )
@@ -243,6 +267,13 @@ def build_local(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
+        ),
+    ] = None,
     select: Annotated[
         str,
         typer.Option(
@@ -258,15 +289,16 @@ def build_local(
 ):
     """
     🔨 [bold yellow]Build workflow[/bold yellow] - Minimal build only
-    
+
     Runs: metadata-download → build
-    
+
     Just builds the dbt project with minimal overhead.
     """
     workflow_manager.run_workflow(
         workflow_type=WorkflowType.BUILD_LOCAL,
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target,
         select=select,
         exclude=exclude
     )
@@ -284,6 +316,13 @@ def test(
         typer.Option(
             "--profiles-dir",
             help="The path to the dbt_profiles directory"
+        ),
+    ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
         ),
     ] = None,
     skip: Annotated[
@@ -307,17 +346,18 @@ def test(
 ):
     """
     🧪 [bold magenta]Test workflow[/bold magenta] - Validation-focused pipeline
-    
+
     Runs: clean → metadata → build → validation
-    
+
     Ensures quality without deployment.
     """
     skip_stages = skip.split(",") if skip else None
-    
+
     workflow_manager.run_workflow(
         workflow_type=WorkflowType.TEST,
         dbt_project_dir=dbt_project_dir,
         dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target,
         skip_stages=skip_stages,
         select=select,
         exclude=exclude
@@ -353,6 +393,13 @@ def run(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
+        ),
+    ] = None,
     interactive: Annotated[
         bool,
         typer.Option(
@@ -369,7 +416,7 @@ def run(
 ):
     """
     🎯 Run a workflow from configuration file or interactively
-    
+
     Examples:
       dbt_wrapper run --workflow ci
       dbt_wrapper run --interactive
@@ -379,22 +426,22 @@ def run(
         interactive_mode = InteractiveMode(console, workflow_manager)
         interactive_mode.run_interactive_workflow()
         return
-    
+
     if not workflow:
         console.print("[error]Please specify --workflow or use --interactive mode[/error]")
         raise typer.Exit(1)
-    
+
     # Load configuration
     config = config_loader.load_config(config_file)
     pipeline_workflow = config_loader.get_workflow(workflow)
-    
+
     if not pipeline_workflow:
         console.print(f"[error]Workflow '{workflow}' not found in configuration[/error]")
         available = config_loader.list_workflows()
         if available:
             console.print(f"Available workflows: {', '.join(available)}")
         raise typer.Exit(1)
-    
+
     # Convert pipeline stages to StageType enum
     stages = []
     for stage_name in pipeline_workflow.stages:
@@ -403,20 +450,21 @@ def run(
             stages.append(stage)
         except ValueError:
             console.print(f"[warning]Unknown stage: {stage_name}[/warning]")
-    
+
     # Display workflow info
     console.print(f"\n[bold cyan]Running '{workflow}' Workflow[/bold cyan]")
     console.print(f"[dim]{pipeline_workflow.description}[/dim]\n")
-    
+
     # Display stages plan
     workflow_manager._display_stages_plan(stages)
-    
+
     # Initialize and execute
     workflow_manager.wrapper_commands.GetDbtConfigs(
         dbt_project_dir=dbt_project_dir,
-        dbt_profiles_dir=dbt_profiles_dir
+        dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target
     )
-    
+
     workflow_manager._execute_stages(
         stages,
         pipeline_workflow.options,
@@ -464,6 +512,13 @@ def stage_run(
             help="The path to the dbt_profiles directory"
         ),
     ] = None,
+    target: Annotated[
+        Optional[str],
+        typer.Option(
+            "--target", "-t",
+            help="The dbt target to use (overrides DBT_TARGET and profiles.yml default)"
+        ),
+    ] = None,
     pre_install: Annotated[
         bool,
         typer.Option(
@@ -502,7 +557,8 @@ def stage_run(
     # Initialize and execute
     workflow_manager.wrapper_commands.GetDbtConfigs(
         dbt_project_dir=dbt_project_dir,
-        dbt_profiles_dir=dbt_profiles_dir
+        dbt_profiles_dir=dbt_profiles_dir,
+        dbt_target=target
     )
 
     workflow_manager._display_stages_plan(stage_types)
