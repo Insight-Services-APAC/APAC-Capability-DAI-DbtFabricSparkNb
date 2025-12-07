@@ -178,6 +178,13 @@ def deploy(
             help="dbt resource exclude syntax"
         ),
     ] = "",
+    retry_batch: Annotated[
+        Optional[str],
+        typer.Option(
+            "--retry-batch",
+            help="Retry failed notebooks from a specific batch_id (mutually exclusive with --select)"
+        ),
+    ] = None,
 ):
     """
     🚢 [bold green]Deploy workflow[/bold green] - Full deployment pipeline
@@ -186,6 +193,11 @@ def deploy(
 
     Complete pipeline with Fabric deployment and execution.
     """
+    # Validate mutual exclusivity
+    if retry_batch and select:
+        console.print("[error]--retry-batch and --select are mutually exclusive[/error]")
+        raise typer.Exit(1)
+
     skip_stages = skip.split(",") if skip else None
     only_stages = only.split(",") if only else None
 
@@ -197,7 +209,8 @@ def deploy(
         skip_stages=skip_stages,
         only_stages=only_stages,
         select=select,
-        exclude=exclude
+        exclude=exclude,
+        retry_batch_id=retry_batch or ""
     )
 
 @app.command()

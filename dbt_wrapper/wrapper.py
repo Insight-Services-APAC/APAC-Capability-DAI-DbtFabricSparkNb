@@ -257,18 +257,22 @@ class Commands:
         progress.print("Running Metadata Extract", LogLevel.INFO)
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=f"metadata_{self.project_name}_extract")
 
-    def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id, select="", exclude=""):
+    def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id, select="", exclude="", retry_batch_id=""):
         nb_name = f"master_{self.project_name}_notebook"
 
-        # Build parameters dict if selection provided
+        # Build parameters dict if selection or retry provided
         parameters = None
-        if select or exclude:
+        if select or exclude or retry_batch_id:
             parameters = {}
             if select:
                 parameters['select_models'] = select
             if exclude:
                 parameters['exclude_models'] = exclude
-            progress.print(f"Running master notebook with selection - select: '{select}', exclude: '{exclude}'", level=LogLevel.INFO)
+            if retry_batch_id:
+                parameters['retry_batch_id'] = retry_batch_id
+                progress.print(f"Running master notebook in RETRY mode - batch_id: '{retry_batch_id}'", level=LogLevel.INFO)
+            else:
+                progress.print(f"Running master notebook with selection - select: '{select}', exclude: '{exclude}'", level=LogLevel.INFO)
 
         # Run the master notebook (with or without parameters)
         self.fa.APIRunNotebook(
@@ -294,12 +298,12 @@ class Commands:
            
             sql = f"""
                 Select  SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)) type, status, count(a.notebook) notebooks
-                from {self.lakehouse}.dbo.execution_log a 
-                join 
+                from {self.lakehouse}.dbo.dbt_execution_log a
+                join
                 (
-                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
-                from {self.lakehouse}.dbo.execution_log  
-                group by batch_id 
+                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time
+                from {self.lakehouse}.dbo.dbt_execution_log
+                group by batch_id
                 order by start_time desc
                 ) b on a.batch_id = b.batch_id
                 group by SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)), status
@@ -308,12 +312,12 @@ class Commands:
 
             sql = f"""
                 Select a.notebook, replace(CONVERT(varchar(20), DATEADD(second, a.start_time, '1970/01/01 00:00:00'),126), 'T',' ') start_time, status, error
-                from {self.lakehouse}.dbo.execution_log a 
-                join 
+                from {self.lakehouse}.dbo.dbt_execution_log a
+                join
                 (
-                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
-                from {self.lakehouse}.dbo.execution_log  
-                group by batch_id 
+                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time
+                from {self.lakehouse}.dbo.dbt_execution_log
+                group by batch_id
                 order by start_time desc
                 ) b on a.batch_id = b.batch_id
                 where a.status = 'error'

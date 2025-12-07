@@ -90,6 +90,7 @@ Complete pipeline with Fabric deployment and execution.
 - `--only TEXT` - Comma-separated list of stages to run exclusively [default: None]
 - `--select TEXT` - dbt resource selection syntax [default: ""]
 - `--exclude TEXT` - dbt resource exclude syntax [default: ""]
+- `--retry-batch TEXT` - Retry failed notebooks from a specific batch_id (mutually exclusive with --select)
 - `--help` - Show this message and exit
 
 **Examples:**
@@ -99,6 +100,9 @@ dbt_wrapper deploy my_project
 
 # Deploy without execution
 dbt_wrapper deploy my_project --skip execute,results
+
+# Retry failed notebooks from a previous batch
+dbt_wrapper deploy my_project --retry-batch abc123-def456-789
 ```
 
 ### `dbt_wrapper build`

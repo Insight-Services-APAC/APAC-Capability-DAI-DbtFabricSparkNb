@@ -191,6 +191,7 @@ class WorkflowManager:
         select: str = "",
         exclude: str = "",
         pre_install: bool = False,
+        retry_batch_id: str = "",
         **override_options,
 
     ):
@@ -225,7 +226,7 @@ class WorkflowManager:
         )
 
         # Execute stages
-        self._execute_stages(stages_to_run, options, select, exclude, pre_install)
+        self._execute_stages(stages_to_run, options, select, exclude, pre_install, retry_batch_id)
     
     def _filter_stages(
         self,
@@ -275,7 +276,8 @@ class WorkflowManager:
         options: Dict[str, Any],
         select: str,
         exclude: str,
-        pre_install: bool 
+        pre_install: bool,
+        retry_batch_id: str = ""
     ):
         """Execute the workflow stages"""
         log_level = LogLevel.from_string(options.get("log_level", "WARNING"))
@@ -360,6 +362,7 @@ class WorkflowManager:
                     lambda **kwargs: self.wrapper_commands.RunMasterNotebook(
                         select=select,
                         exclude=exclude,
+                        retry_batch_id=retry_batch_id,
                         **kwargs
                     )
                 ],

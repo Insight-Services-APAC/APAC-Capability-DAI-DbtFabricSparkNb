@@ -87,6 +87,7 @@ clean → pre-scripts → metadata-extract → metadata-download → build → p
 - `--only STAGES` - Run only these stages
 - `--select SELECTOR` - dbt resource selection syntax
 - `--exclude SELECTOR` - dbt resource exclude syntax
+- `--retry-batch BATCH_ID` - Retry failed notebooks from a specific batch_id (mutually exclusive with --select)
 
 **Examples:**
 ```bash
@@ -98,6 +99,9 @@ dbt_wrapper deploy my_project --skip execute,results
 
 # Deploy with extended timeout
 dbt_wrapper deploy my_project --notebook-timeout 3600
+
+# Retry failed notebooks from a previous batch
+dbt_wrapper deploy my_project --retry-batch abc123-def456-789
 ```
 
 ### `dbt_wrapper build`

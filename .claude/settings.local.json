@@ -3,7 +3,8 @@
     "allow": [
       "Bash(time python:*)",
       "Bash(python:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }
