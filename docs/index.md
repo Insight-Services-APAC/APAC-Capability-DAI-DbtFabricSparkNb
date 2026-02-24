@@ -116,8 +116,18 @@ When creating a branch to work on from please use the branch name of `feature/Yo
 
 Logging was previously done to a log file saved in the lakehouse and in json format. This has been changed to now log to a delta table in the lakehouse.
 
-It works using 2 tables *"batch"* and *"execution_log"*. At the start of the ETL the Prepare step will check if the tables exist and if they don't they will be created. This is followed by a check for an *"open"* batch and where the batch is still open it will fail. 
+It works using 2 tables *"dbt_batch"* and *"dbt_execution_log"*. At the start of the ETL the Prepare step will check if the tables exist and if they don't they will be created. This is followed by a check for an *"open"* batch and where the batch is still open it will fail.
 
-If you need to close the batch manually, this code is available at the end of the master notebook. 
+If you need to close the batch manually, this code is available at the end of the master notebook.
 
 If this check passes, a batch will be opened. There are steps in each master numbered notebook to check for failures in previousn notebook runs and this is done using the open batch so previous ETL executions with failures are not picked up and return false stops on the current execution.
+
+#### Retrying Failed Batches
+
+If a batch fails, you can retry only the failed notebooks using the `--retry-batch` option:
+
+```bash
+dbt_wrapper deploy my_project --retry-batch <batch_id>
+```
+
+This will query the `dbt_execution_log` table for notebooks with `status='error'` in that batch and re-execute only those notebooks (including any downstream models that failed due to upstream failures). The batch_id can be found in the execution output or by querying the `dbt_batch` table.

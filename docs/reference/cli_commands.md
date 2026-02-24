@@ -47,6 +47,7 @@ Perfect for rapid development and testing cycles.
 
 **Options:**
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--skip TEXT` - Comma-separated list of stages to skip [default: None]
 - `--only TEXT` - Comma-separated list of stages to run exclusively [default: None]
 - `--select TEXT` - dbt resource selection syntax [default: ""]
@@ -84,10 +85,12 @@ Complete pipeline with Fabric deployment and execution.
 
 **Options:**
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--skip TEXT` - Comma-separated list of stages to skip [default: None]
 - `--only TEXT` - Comma-separated list of stages to run exclusively [default: None]
 - `--select TEXT` - dbt resource selection syntax [default: ""]
 - `--exclude TEXT` - dbt resource exclude syntax [default: ""]
+- `--retry-batch TEXT` - Retry failed notebooks from a specific batch_id (mutually exclusive with --select)
 - `--help` - Show this message and exit
 
 **Examples:**
@@ -97,6 +100,9 @@ dbt_wrapper deploy my_project
 
 # Deploy without execution
 dbt_wrapper deploy my_project --skip execute,results
+
+# Retry failed notebooks from a previous batch
+dbt_wrapper deploy my_project --retry-batch abc123-def456-789
 ```
 
 ### `dbt_wrapper build`
@@ -118,6 +124,7 @@ Just builds the dbt project with minimal overhead.
 
 **Options:**
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--select TEXT` - dbt resource selection syntax [default: ""]
 - `--exclude TEXT` - dbt resource exclude syntax [default: ""]
 - `--help` - Show this message and exit
@@ -150,6 +157,7 @@ Ensures quality without deployment.
 
 **Options:**
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--skip TEXT` - Comma-separated list of stages to skip [default: None]
 - `--select TEXT` - dbt resource selection syntax [default: ""]
 - `--exclude TEXT` - dbt resource exclude syntax [default: ""]
@@ -186,6 +194,7 @@ Examples:
 - `--config TEXT` - Path to configuration file [default: None]
 - `--project-dir TEXT` - The path to the dbt_project directory [default: .]
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--interactive` - Run in interactive mode [default: False]
 - `--help` - Show this message and exit
 
@@ -280,6 +289,7 @@ dbt_wrapper stage run [OPTIONS] STAGES...
 **Options:**
 - `--project-dir TEXT` - The path to the dbt_project directory [default: .]
 - `--profiles-dir TEXT` - The path to the dbt_profiles directory [default: None]
+- `--target, -t TEXT` - The dbt target to use (overrides DBT_TARGET env var and profiles.yml default)
 - `--help` - Show this message and exit
 
 **Examples:**
@@ -662,6 +672,7 @@ dbt_wrapper run --workflow my-custom-workflow
 |----------|-------------|---------|
 | `DBT_PROFILES_DIR` | Default profiles directory | `~/.dbt` |
 | `DBT_PROJECT_DIR` | Default project directory | `.` |
+| `DBT_TARGET` | Default dbt target (overridden by --target flag) | profiles.yml default |
 | `DBT_FABRIC_WORKSPACE_ID` | Default workspace ID | (none) |
 | `DBT_FABRIC_LAKEHOUSE_ID` | Default lakehouse ID | (none) |
 

@@ -30,7 +30,7 @@ class Commands:
         self.next_env = None
         self.next_env_name = None
     
-    def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None):
+    def GetDbtConfigs(self, dbt_project_dir, dbt_profiles_dir=None, source_env=None, target_env=None, dbt_target=None):
         path = Path(dbt_project_dir.replace("\\", "/"))
         path_elements = path.parts
         num_elements = len(path_elements)
@@ -48,17 +48,21 @@ class Commands:
         self.dbt_project_dir = dbt_project_dir
         if (dbt_profiles_dir is not None):
             os.environ["DBT_PROFILES_DIR"] = dbt_profiles_dir
-            
+
         if (os.environ.get('DBT_PROFILES_DIR') is not None):
             profile_path = Path(os.environ['DBT_PROFILES_DIR'])
             self.console.print(profile_path, style="debug")
         else:
             profile_path = Path(os.path.expanduser('~')) / '.dbt/'
-        
+
         self.profile = dbtconfig.profile.read_profile(profile_path)
         self.config = dbtconfig.project.load_raw_project(self.dbt_project_dir)
         self.profile_info = self.profile[self.config['profile']]
-        self.target_info = self.profile_info['outputs'][self.profile_info['target']]
+
+        # Determine target with priority: parameter > env var > yaml default
+        target_name = dbt_target or os.environ.get('DBT_TARGET') or self.profile_info['target']
+        self.console.print(f"Using dbt target: {target_name}", style="debug")
+        self.target_info = self.profile_info['outputs'][target_name]
         self.lakehouse = self.target_info['lakehouse']
         if "sql_endpoint" in self.target_info.keys():
             self.sql_endpoint = self.target_info['sql_endpoint']
@@ -102,14 +106,15 @@ class Commands:
         
       #  gf.GenerateAzCopyScripts(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], progress=progress, task_id=task_id)
     
-    def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None, notebook_timeout=None, log_lakehouse=None, notebook_hashcheck=None, lakehouse_config=None): 
-        try:
-            log_lakehouse = self.target_info['log_lakehouse']
-        except KeyError:
-            log_lakehouse = self.lakehouse
+    def GeneratePostDbtScripts(self, PreInstall=False, progress=None, task_id=None, notebook_timeout=None, log_lakehouse=None, notebook_hashcheck=None, lakehouse_config=None):
+        log_lakehouse = self.target_info.get('log_lakehouse', self.lakehouse)
+        cell_timeout = self.target_info.get('cell_timeout', 7200)
+        spark_config_conf = self.target_info.get('spark_config', {}).get('conf', {})
+        dag_timeout = self.target_info.get('dag_timeout', 10800)
 
-        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config,notebook_timeout=notebook_timeout)
-        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, notebook_timeout=notebook_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config)
+        gf.SetSqlVariableForAllNotebooks(self.dbt_project_dir, self.lakehouse, progress=progress, task_id=task_id, lakehouse_config=lakehouse_config)
+        gf.GenerateMasterNotebookUtils(self.dbt_project_dir, progress=progress, task_id=task_id)
+        gf.GenerateMasterNotebook(self.dbt_project_dir, self.target_info['workspaceid'], self.target_info['lakehouseid'], self.lakehouse, self.config['name'], progress=progress, task_id=task_id, dag_timeout=dag_timeout, max_worker=self.target_info['threads'], log_lakehouse=log_lakehouse, notebook_hashcheck=notebook_hashcheck, lakehouse_config=lakehouse_config, cell_timeout=cell_timeout, spark_config_conf=spark_config_conf)
     
     def ConvertNotebooksToFabricFormat(self, progress: ProgressConsoleWrapper, task_id=None, lakehouse_config=None):
         curr_dir = os.getcwd()
@@ -124,6 +129,28 @@ class Commands:
         
         if not os.path.exists(self.dbt_project_dir + "/target/notebooks"):
             os.makedirs(self.dbt_project_dir + "/target/notebooks")
+
+    def UploadArtifacts(self, progress: ProgressConsoleWrapper, task_id):
+        """Upload runtime artifacts (manifest.json) to lakehouse for notebook execution"""
+        import dbt_wrapper.utils as mn
+
+        # Validate manifest exists
+        manifest_path = f'./{self.dbt_project_dir}/target/manifest.json'
+        if not os.path.exists(manifest_path):
+            raise Exception(f"Manifest not found at {manifest_path}. Run 'build' stage first.")
+
+        progress.print("Uploading manifest.json to lakehouse", level=LogLevel.INFO)
+        # Upload manifest to lakehouse
+        mn.UploadFileToLakehouse(
+            progress=progress,
+            task_id=task_id,
+            workspace_name=self.target_info['workspacename'],
+            lakehouse_name=self.target_info['lakehouse'],
+            local_file_path=manifest_path,
+            remote_path='MetaExtracts/manifest.json'
+        )
+
+        progress.print("Manifest uploaded successfully", level=LogLevel.INFO)
 
     def AutoUploadNotebooksViaApi(self, progress: ProgressConsoleWrapper, task_id):
         curr_dir = os.getcwd()
@@ -230,9 +257,31 @@ class Commands:
         progress.print("Running Metadata Extract", LogLevel.INFO)
         self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=f"metadata_{self.project_name}_extract")
 
-    def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id):
+    def RunMasterNotebook(self, progress: ProgressConsoleWrapper, task_id, select="", exclude="", retry_batch_id=""):
         nb_name = f"master_{self.project_name}_notebook"
-        self.fa.APIRunNotebook(progress=progress, task_id=task_id, workspace_id=self.target_info['workspaceid'], notebook_name=nb_name)
+
+        # Build parameters dict if selection or retry provided
+        parameters = None
+        if select or exclude or retry_batch_id:
+            parameters = {}
+            if select:
+                parameters['select_models'] = select
+            if exclude:
+                parameters['exclude_models'] = exclude
+            if retry_batch_id:
+                parameters['retry_batch_id'] = retry_batch_id
+                progress.print(f"Running master notebook in RETRY mode - batch_id: '{retry_batch_id}'", level=LogLevel.INFO)
+            else:
+                progress.print(f"Running master notebook with selection - select: '{select}', exclude: '{exclude}'", level=LogLevel.INFO)
+
+        # Run the master notebook (with or without parameters)
+        self.fa.APIRunNotebook(
+            progress=progress,
+            task_id=task_id,
+            workspace_id=self.target_info['workspaceid'],
+            notebook_name=nb_name,
+            parameters=parameters
+        )
 
     def GetExecutionResults(self, progress: ProgressConsoleWrapper, task_id):
         import dbt_wrapper.fabric_sql as fas
@@ -249,12 +298,12 @@ class Commands:
            
             sql = f"""
                 Select  SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)) type, status, count(a.notebook) notebooks
-                from {self.lakehouse}.dbo.execution_log a 
-                join 
+                from {self.lakehouse}.dbo.dbt_execution_log a
+                join
                 (
-                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
-                from {self.lakehouse}.dbo.execution_log  
-                group by batch_id 
+                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time
+                from {self.lakehouse}.dbo.dbt_execution_log
+                group by batch_id
                 order by start_time desc
                 ) b on a.batch_id = b.batch_id
                 group by SUBSTRING(a.notebook, 0, CHARINDEX('.', a.notebook)), status
@@ -263,12 +312,12 @@ class Commands:
 
             sql = f"""
                 Select a.notebook, replace(CONVERT(varchar(20), DATEADD(second, a.start_time, '1970/01/01 00:00:00'),126), 'T',' ') start_time, status, error
-                from {self.lakehouse}.dbo.execution_log a 
-                join 
+                from {self.lakehouse}.dbo.dbt_execution_log a
+                join
                 (
-                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time  
-                from {self.lakehouse}.dbo.execution_log  
-                group by batch_id 
+                Select top 1 batch_id, max(DATEADD(second, start_time, '1970/01/01 00:00:00')) start_time
+                from {self.lakehouse}.dbo.dbt_execution_log
+                group by batch_id
                 order by start_time desc
                 ) b on a.batch_id = b.batch_id
                 where a.status = 'error'

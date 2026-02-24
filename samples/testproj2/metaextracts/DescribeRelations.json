@@ -4,196 +4,196 @@
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "start_time",
         "data_type": "double",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "status",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "error",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "execution_time",
         "data_type": "double",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "run_order",
         "data_type": "int",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "batch_id",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "master_notebook",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "",
         "data_type": "",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "# detailed table information",
         "data_type": "",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "name",
-        "data_type": "spark_catalog.lh_raw.execution_log",
+        "data_type": "spark_catalog.lh_raw.dbt_execution_log",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "type",
         "data_type": "MANAGED",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "location",
-        "data_type": "abfss:\/\/49cebc79-96d3-47cc-b610-7c58fcee5004@onelake.dfs.fabric.microsoft.com\/a55e2f97-0df9-4e51-96b2-9876128713bd\/Tables\/execution_log",
+        "data_type": "abfss:\/\/49cebc79-96d3-47cc-b610-7c58fcee5004@onelake.dfs.fabric.microsoft.com\/a55e2f97-0df9-4e51-96b2-9876128713bd\/Tables\/dbt_execution_log",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "provider",
         "data_type": "delta",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "owner",
         "data_type": "trusted-service-user",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "table properties",
         "data_type": "[delta.minReaderVersion=1,delta.minWriterVersion=2]",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "execution_log"
+        "tableName": "dbt_execution_log"
     },
     {
         "col_name": "batch_id",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "start_time",
         "data_type": "bigint",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "status",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "master_notebook",
         "data_type": "string",
         "comment": null,
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "",
         "data_type": "",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "# detailed table information",
         "data_type": "",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "name",
-        "data_type": "spark_catalog.lh_raw.batch",
+        "data_type": "spark_catalog.lh_raw.dbt_batch",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "type",
         "data_type": "MANAGED",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "location",
-        "data_type": "abfss:\/\/49cebc79-96d3-47cc-b610-7c58fcee5004@onelake.dfs.fabric.microsoft.com\/a55e2f97-0df9-4e51-96b2-9876128713bd\/Tables\/batch",
+        "data_type": "abfss:\/\/49cebc79-96d3-47cc-b610-7c58fcee5004@onelake.dfs.fabric.microsoft.com\/a55e2f97-0df9-4e51-96b2-9876128713bd\/Tables\/dbt_batch",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "provider",
         "data_type": "delta",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "owner",
         "data_type": "trusted-service-user",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "table properties",
         "data_type": "[delta.minReaderVersion=1,delta.minWriterVersion=2]",
         "comment": "",
         "namespace": "lh_raw",
-        "tableName": "batch"
+        "tableName": "dbt_batch"
     },
     {
         "col_name": "id",

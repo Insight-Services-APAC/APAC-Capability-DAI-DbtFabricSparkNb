@@ -22,6 +22,7 @@ class SparkCredentials(Credentials):
     connect_timeout: int = 10
     livy_session_parameters: Dict[str, Any] = field(default_factory=dict)
     retry_all: bool = False
+    cell_timeout: int = 90
 
     @classmethod
     def __pre_deserialize__(cls, data: Any) -> Any:

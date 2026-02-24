@@ -178,7 +178,7 @@ class FabricAPI:
         progress.print("Starting notebooks validation and upload via API ...", level=LogLevel.INFO)
         target_dir = str(Path(dbt_project_dir) / Path("target"))
         notebooks_fabric_py_dir = os.getcwd() / Path(target_dir) / Path("notebooks_fabric_py")        
-        fc = FabricClientCore(silent=True)
+        fc = FabricClientCore()
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         servernotebooks = fc.list_notebooks(workspace_id)
@@ -219,7 +219,7 @@ class FabricAPI:
         progress.progress.update(task_id=task_id, description="Completed uploading notebooks via API")
 
     def GetNotebookIdByName(self, workspace_id, notebook_name):
-        fc = FabricClientCore(silent=True)
+        fc = FabricClientCore()
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         ws_items = fc.list_items(workspace_id)
@@ -229,24 +229,49 @@ class FabricAPI:
         return None
     
     def GetWorkspaceName(self, workspace_id):
-        fc = FabricClientCore(silent=True)
+        fc = FabricClientCore()
         workspace = fc.get_workspace_by_id(id=workspace_id)
         return workspace.display_name
   
-    def APIRunNotebook(self, progress: ProgressConsoleWrapper, task_id, workspace_id, notebook_name):
-        fc = FabricClientCore(silent=True)
+    def APIRunNotebook(self, progress: ProgressConsoleWrapper, task_id, workspace_id, notebook_name, parameters=None):
+        fc = FabricClientCore()
         workspace = fc.get_workspace_by_id(id=workspace_id)
         workspace_id = workspace.id
         ws_items = fc.list_items(workspace_id)
         item_found = False
-        for item in ws_items:         
+        for item in ws_items:
             if item.type == 'Notebook' and item.display_name == notebook_name:
                 item_found = True
                 nbfailed = False
-                try: 
+                try:
                     progress.progress.update(task_id=task_id, description=f"Running {item.display_name}")
-                    start = time.time()                
-                    ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
+                    start = time.time()
+
+                    # Build execution_data with parameters if provided
+                    execution_data = None
+                    if parameters:
+                        execution_data = {
+                            "parameters": {
+                                param_name: {
+                                    "value": param_value,
+                                    "type": "string"
+                                }
+                                for param_name, param_value in parameters.items()
+                            }
+                        }
+                        progress.print(f"Running {item.display_name} with parameters: {parameters}", level=LogLevel.INFO)
+
+                    # Run notebook with or without parameters
+                    if execution_data:
+                        ji = fc.run_on_demand_item_job(
+                            workspace_id=workspace_id,
+                            item_id=item.id,
+                            job_type="RunNotebook",
+                            execution_data=execution_data
+                        )
+                    else:
+                        ji = fc.run_on_demand_item_job(workspace_id=workspace_id, item_id=item.id, job_type="RunNotebook")
+
                     progress.progress.update(task_id=task_id, description=f"Running {item.display_name}")
                     time.sleep(10)
                     while ji.status == "InProgress" or ji.status == "NotStarted" or ji.status == "Failed":

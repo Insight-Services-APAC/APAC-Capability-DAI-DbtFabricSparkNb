@@ -37,7 +37,8 @@ class StageType(str, Enum):
     METADATA_DOWNLOAD = "metadata-download"
     BUILD = "build"
     POST_SCRIPTS = "post-scripts"
-    UPLOAD = "upload"
+    UPLOAD_ARTIFACTS = "upload-artifacts"
+    UPLOAD_NOTEBOOKS = "upload-notebooks"
     EXECUTE = "execute"
     VALIDATE = "validate"
     RESULTS = "results"
@@ -92,7 +93,8 @@ class WorkflowManager:
                     StageType.METADATA_DOWNLOAD,
                     StageType.BUILD,
                     StageType.POST_SCRIPTS,
-                    StageType.UPLOAD,
+                    StageType.UPLOAD_ARTIFACTS,
+                    StageType.UPLOAD_NOTEBOOKS,
                     StageType.EXECUTE,
                     StageType.RESULTS,
                 ],
@@ -183,45 +185,48 @@ class WorkflowManager:
         workflow_type: WorkflowType,
         dbt_project_dir: str,
         dbt_profiles_dir: Optional[str] = None,
+        dbt_target: Optional[str] = None,
         skip_stages: Optional[List[str]] = None,
         only_stages: Optional[List[str]] = None,
         select: str = "",
         exclude: str = "",
         pre_install: bool = False,
+        retry_batch_id: str = "",
         **override_options,
-        
+
     ):
         """Execute a predefined workflow"""
         workflow = self.predefined_workflows.get(workflow_type)
         if not workflow:
             self.console.print(f"[error]Unknown workflow type: {workflow_type}[/error]")
             return
-        
+
         # Display workflow info
         self.console.print(f"\n[bold cyan]Running {workflow.name} Workflow[/bold cyan]")
         self.console.print(f"[dim]{workflow.description}[/dim]\n")
-        
+
         # Merge options with overrides
         options = {**workflow.options, **override_options}
-        
+
         # Filter stages based on skip/only parameters
         stages_to_run = self._filter_stages(
             workflow.stages,
             skip_stages,
             only_stages
         )
-        
+
         # Display stages to run
         self._display_stages_plan(stages_to_run)
-        
+
         # Initialize configurations
         self.wrapper_commands.GetDbtConfigs(
             dbt_project_dir=dbt_project_dir,
-            dbt_profiles_dir=dbt_profiles_dir
+            dbt_profiles_dir=dbt_profiles_dir,
+            dbt_target=dbt_target
         )
-        
+
         # Execute stages
-        self._execute_stages(stages_to_run, options, select, exclude, pre_install)
+        self._execute_stages(stages_to_run, options, select, exclude, pre_install, retry_batch_id)
     
     def _filter_stages(
         self,
@@ -249,7 +254,8 @@ class WorkflowManager:
             StageType.METADATA_DOWNLOAD: "Download metadata locally",
             StageType.BUILD: "Build dbt project",
             StageType.POST_SCRIPTS: "Generate post-dbt scripts",
-            StageType.UPLOAD: "Upload notebooks to Fabric",
+            StageType.UPLOAD_ARTIFACTS: "Upload artifacts to lakehouse",
+            StageType.UPLOAD_NOTEBOOKS: "Upload notebooks to workspace",
             StageType.EXECUTE: "Execute master notebook",
             StageType.VALIDATE: "Run validation checks",
             StageType.RESULTS: "Retrieve execution results",
@@ -270,7 +276,8 @@ class WorkflowManager:
         options: Dict[str, Any],
         select: str,
         exclude: str,
-        pre_install: bool 
+        pre_install: bool,
+        retry_batch_id: str = ""
     ):
         """Execute the workflow stages"""
         log_level = LogLevel.from_string(options.get("log_level", "WARNING"))
@@ -339,14 +346,26 @@ class WorkflowManager:
                 ],
                 stage_name="Generate Post-DBT Scripts"
             ),
-            StageType.UPLOAD: lambda: se.perform_stage(
+            StageType.UPLOAD_ARTIFACTS: lambda: se.perform_stage(
+                option=True,
+                action_callables=[self.wrapper_commands.UploadArtifacts],
+                stage_name="Upload Artifacts to Lakehouse"
+            ),
+            StageType.UPLOAD_NOTEBOOKS: lambda: se.perform_stage(
                 option=options.get("upload_notebooks", False),
                 action_callables=[self.wrapper_commands.AutoUploadNotebooksViaApi],
-                stage_name="Upload Notebooks via API"
+                stage_name="Upload Notebooks to Workspace"
             ),
             StageType.EXECUTE: lambda: se.perform_stage(
                 option=options.get("auto_run_master", False),
-                action_callables=[self.wrapper_commands.RunMasterNotebook],
+                action_callables=[
+                    lambda **kwargs: self.wrapper_commands.RunMasterNotebook(
+                        select=select,
+                        exclude=exclude,
+                        retry_batch_id=retry_batch_id,
+                        **kwargs
+                    )
+                ],
                 stage_name="Run Master Notebook"
             ),
             StageType.RESULTS: lambda: se.perform_stage(
@@ -375,7 +394,8 @@ class WorkflowManager:
             (StageType.METADATA_DOWNLOAD, "Download metadata locally", "deploy, build, test"),
             (StageType.BUILD, "Build dbt project", "all workflows"),
             (StageType.POST_SCRIPTS, "Generate post-dbt scripts", "dev, deploy, test"),
-            (StageType.UPLOAD, "Upload notebooks to Fabric", "deploy"),
+            (StageType.UPLOAD_ARTIFACTS, "Upload artifacts to lakehouse", "deploy"),
+            (StageType.UPLOAD_NOTEBOOKS, "Upload notebooks to workspace", "deploy"),
             (StageType.EXECUTE, "Execute master notebook", "deploy"),
             (StageType.VALIDATE, "Run validation checks", "test, ci"),
             (StageType.RESULTS, "Retrieve execution results", "deploy"),
@@ -425,7 +445,13 @@ class WorkflowManager:
                 "purpose": "Prepares notebooks for Fabric execution",
                 "when_to_skip": "When only doing local development",
             },
-            "upload": {
+            "upload-artifacts": {
+                "name": "Upload Artifacts",
+                "description": "Uploads manifest.json and runtime artifacts to lakehouse",
+                "purpose": "Makes build artifacts available for notebook execution",
+                "when_to_skip": "When not using runtime model selection",
+            },
+            "upload-notebooks": {
                 "name": "Upload Notebooks",
                 "description": "Uploads generated notebooks to Fabric workspace",
                 "purpose": "Deploys transformation logic to Fabric",
@@ -525,7 +551,7 @@ class InteractiveMode:
                         "log_level": "INFO",
                         "hashcheck_level": "BYPASS",
                         "notebook_timeout": 1800,
-                        "upload_notebooks": StageType.UPLOAD in stages,
+                        "upload_notebooks": StageType.UPLOAD_NOTEBOOKS in stages,
                         "auto_run_master": StageType.EXECUTE in stages,
                     }
                 )
@@ -548,7 +574,8 @@ class InteractiveMode:
             (StageType.METADATA_DOWNLOAD, "Download metadata"),
             (StageType.BUILD, "Build dbt project"),
             (StageType.POST_SCRIPTS, "Generate post-dbt scripts"),
-            (StageType.UPLOAD, "Upload notebooks"),
+            (StageType.UPLOAD_ARTIFACTS, "Upload artifacts to lakehouse"),
+            (StageType.UPLOAD_NOTEBOOKS, "Upload notebooks to workspace"),
             (StageType.EXECUTE, "Execute master notebook"),
             (StageType.VALIDATE, "Run validation"),
             (StageType.RESULTS, "Get execution results"),
