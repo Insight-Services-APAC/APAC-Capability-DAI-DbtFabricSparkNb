@@ -902,6 +902,12 @@ def run_all(
             help="The option to run the dbt adapter using source code and not the installed package."
         ),
     ] = False,
+    upload_artifacts: Annotated[
+        bool,
+        typer.Option(
+            help="The option to upload the manifest file directly via the powerbi api."
+        ),
+    ] = True,
     upload_notebooks_via_api: Annotated[
         bool,
         typer.Option(
@@ -988,7 +994,9 @@ def run_all(
     se.perform_stage(option=generate_post_dbt_scripts, action_callables=action_callables, stage_name="Generate Post-DBT Scripts")    
 
     se.perform_stage(option=upload_notebooks_via_api, action_callables=[wrapper_commands.AutoUploadNotebooksViaApi], stage_name="Upload Notebooks via API")
-
+    
+    se.perform_stage(option=upload_artifacts, action_callables=[wrapper_commands.UploadArtifacts], stage_name="Upload Artifacts")
+    
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.RunMasterNotebook], stage_name="Run Master Notebook")
     se.perform_stage(option=auto_run_master_notebook, action_callables=[wrapper_commands.GetExecutionResults], stage_name="Get Execution Results")
 
