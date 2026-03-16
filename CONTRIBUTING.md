@@ -27,17 +27,17 @@ You will need `git` in order to download and modify the `dbt-fabricsparknb` sour
 
 ### External contributors
 
-If you are not a member of the `Microsoft` GitHub organization, you can contribute to `dbt-fabricsparknb` by forking the `dbt-fabricsparknb` repository. For a detailed overview on forking, check out the [GitHub docs on forking](https://help.github.com/en/articles/fork-a-repo). In short, you will need to:
+If you are not a member of the `Insight-Services-APAC` GitHub organization, you can contribute to `dbt-fabricsparknb` by forking the `dbt-fabricsparknb` repository. For a detailed overview on forking, check out the [GitHub docs on forking](https://help.github.com/en/articles/fork-a-repo). In short, you will need to:
 
 1. fork the `dbt-fabricsparknb` repository
 2. clone your fork locally
 3. check out a new branch for your proposed changes
 4. push changes to your fork
-5. open a pull request against `microsoft/dbt-fabricsparknb` from your forked repository
+5. open a pull request against `Insight-Services-APAC/APAC-Capability-DAI-DbtFabricSparkNb` from your forked repository
 
-### Microsoft Org contributors
+### Insight-Services-APAC Org contributors
 
-If you are a member of the `Microsoft` GitHub organization, you will have push access to the `dbt-fabricsparknb` repo. Rather than forking `dbt-fabricsparknb` to make your changes, just clone the repository, check out a new branch, and push directly to that branch.
+If you are a member of the `Insight-Services-APAC` GitHub organization, you will have push access to the `dbt-fabricsparknb` repo. Rather than forking `dbt-fabricsparknb` to make your changes, just clone the repository, check out a new branch, and push directly to that branch.
 
 
 ## Running `dbt-fabricsparknb` in development
